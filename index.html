@@ -47,38 +47,22 @@
   /* RAYON SELECT */
   .rayon-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
   .rayon-row label{font-size:.8rem;font-weight:700;color:var(--navy);flex-shrink:0}
-  .rayon-select{flex:1;min-width:200px;border:2px solid var(--navy);border-radius:8px;padding:9px 12px;font-family:var(--font);font-size:.82rem;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a3a5c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+  .rayon-select{flex:1;min-width:220px;border:2px solid var(--navy);border-radius:8px;padding:9px 32px 9px 12px;font-family:var(--font);font-size:.85rem;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a3a5c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
   .rayon-select:focus{border-color:var(--navy2)}
   .rayon-select option{font-weight:400;color:var(--text)}
   .rayon-select optgroup{font-weight:700;color:var(--muted)}
 
-  /* PROVIDER */
-  .provider-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-  .provider-btn{flex:1;min-width:130px;padding:9px 12px;border:2px solid var(--border);border-radius:8px;background:#fff;font-family:var(--font);font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
-  .provider-btn:hover{border-color:var(--navy);color:var(--navy)}
-  .provider-btn.active{border-color:var(--navy);background:var(--navy);color:#fff}
-  .provider-badge{font-size:.58rem;font-weight:700;padding:2px 5px;border-radius:10px;background:rgba(255,255,255,.25);letter-spacing:.04em}
-  .provider-btn:not(.active) .provider-badge{background:var(--bg-green);color:var(--green)}
-  .provider-btn:not(.active) .provider-badge.paid{background:var(--bg-amber);color:var(--amber)}
-
-  /* API ROW */
-  .api-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
-  .api-row label{font-size:.75rem;font-weight:600;color:var(--navy);flex-shrink:0;padding-top:9px}
-  .api-row input{flex:1;min-width:180px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:.78rem;font-family:var(--mono);color:var(--text);background:var(--bg-gray);outline:none;transition:border-color .2s}
-  .api-row input:focus{border-color:var(--navy2);background:#fff}
-  .api-hint{font-size:.68rem;color:var(--muted);width:100%;line-height:1.4;padding:4px 0}
-
   /* BOUTON GÉNÉRER */
-  .btn-generate{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-generate{width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
   .btn-generate:hover{background:var(--navy2)}
   .btn-generate:active{transform:scale(.98)}
   .btn-generate:disabled{background:#aaa;cursor:not-allowed}
 
   /* LOADER */
-  .loader-wrap{display:none;flex-direction:column;align-items:center;padding:32px;gap:14px}
+  .loader-wrap{display:none;flex-direction:column;align-items:center;padding:36px;gap:14px}
   .loader-wrap.visible{display:flex}
-  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
-  .loader-msg{font-size:.82rem;color:var(--muted);text-align:center}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
+  .loader-msg{font-size:.85rem;color:var(--muted);text-align:center;max-width:260px;line-height:1.5}
 
   /* OUTPUT */
   #brief-output{display:none}
@@ -95,13 +79,13 @@
   .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
   @media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
   .kpi{background:var(--bg-gray);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center}
-  .kpi-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .kpi-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
   .kpi-value{font-size:clamp(1.2rem,4vw,1.6rem);font-weight:700;line-height:1.1;font-family:var(--mono)}
   .kpi-value.red{color:var(--red)} .kpi-value.green{color:var(--green)} .kpi-value.navy{color:var(--navy)}
-  .kpi-sub{font-size:.65rem;color:var(--muted);margin-top:4px;line-height:1.3}
+  .kpi-sub{font-size:.63rem;color:var(--muted);margin-top:4px;line-height:1.3}
 
   /* BARS */
-  .bar{border-radius:6px;padding:10px 12px 10px 16px;font-size:.82rem;line-height:1.5;margin-bottom:8px;border-left:3px solid transparent}
+  .bar{border-radius:6px;padding:10px 12px 10px 16px;font-size:.82rem;line-height:1.55;margin-bottom:8px;border-left:3px solid transparent}
   .bar:last-child{margin-bottom:0}
   .bar.red{background:var(--bg-red);border-color:var(--red)}
   .bar.green{background:var(--bg-green);border-color:var(--green)}
@@ -181,20 +165,19 @@
 
   <header class="header">
     <div class="header-left">
-      <h1>Brief collaborateur<br><span id="header-rayon">Rayon — Narbonne</span></h1>
+      <h1>Brief collaborateur<br><span id="header-rayon">Narbonne</span></h1>
       <p>HF7152 · Source Darwin</p>
     </div>
     <div class="header-right">
-      <div class="store">Générer le brief</div>
+      <div class="store">Carrefour Narbonne</div>
       <div class="date" id="today-date"></div>
     </div>
   </header>
 
   <div class="upload-section">
     <h2>📂 Charger les fichiers Darwin du jour</h2>
-    <p>Télécharge les 3 rapports PDF depuis Darwin, choisis ton rayon, puis clique sur <strong>Générer le brief</strong>.</p>
+    <p>Charge les 3 rapports PDF, choisis ton rayon, puis clique sur <strong>Générer le brief</strong>.</p>
 
-    <!-- PDFs -->
     <div class="upload-grid">
       <div class="upload-box" id="box-perf">
         <input type="file" accept=".pdf" onchange="onFile(this,'perf')">
@@ -219,26 +202,26 @@
     <!-- SÉLECTION RAYON -->
     <div class="rayon-row">
       <label>🏬 Rayon :</label>
-      <select class="rayon-select" id="rayon-select">
+      <select class="rayon-select" id="rayon-select" onchange="updateRayonHeader()">
         <option value="">— Choisir un rayon —</option>
-        <optgroup label="BAZAR">
+        <optgroup label="── BAZAR ──">
           <option value="30 BRICOLAGE">30 · Bricolage</option>
-          <option value="31 CONFORT DE LA MAISON" selected>31 · Confort de la Maison</option>
+          <option value="31 CONFORT DE LA MAISON">31 · Confort de la Maison</option>
           <option value="32 PAPETERIE">32 · Papeterie</option>
           <option value="33 JOUET SPORT">33 · Jouet Sport</option>
-          <option value="34 JARDIN ET ANIMALERIE">34 · Jardin & Animalerie</option>
+          <option value="34 JARDIN ET ANIMALERIE">34 · Jardin &amp; Animalerie</option>
           <option value="35 AUTO">35 · Auto</option>
           <option value="8X CULTURE">8X · Culture</option>
         </optgroup>
-        <optgroup label="ÉPCS">
+        <optgroup label="── ÉPCS ──">
           <option value="40 GEM">40 · GEM</option>
           <option value="41 PEM">41 · PEM</option>
           <option value="42 PHOTO COMMUNICATION">42 · Photo Communication</option>
-          <option value="43 IMAGE ET SON">43 · Image & Son</option>
+          <option value="43 IMAGE ET SON">43 · Image &amp; Son</option>
           <option value="44 MICRO INFORMATIQUE">44 · Micro Informatique</option>
           <option value="45 RADIOTELEPHONIE">45 · Radiotéléphonie</option>
         </optgroup>
-        <optgroup label="TEXTILE">
+        <optgroup label="── TEXTILE ──">
           <option value="60 CHAUSSURE">60 · Chaussure</option>
           <option value="61 BEBE">61 · Bébé</option>
           <option value="62 ENFANT">62 · Enfant</option>
@@ -248,7 +231,7 @@
           <option value="66 ACCESSOIRES">66 · Accessoires</option>
           <option value="67 BIJOUTERIE">67 · Bijouterie</option>
         </optgroup>
-        <optgroup label="ALIMENTAIRE — PGC">
+        <optgroup label="── ALIMENTAIRE PGC ──">
           <option value="10 BOISSONS">10 · Boissons</option>
           <option value="11 DROGUERIE">11 · Droguerie</option>
           <option value="12 PARFUMERIE HYGIENE">12 · Parfumerie Hygiène</option>
@@ -256,39 +239,14 @@
           <option value="19 PARAPHARMACIE">19 · Parapharmacie</option>
           <option value="25 PLS">25 · P.L.S.</option>
         </optgroup>
-        <optgroup label="ALIMENTAIRE — PFT">
+        <optgroup label="── ALIMENTAIRE PFT ──">
           <option value="20 CHARCUT.TRAITEUR">20 · Charcuterie Traiteur</option>
           <option value="21 POISSONNERIE">21 · Poissonnerie</option>
-          <option value="22 FRUITS ET LEGUMES">22 · Fruits & Légumes</option>
+          <option value="22 FRUITS ET LEGUMES">22 · Fruits &amp; Légumes</option>
           <option value="23 BOULANGERIE/PATISSERIE">23 · Boulangerie / Pâtisserie</option>
           <option value="24 BOUCHERIE VOLAILLE">24 · Boucherie Volaille</option>
         </optgroup>
       </select>
-    </div>
-
-    <!-- FOURNISSEUR IA -->
-    <div class="provider-row">
-      <button class="provider-btn active" id="btn-gemini" onclick="selectProvider('gemini')">
-        🆓 Google Gemini <span class="provider-badge">Gratuit</span>
-      </button>
-      <button class="provider-btn" id="btn-claude" onclick="selectProvider('claude')">
-        ⚡ Claude Anthropic <span class="provider-badge paid">Payant</span>
-      </button>
-    </div>
-
-    <div id="field-gemini">
-      <div class="api-row">
-        <label>Clé Google :</label>
-        <input type="password" id="api-key-gemini" placeholder="AIzaSy…" autocomplete="off">
-        <span class="api-hint">Gratuit · <strong>aistudio.google.com</strong> → connexion Google → "Get API key" → "Create API key". 1 500 req/jour, sans CB.</span>
-      </div>
-    </div>
-    <div id="field-claude" style="display:none">
-      <div class="api-row">
-        <label>Clé Anthropic :</label>
-        <input type="password" id="api-key-claude" placeholder="sk-ant-api03-…" autocomplete="off">
-        <span class="api-hint"><strong>console.anthropic.com</strong> → "API Keys" → "Create Key". ~0,05 € par brief.</span>
-      </div>
     </div>
 
     <button class="btn-generate" id="btn-gen" onclick="generateBrief()">
@@ -315,7 +273,6 @@
 <script>
 // ── État ──────────────────────────────────────────────────────────
 const files = { perf:null, rayon:null, comp:null };
-let provider = 'gemini';
 
 // Date du jour
 const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -324,20 +281,11 @@ const now   = new Date();
 document.getElementById('today-date').textContent =
   JOURS[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS[now.getMonth()] + ' ' + now.getFullYear();
 
-// Mise à jour header rayon au changement
-document.getElementById('rayon-select').addEventListener('change', function() {
-  const v = this.value;
-  const label = v ? this.options[this.selectedIndex].text : 'Rayon — Narbonne';
-  document.getElementById('header-rayon').textContent = label + ' · Narbonne';
-});
-
-// ── Sélection fournisseur ─────────────────────────────────────────
-function selectProvider(p) {
-  provider = p;
-  document.getElementById('btn-gemini').classList.toggle('active', p === 'gemini');
-  document.getElementById('btn-claude').classList.toggle('active', p === 'claude');
-  document.getElementById('field-gemini').style.display = p === 'gemini' ? 'block' : 'none';
-  document.getElementById('field-claude').style.display = p === 'claude' ? 'block' : 'none';
+// ── Mise à jour header rayon ──────────────────────────────────────
+function updateRayonHeader() {
+  const sel = document.getElementById('rayon-select');
+  const txt = sel.value ? sel.options[sel.selectedIndex].text : 'Narbonne';
+  document.getElementById('header-rayon').textContent = txt + ' · Narbonne';
 }
 
 // ── Chargement fichier ────────────────────────────────────────────
@@ -359,7 +307,7 @@ function toBase64(file) {
   });
 }
 
-// ── Prompt dynamique selon le rayon ──────────────────────────────
+// ── Prompt ────────────────────────────────────────────────────────
 function buildPrompt(rayonCode) {
   return `Tu es assistant chef de rayon dans un hypermarché Carrefour (HF7152 Narbonne).
 Tu reçois 3 rapports PDF Darwin :
@@ -369,38 +317,36 @@ Tu reçois 3 rapports PDF Darwin :
 
 RAYON CIBLE : "${rayonCode}"
 
-RÈGLES DE LECTURE DES DONNÉES — RESPECTER ABSOLUMENT :
-- Lire chaque chiffre exactement tel qu'il apparaît dans le PDF, sans arrondi ni approximation.
-- Pour le TAUX DE MARGE : prendre UNIQUEMENT la colonne "Taux" (Marge Brute Gestion Commerciale) sur la ligne exacte du rayon "${rayonCode}". Ne pas confondre avec le taux différentiel N-1, ni avec la marge d'un autre rayon. Lire ce chiffre avec toutes ses décimales.
-- Pour le CA : prendre la valeur K€ exacte de la ligne "${rayonCode}".
-- Pour l'évolution % : prendre le % exact affiché, avec son signe + ou -.
-- Pour l'écart budget : prendre la valeur K€ exacte (positive ou négative).
-- Pour le classement : prendre le "Rang CA" exact de la ligne "${rayonCode}" dans le classement régional.
-- Ne jamais mentionner le VAB top 3000 (non pertinent).
-- Si une donnée est absente ou illisible, mettre "N/D" comme valeur.
+RÈGLES DE LECTURE — OBLIGATOIRES :
+- Lire chaque chiffre EXACTEMENT tel qu'il apparaît dans le PDF, sans arrondi.
+- TAUX DE MARGE : prendre UNIQUEMENT la colonne "Taux" (Marge Brute Gestion Commerciale) sur la ligne EXACTE du rayon "${rayonCode}". Ne pas confondre avec le différentiel N-1, ni avec un autre rayon. Lire toutes les décimales.
+- CA : valeur K€ exacte de la ligne "${rayonCode}".
+- Évolution % : signe + ou - exact affiché.
+- Écart budget : valeur K€ exacte (positive ou négative).
+- Classement : "Rang CA" exact de la ligne "${rayonCode}" dans le classement régional.
+- Ne jamais mentionner le VAB top 3000.
+- Si une donnée est absente : mettre "N/D".
 
-Extrais uniquement les données du rayon "${rayonCode}" et génère le brief collaborateur.
-
-Réponds UNIQUEMENT avec un objet JSON valide (sans balises markdown, sans texte avant ou après) :
+Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
 
 {
   "date": "Lundi 04 mai 2026",
   "rayon_nom": "Confort de la Maison",
   "kpis": [
-    {"label": "CA rayon", "value": "X,X K€", "color": "red|green|navy", "sub": "Cumul mois ou journée"},
+    {"label": "CA rayon", "value": "X,X K€", "color": "red|green|navy", "sub": "Période"},
     {"label": "Évol. vs N-1", "value": "−X,X %", "color": "red|green|navy", "sub": "vs magasin : −X,X %"},
     {"label": "Écart budget", "value": "−X,X K€", "color": "red|green|navy", "sub": "Sous/Au-dessus cible"},
     {"label": "Taux de marge", "value": "XX,XX %", "color": "red|green|navy", "sub": "Diff N-1 : +/−X,XX pts"}
   ],
   "bars_perf": [
-    {"type": "red|green|blue|amber", "html": "Analyse CA avec <strong>chiffres exacts</strong>."},
-    {"type": "red|green|blue|amber", "html": "Analyse marge avec <strong>taux exact</strong> lu dans la colonne Taux."},
-    {"type": "blue", "html": "Contexte magasin : panier moyen, débits, dispo linéaire (sans VAB top 3000)."}
+    {"type": "red|green|blue|amber", "html": "Analyse CA avec <strong>chiffres exacts du PDF</strong>."},
+    {"type": "red|green|blue|amber", "html": "Analyse marge avec <strong>taux exact colonne Taux</strong>."},
+    {"type": "blue", "html": "Contexte magasin : panier moyen, débits, dispo linéaire."}
   ],
   "rang": "X",
   "rang_sur": "31",
   "rang_label": "Classement régional DTF Sud Est",
-  "rang_detail": "Xème sur 31 magasins — CA ${rayonCode}",
+  "rang_detail": "Xème sur 31 magasins — ${rayonCode}",
   "rang_color": "green|red|navy",
   "bar_rang": {"type": "green|blue|amber|red", "html": "Commentaire classement."},
   "comp_rows": [
@@ -408,27 +354,18 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans balises markdown, sans texte
     {"magasin": "Narbonne", "ca": "X,X", "evol_ca": "−X,X %", "debits": "XXX", "evol_debits": "−X,X %", "highlight": true}
   ],
   "bar_comp": {"type": "blue", "html": "Analyse comparative."},
-  "tenue_checks": ["Consigne 1","Consigne 2","Consigne 3","Consigne 4","Consigne 5"],
+  "tenue_checks": ["Consigne tenue 1","Consigne 2","Consigne 3","Consigne 4","Consigne 5"],
   "cmd_checks": ["Rupture 1","Rupture 2","Rupture 3"],
-  "positif": "Message motivant adapté au rayon ${rayonCode}. Finir par <strong>Merci et bonne journée !</strong>"
+  "positif": "Message motivant pour le rayon ${rayonCode}. Finir par <strong>Merci et bonne journée !</strong>"
 }`;
 }
 
 // ── Génération ────────────────────────────────────────────────────
 async function generateBrief() {
   const rayonCode = document.getElementById('rayon-select').value;
-  if (!rayonCode) { alert('Merci de choisir un rayon dans le menu déroulant.'); return; }
+  if (!rayonCode)                              { alert('Merci de choisir un rayon.'); return; }
+  if (!files.perf || !files.rayon || !files.comp) { alert('Merci de charger les 3 fichiers PDF Darwin.'); return; }
 
-  const apiKey = provider === 'gemini'
-    ? document.getElementById('api-key-gemini').value.trim()
-    : document.getElementById('api-key-claude').value.trim();
-  if (!apiKey) { alert('Merci de saisir ta clé API.'); return; }
-
-  if (!files.perf || !files.rayon || !files.comp) {
-    alert('Merci de charger les 3 fichiers PDF Darwin.'); return;
-  }
-
-  const rayonLabel = document.getElementById('rayon-select').options[document.getElementById('rayon-select').selectedIndex].text;
   const btn = document.getElementById('btn-gen');
   btn.disabled = true;
   showLoader('Lecture des PDFs…');
@@ -438,18 +375,46 @@ async function generateBrief() {
   document.getElementById('btn-print').classList.remove('visible');
 
   try {
+    setLoaderMsg('Conversion des PDFs…');
     const [b64perf, b64rayon, b64comp] = await Promise.all([
       toBase64(files.perf), toBase64(files.rayon), toBase64(files.comp)
     ]);
 
-    setLoaderMsg((provider === 'gemini' ? 'Gemini' : 'Claude') + ' analyse les données de ' + rayonLabel + '…');
+    setLoaderMsg('Analyse des données Darwin…');
 
-    const prompt = buildPrompt(rayonCode);
-    const brief  = provider === 'gemini'
-      ? await callGemini(apiKey, b64perf, b64rayon, b64comp, prompt)
-      : await callClaude(apiKey, b64perf, b64rayon, b64comp, prompt);
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64perf  } },
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64rayon } },
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64comp  } },
+            { type: 'text', text: buildPrompt(rayonCode) }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err?.error?.message || 'Erreur API ' + response.status);
+    }
 
     setLoaderMsg('Mise en forme du brief…');
+    const data  = await response.json();
+    const raw   = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const brief = JSON.parse(clean);
+
     renderBrief(brief);
 
   } catch (e) {
@@ -461,71 +426,9 @@ async function generateBrief() {
   }
 }
 
-// ── Appel Gemini (gratuit) ────────────────────────────────────────
-async function callGemini(apiKey, b64perf, b64rayon, b64comp, prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
-        parts: [
-          { inline_data: { mime_type: 'application/pdf', data: b64perf  } },
-          { inline_data: { mime_type: 'application/pdf', data: b64rayon } },
-          { inline_data: { mime_type: 'application/pdf', data: b64comp  } },
-          { text: prompt }
-        ]
-      }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 3000 }
-    })
-  });
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err?.error?.message || 'Erreur Gemini ' + resp.status);
-  }
-  const data  = await resp.json();
-  const raw   = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  const clean = raw.replace(/```json|```/g, '').trim();
-  return JSON.parse(clean);
-}
-
-// ── Appel Claude (payant) ─────────────────────────────────────────
-async function callClaude(apiKey, b64perf, b64rayon, b64comp, prompt) {
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 3000,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64perf  } },
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64rayon } },
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64comp  } },
-          { type: 'text', text: prompt }
-        ]
-      }]
-    })
-  });
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err?.error?.message || 'Erreur Claude ' + resp.status);
-  }
-  const data  = await resp.json();
-  const raw   = data.content.map(b => b.text || '').join('');
-  const clean = raw.replace(/```json|```/g, '').trim();
-  return JSON.parse(clean);
-}
-
 // ── Rendu HTML ────────────────────────────────────────────────────
 function renderBrief(d) {
-  if (d.date) document.getElementById('today-date').textContent = d.date;
+  if (d.date)      document.getElementById('today-date').textContent = d.date;
   if (d.rayon_nom) document.getElementById('header-rayon').textContent = d.rayon_nom + ' · Narbonne';
 
   const kpiHtml = d.kpis.map(k => `
@@ -546,7 +449,7 @@ function renderBrief(d) {
     : d.rang_color === 'red' ? 'var(--red)' : 'var(--navy)';
 
   const compRows = d.comp_rows.map(r => {
-    const ec = (r.evol_ca || '').startsWith('+')     ? 'evol-pos' : 'evol-neg';
+    const ec = (r.evol_ca     || '').startsWith('+') ? 'evol-pos' : 'evol-neg';
     const ed = (r.evol_debits || '').startsWith('+') ? 'evol-pos' : 'evol-neg';
     return `<tr ${r.highlight ? 'class="highlight"' : ''}>
       <td>${r.magasin}</td><td>${r.ca}</td>
