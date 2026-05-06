@@ -49,8 +49,6 @@
   .rayon-row label{font-size:.8rem;font-weight:700;color:var(--navy);flex-shrink:0}
   .rayon-select{flex:1;min-width:220px;border:2px solid var(--navy);border-radius:8px;padding:9px 32px 9px 12px;font-family:var(--font);font-size:.85rem;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a3a5c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
   .rayon-select:focus{border-color:var(--navy2)}
-  .rayon-select option{font-weight:400;color:var(--text)}
-  .rayon-select optgroup{font-weight:700;color:var(--muted)}
 
   /* BOUTON GÉNÉRER */
   .btn-generate{width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -62,7 +60,7 @@
   .loader-wrap{display:none;flex-direction:column;align-items:center;padding:36px;gap:14px}
   .loader-wrap.visible{display:flex}
   .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
-  .loader-msg{font-size:.85rem;color:var(--muted);text-align:center;max-width:260px;line-height:1.5}
+  .loader-msg{font-size:.85rem;color:var(--muted);text-align:center;max-width:280px;line-height:1.5}
 
   /* OUTPUT */
   #brief-output{display:none}
@@ -199,7 +197,6 @@
       </div>
     </div>
 
-    <!-- SÉLECTION RAYON -->
     <div class="rayon-row">
       <label>🏬 Rayon :</label>
       <select class="rayon-select" id="rayon-select" onchange="updateRayonHeader()">
@@ -271,24 +268,20 @@
 
 </div>
 <script>
-// ── État ──────────────────────────────────────────────────────────
 const files = { perf:null, rayon:null, comp:null };
 
-// Date du jour
 const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const now   = new Date();
 document.getElementById('today-date').textContent =
   JOURS[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS[now.getMonth()] + ' ' + now.getFullYear();
 
-// ── Mise à jour header rayon ──────────────────────────────────────
 function updateRayonHeader() {
   const sel = document.getElementById('rayon-select');
   const txt = sel.value ? sel.options[sel.selectedIndex].text : 'Narbonne';
   document.getElementById('header-rayon').textContent = txt + ' · Narbonne';
 }
 
-// ── Chargement fichier ────────────────────────────────────────────
 function onFile(input, key) {
   const file = input.files[0];
   if (!file) return;
@@ -297,7 +290,6 @@ function onFile(input, key) {
   document.getElementById('status-' + key).textContent = '✓ ' + file.name;
 }
 
-// ── PDF → base64 ──────────────────────────────────────────────────
 function toBase64(file) {
   return new Promise((res, rej) => {
     const r = new FileReader();
@@ -307,7 +299,6 @@ function toBase64(file) {
   });
 }
 
-// ── Prompt ────────────────────────────────────────────────────────
 function buildPrompt(rayonCode) {
   return `Tu es assistant chef de rayon dans un hypermarché Carrefour (HF7152 Narbonne).
 Tu reçois 3 rapports PDF Darwin :
@@ -320,38 +311,37 @@ RAYON CIBLE : "${rayonCode}"
 PROTOCOLE DE LECTURE DES DONNÉES — OBLIGATOIRE ET SANS EXCEPTION :
 
 ÉTAPE 1 — IDENTIFICATION DE LA LIGNE :
-- Dans chaque tableau PDF, repérer visuellement la ligne dont le libellé correspond EXACTEMENT à "${rayonCode}".
-- Mémoriser le numéro de cette ligne dans le tableau (ex : ligne 8 sur 47).
-- Ne jamais confondre avec une ligne de sous-total, une ligne parent (ex: "3 BAZAR"), ou une ligne voisine.
+- Dans chaque tableau PDF, repérer la ligne dont le libellé correspond EXACTEMENT à "${rayonCode}".
+- Mémoriser la position de cette ligne (ex : ligne 8 sur 47).
+- Ne jamais confondre avec une ligne parent (ex: "3 BAZAR"), une ligne de sous-total, ou une ligne voisine.
 
 ÉTAPE 2 — DOUBLE VÉRIFICATION AVANT CHAQUE VALEUR :
 Avant de lire chaque valeur, se poser ces 2 questions :
   ✓ Q1 : Suis-je bien sur la ligne "${rayonCode}" et pas une autre ?
   ✓ Q2 : Suis-je bien dans la bonne colonne (pas une colonne voisine) ?
-Si la réponse à l'une des deux questions est incertaine → mettre "N/D".
+Si l'une des réponses est incertaine → mettre "N/D".
 
 ÉTAPE 3 — LECTURE COLONNE PAR COLONNE sur la ligne "${rayonCode}" :
-- CA (K€) : colonne "Valeur (K€)" — valeur exacte avec décimales, signe positif implicite.
-- ÉVOLUTION % CA : colonne "Evolution %" — signe + ou - exact, toutes décimales. ATTENTION : cette colonne est encadrée entre "Valeur (K€)" et "Ecart budget (K€)". Ne pas prendre l'évolution région ni l'évolution rang.
-- ÉCART BUDGET : colonne "Ecart budget (K€)" — valeur exacte, signe + ou - obligatoire.
+- CA (K€) : colonne "Valeur (K€)" — valeur exacte avec décimales.
+- ÉVOLUTION % CA : colonne "Evolution %" — signe + ou - exact, toutes décimales. ATTENTION : colonne située entre "Valeur (K€)" et "Ecart budget (K€)". Ne pas confondre avec évolution région, évolution rang, ni aucun autre %.
+- ÉCART BUDGET : colonne "Ecart budget (K€)" — valeur exacte avec signe + ou -.
 - TAUX DE MARGE — VÉRIFICATION TRIPLE OBLIGATOIRE :
-  * Lecture 1 : Aller sur la ligne "${rayonCode}" → colonne "Taux" du bloc "Marge Brute Gestion Commerciale" → noter la valeur.
-  * Lecture 2 : Recompter les lignes depuis le haut du tableau jusqu'à "${rayonCode}" → relire la colonne "Taux" → confirmer que c'est la même valeur qu'en Lecture 1.
-  * Lecture 3 : Vérifier que la valeur lue est cohérente avec le type de rayon (un taux de marge non alimentaire est généralement entre 30 % et 55 %, alimentaire entre 15 % et 40 %). Si la valeur semble anormale, relire une 4ème fois.
-  * Ne JAMAIS prendre la colonne "Diff % N-1" (colonne suivante), ni le taux d'une ligne voisine.
-  * Si les 3 lectures donnent des résultats différents → mettre "N/D" et signaler l'anomalie dans bars_perf.
-- DIFF MARGE N-1 : colonne "Diff % N-1" dans "Marge Brute Gestion Commerciale" — pour le sous-texte KPI marge uniquement.
-- RANG CA : colonne "Rang CA" dans le bloc "Classement" — chiffre entier exact.
-- ÉVOLUTION RANG : colonne "Evolution Rang" — pour information contexte uniquement.
+  * Lecture 1 : aller sur ligne "${rayonCode}" → colonne "Taux" du bloc "Marge Brute Gestion Commerciale" → noter la valeur.
+  * Lecture 2 : recompter les lignes depuis le haut → relire la colonne "Taux" → confirmer identique à Lecture 1.
+  * Lecture 3 : vérifier la cohérence (non alim : 30–55 %, alim : 15–40 %). Si anormal → 4ème lecture.
+  * Ne JAMAIS prendre la colonne "Diff % N-1" ni le taux d'une ligne voisine.
+  * Si les lectures divergent → mettre "N/D".
+- DIFF MARGE N-1 : colonne "Diff % N-1" — uniquement pour le sous-texte KPI marge.
+- RANG CA : colonne "Rang CA" dans le bloc "Classement" — entier exact.
+- ÉVOLUTION % COMPARAISON MAGASINS : colonne "Evolution %" du tableau Comparaison Magasins sur la ligne "Narbonne" uniquement.
 
 ÉTAPE 4 — VÉRIFICATION FINALE avant de construire le JSON :
-Relire mentalement chaque valeur extraite et confirmer :
-  ✓ La valeur CA lue correspond bien à "${rayonCode}" et pas à la ligne du dessus ou dessous.
-  ✓ L'évolution % CA est bien dans la colonne Evolution % et pas dans une autre colonne %.
-  ✓ Le taux de marge est bien dans la colonne "Taux" et pas "Diff % N-1".
+  ✓ Le CA correspond bien à "${rayonCode}" et pas à la ligne du dessus/dessous.
+  ✓ L'évolution % CA est bien la colonne Evolution % et pas une autre colonne %.
+  ✓ Le taux de marge est bien la colonne "Taux" et pas "Diff % N-1".
   ✓ L'écart budget a bien son signe + ou -.
-  ✓ Le rang est un entier cohérent (entre 1 et 60 environ).
-Si une incohérence est détectée → corriger avant de répondre.
+  ✓ Le rang est un entier cohérent (1 à 60).
+Corriger toute incohérence avant de répondre.
 
 - Ne jamais mentionner le VAB top 3000.
 - Si une donnée est absente ou illisible : mettre "N/D".
@@ -369,7 +359,7 @@ Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
   ],
   "bars_perf": [
     {"type": "red|green|blue|amber", "html": "Analyse CA avec <strong>chiffres exacts du PDF</strong>."},
-    {"type": "red|green|blue|amber", "html": "Analyse marge avec <strong>taux exact colonne Taux</strong>."},
+    {"type": "red|green|blue|amber", "html": "Analyse marge avec <strong>taux exact colonne Taux</strong> vérifié 3 fois."},
     {"type": "blue", "html": "Contexte magasin : panier moyen, débits, dispo linéaire."}
   ],
   "rang": "X",
@@ -383,13 +373,12 @@ Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
     {"magasin": "Narbonne", "ca": "X,X", "evol_ca": "−X,X %", "debits": "XXX", "evol_debits": "−X,X %", "highlight": true}
   ],
   "bar_comp": {"type": "blue", "html": "Analyse comparative."},
-  "tenue_checks": ["Consigne tenue 1","Consigne 2","Consigne 3","Consigne 4","Consigne 5"],
+  "tenue_checks": ["Consigne 1","Consigne 2","Consigne 3","Consigne 4","Consigne 5"],
   "cmd_checks": ["Rupture 1","Rupture 2","Rupture 3"],
-  "positif": "Message motivant pour le rayon ${rayonCode}. Finir par <strong>Merci et bonne journée !</strong>"
+  "positif": "Message motivant. Finir par <strong>Merci et bonne journée !</strong>"
 }`;
 }
 
-// ── Génération ────────────────────────────────────────────────────
 async function generateBrief() {
   const rayonCode = document.getElementById('rayon-select').value;
   if (!rayonCode)                              { alert('Merci de choisir un rayon.'); return; }
@@ -411,16 +400,10 @@ async function generateBrief() {
 
     setLoaderMsg('Analyse des données Darwin…');
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/brief', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 3000,
         messages: [{
           role: 'user',
           content: [
@@ -435,7 +418,7 @@ async function generateBrief() {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err?.error?.message || 'Erreur API ' + response.status);
+      throw new Error(err?.error?.message || 'Erreur serveur ' + response.status);
     }
 
     setLoaderMsg('Mise en forme du brief…');
@@ -455,7 +438,6 @@ async function generateBrief() {
   }
 }
 
-// ── Rendu HTML ────────────────────────────────────────────────────
 function renderBrief(d) {
   if (d.date)      document.getElementById('today-date').textContent = d.date;
   if (d.rayon_nom) document.getElementById('header-rayon').textContent = d.rayon_nom + ' · Narbonne';
@@ -469,13 +451,11 @@ function renderBrief(d) {
 
   const barsPerfHtml = d.bars_perf.map(b => `<div class="bar ${b.type}">${b.html}</div>`).join('');
 
-  const rankStyle = d.rang_color === 'green'
-    ? 'background:var(--bg-green);border-color:#b8dda0'
-    : d.rang_color === 'red'
-    ? 'background:var(--bg-red);border-color:#f0b8b8'
-    : 'background:var(--bg-blue);border-color:#c5ddf3';
+  const rankStyle    = d.rang_color === 'green' ? 'background:var(--bg-green);border-color:#b8dda0'
+                     : d.rang_color === 'red'   ? 'background:var(--bg-red);border-color:#f0b8b8'
+                     :                            'background:var(--bg-blue);border-color:#c5ddf3';
   const rankNumColor = d.rang_color === 'green' ? 'var(--green)'
-    : d.rang_color === 'red' ? 'var(--red)' : 'var(--navy)';
+                     : d.rang_color === 'red'   ? 'var(--red)' : 'var(--navy)';
 
   const compRows = d.comp_rows.map(r => {
     const ec = (r.evol_ca     || '').startsWith('+') ? 'evol-pos' : 'evol-neg';
@@ -502,7 +482,6 @@ function renderBrief(d) {
     <div class="kpi-grid">${kpiHtml}</div>
     ${barsPerfHtml}
   </div>
-
   <div class="card">
     <div class="section-title"><div class="badge">2</div>
       <h2>Positionnement Narbonne — classement régional DTF Sud Est</h2>
@@ -525,7 +504,6 @@ function renderBrief(d) {
     </table>
     <div class="bar ${d.bar_comp.type}">${d.bar_comp.html}</div>
   </div>
-
   <div class="card">
     <div class="section-title"><div class="badge amber">3</div><h2>Consignes du jour</h2></div>
     <div class="progress-wrap">
@@ -551,7 +529,6 @@ function renderBrief(d) {
     </div>
     <ul class="check-list">${cmdHtml}</ul>
   </div>
-
   <div class="positive-card">
     <div class="eyebrow">🌟 Bonne journée à toute l'équipe !</div>
     <p>${d.positif}</p>
@@ -564,12 +541,10 @@ function renderBrief(d) {
   document.getElementById('brief-output').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-// ── Loader ────────────────────────────────────────────────────────
 function showLoader(msg)   { document.getElementById('loader').classList.add('visible'); setLoaderMsg(msg); }
 function hideLoader()      { document.getElementById('loader').classList.remove('visible'); }
 function setLoaderMsg(msg) { document.getElementById('loader-msg').textContent = msg; }
 
-// ── Cochage ───────────────────────────────────────────────────────
 function toggleCheck(li) { li.classList.toggle('done'); updateProgress(); }
 function updateProgress() {
   const all  = document.querySelectorAll('.check-list li');
