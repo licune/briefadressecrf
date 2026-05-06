@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3a5c">
+<title>Brief Collaborateur — Confort de la Maison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #1a3a5c;
+    --navy2:   #2a5080;
+    --red:     #b83232;
+    --green:   #1a7a4a;
+    --amber:   #c47a15;
+    --bg:      #f5f4f1;
+    --bg-card: #ffffff;
+    --bg-gray: #f4f3f0;
+    --bg-blue: #eaf2fb;
+    --bg-green:#eaf3de;
+    --bg-amber:#fdf3e0;
+    --bg-red:  #fdf0f0;
+    --border:  #d8d6ce;
+    --text:    #1e1e1c;
+    --muted:   #6b6a65;
+    --font:    'DM Sans', sans-serif;
+    --mono:    'DM Mono', monospace;
+    --radius:  12px;
+    --shadow:  0 2px 12px rgba(26,58,92,.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 860px; margin: 0 auto; padding: 16px 16px 40px; }
+
+  /* HEADER */
+  .header { background:var(--navy); border-radius:var(--radius); padding:20px 24px; display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; animation:fadeDown .5s ease both; }
+  .header-left h1 { font-size:clamp(1rem,3vw,1.2rem); font-weight:700; color:#fff; line-height:1.3; }
+  .header-left p  { font-size:.75rem; color:#a8c4e0; margin-top:2px; }
+  .header-right   { text-align:right; flex-shrink:0; }
+  .header-right .store { font-size:.8rem; font-weight:700; color:#fff; letter-spacing:.04em; }
+  .header-right .date  { font-size:.72rem; color:#a8c4e0; margin-top:2px; }
+
+  /* UPLOAD SECTION */
+  .upload-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 20px; margin-bottom:16px; box-shadow:var(--shadow); animation:fadeUp .4s ease both; }
+  .upload-section h2 { font-size:.95rem; font-weight:700; color:var(--navy); margin-bottom:6px; }
+  .upload-section p  { font-size:.78rem; color:var(--muted); margin-bottom:16px; line-height:1.5; }
+
+  .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  @media(max-width:600px){ .upload-grid { grid-template-columns:1fr; } }
+
+  .upload-box { border:2px dashed var(--border); border-radius:8px; padding:14px 10px; text-align:center; cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
+  .upload-box:hover { border-color:var(--navy2); background:var(--bg-blue); }
+  .upload-box.loaded { border-color:var(--green); background:var(--bg-green); }
+  .upload-box input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-icon  { font-size:1.5rem; margin-bottom:6px; }
+  .upload-label { font-size:.72rem; font-weight:700; color:var(--navy); line-height:1.3; }
+  .upload-status { font-size:.65rem; color:var(--muted); margin-top:4px; }
+  .upload-box.loaded .upload-status { color:var(--green); font-weight:600; }
+
+  /* API KEY */
+  .api-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  .api-row label { font-size:.75rem; font-weight:600; color:var(--navy); flex-shrink:0; }
+  .api-row input { flex:1; min-width:180px; border:1px solid var(--border); border-radius:6px; padding:8px 12px; font-size:.78rem; font-family:var(--mono); color:var(--text); background:var(--bg-gray); outline:none; transition:border-color .2s; }
+  .api-row input:focus { border-color:var(--navy2); background:#fff; }
+  .api-hint { font-size:.68rem; color:var(--muted); width:100%; }
+
+  /* BUTTON */
+  .btn-generate { width:100%; padding:13px; background:var(--navy); color:#fff; border:none; border-radius:8px; font-family:var(--font); font-size:.9rem; font-weight:700; cursor:pointer; transition:background .2s, transform .1s; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .btn-generate:hover  { background:var(--navy2); }
+  .btn-generate:active { transform:scale(.98); }
+  .btn-generate:disabled { background:#aaa; cursor:not-allowed; }
+
+  /* LOADER */
+  .loader-wrap { display:none; flex-direction:column; align-items:center; padding:32px; gap:14px; }
+  .loader-wrap.visible { display:flex; }
+  .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--navy); border-radius:50%; animation:spin .8s linear infinite; }
+  .loader-msg { font-size:.82rem; color:var(--muted); text-align:center; }
+
+  /* BRIEF OUTPUT */
+  #brief-output { display:none; }
+  #brief-output.visible { display:block; }
+
+  /* CARDS */
+  .card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:14px; box-shadow:var(--shadow); animation:fadeUp .4s ease both; }
+  .section-title { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .badge { width:26px; height:26px; border-radius:50%; background:var(--navy); color:#fff; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .badge.amber { background:var(--amber); }
+  .section-title h2 { font-size:clamp(.9rem,2.5vw,1rem); font-weight:700; color:var(--navy); line-height:1.3; }
+
+  /* KPI */
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
+  @media(max-width:600px){ .kpi-grid { grid-template-columns:repeat(2,1fr); } }
+  .kpi { background:var(--bg-gray); border:1px solid var(--border); border-radius:8px; padding:12px 8px; text-align:center; }
+  .kpi-label { font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+  .kpi-value { font-size:clamp(1.2rem,4vw,1.6rem); font-weight:700; line-height:1.1; font-family:var(--mono); }
+  .kpi-value.red   { color:var(--red); }
+  .kpi-value.green { color:var(--green); }
+  .kpi-value.navy  { color:var(--navy); }
+  .kpi-sub { font-size:.65rem; color:var(--muted); margin-top:4px; line-height:1.3; }
+
+  /* BARS */
+  .bar { border-radius:6px; padding:10px 12px 10px 16px; font-size:.82rem; line-height:1.5; margin-bottom:8px; border-left:3px solid transparent; }
+  .bar:last-child { margin-bottom:0; }
+  .bar.red   { background:var(--bg-red);   border-color:var(--red); }
+  .bar.green { background:var(--bg-green); border-color:var(--green); }
+  .bar.blue  { background:var(--bg-blue);  border-color:var(--navy); }
+  .bar.amber { background:var(--bg-amber); border-color:var(--amber); }
+
+  /* RANK */
+  .rank-block { border-radius:8px; display:flex; align-items:center; gap:16px; padding:14px 18px; margin-bottom:14px; border:1px solid; }
+  .rank-number { font-size:clamp(2.8rem,10vw,3.8rem); font-weight:700; line-height:1; font-family:var(--mono); flex-shrink:0; }
+  .rank-info strong { display:block; font-size:.85rem; font-weight:700; }
+  .rank-info span   { font-size:.78rem; color:var(--muted); line-height:1.4; }
+
+  /* TABLE */
+  .table-label { font-size:.8rem; font-weight:700; color:var(--navy); margin-bottom:8px; }
+  .comp-table  { width:100%; border-collapse:collapse; overflow:hidden; font-size:.78rem; margin-bottom:10px; border-radius:8px; }
+  .comp-table thead th { background:var(--navy); color:#fff; padding:7px 8px; font-weight:600; text-align:center; font-size:.7rem; letter-spacing:.03em; }
+  .comp-table thead th:first-child { text-align:left; }
+  .comp-table tbody tr:nth-child(odd)  { background:var(--bg-gray); }
+  .comp-table tbody tr:nth-child(even) { background:#fff; }
+  .comp-table tbody tr.highlight { background:var(--bg-blue); }
+  .comp-table tbody td { padding:7px 8px; text-align:center; border-bottom:1px solid var(--border); }
+  .comp-table tbody td:first-child { text-align:left; font-weight:600; color:var(--navy); }
+  .evol-pos { color:var(--green); font-weight:600; }
+  .evol-neg { color:var(--red);   font-weight:600; }
+  @media(max-width:480px){ .comp-table { font-size:.7rem; } .comp-table thead th, .comp-table tbody td { padding:6px 5px; } }
+
+  /* CONSIGNES */
+  .sub-title { display:flex; align-items:center; gap:8px; border-radius:6px; padding:8px 12px; margin-bottom:10px; font-size:.82rem; font-weight:700; color:#fff; }
+  .sub-title.navy  { background:var(--navy); }
+  .sub-title.amber { background:var(--amber); }
+  .check-list { list-style:none; margin-bottom:4px; }
+  .check-list li { display:flex; align-items:flex-start; gap:10px; padding:7px 4px; border-bottom:1px solid var(--bg-gray); font-size:.82rem; line-height:1.5; cursor:pointer; border-radius:4px; transition:background .15s; }
+  .check-list li:last-child { border-bottom:none; }
+  .check-list li:hover { background:var(--bg-gray); }
+  .check-box { width:18px; height:18px; border:2px solid var(--border); border-radius:4px; flex-shrink:0; margin-top:2px; transition:all .2s; display:flex; align-items:center; justify-content:center; background:#fff; }
+  .check-list li.done .check-box { background:var(--green); border-color:var(--green); }
+  .check-list li.done .check-box::after { content:''; width:9px; height:5px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg) translateY(-1px); }
+  .check-list li.done .check-text { text-decoration:line-through; color:var(--muted); }
+  .progress-wrap { display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:.75rem; color:var(--muted); }
+  .progress-bar-bg  { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:var(--green); border-radius:3px; transition:width .4s ease; width:0%; }
+  .spacer { height:14px; }
+
+  /* POSITIVE */
+  .positive-card { background:var(--bg-green); border:1px solid #b8dda0; border-radius:var(--radius); padding:20px; margin-bottom:14px; }
+  .positive-card .eyebrow { font-size:.65rem; font-weight:700; color:#2e6b18; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+  .positive-card p { font-size:.85rem; line-height:1.65; color:#1a4a0e; }
+
+  /* ERROR */
+  .error-card { background:var(--bg-red); border:1px solid #f0b8b8; border-radius:var(--radius); padding:18px 20px; margin-bottom:14px; }
+  .error-card p { font-size:.82rem; color:var(--red); line-height:1.5; }
+
+  .footer { text-align:center; font-size:.65rem; color:var(--muted); padding-top:8px; }
+
+  /* BOUTON IMPRIMER */
+  .btn-print { display:none; width:100%; padding:12px; background:#fff; color:var(--navy); border:2px solid var(--navy); border-radius:8px; font-family:var(--font); font-size:.88rem; font-weight:700; cursor:pointer; transition:background .2s, color .2s; margin-bottom:14px; align-items:center; justify-content:center; gap:8px; }
+  .btn-print:hover { background:var(--navy); color:#fff; }
+  .btn-print.visible { display:flex; }
+
+  /* IMPRESSION */
+  @media print {
+    body { background:#fff; }
+    .upload-section, .loader-wrap, .btn-print, .progress-wrap { display:none !important; }
+    .header { border-radius:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .card, .positive-card { box-shadow:none; border:1px solid #ccc; break-inside:avoid; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .page { padding:0; max-width:100%; }
+    .kpi-grid { grid-template-columns:repeat(4,1fr) !important; }
+    .check-list li { cursor:default; }
+    .footer { display:block !important; }
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(10px)}  to{opacity:1;transform:translateY(0)} }
+  @keyframes spin     { to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <h1>Brief collaborateur<br>Confort de la Maison</h1>
+      <p>Rayon 31 · HF7152 Narbonne</p>
+    </div>
+    <div class="header-right">
+      <div class="store">Générer le brief</div>
+      <div class="date" id="today-date"></div>
+    </div>
+  </header>
+
+  <!-- UPLOAD SECTION -->
+  <div class="upload-section">
+    <h2>📂 Charger les fichiers Darwin du jour</h2>
+    <p>Télécharge les 3 rapports PDF depuis Darwin, puis clique sur <strong>Générer le brief</strong>.</p>
+
+    <div class="upload-grid">
+      <div class="upload-box" id="box-perf">
+        <input type="file" accept=".pdf" onchange="onFile(this,'perf')">
+        <div class="upload-icon">📊</div>
+        <div class="upload-label">Performances Globales</div>
+        <div class="upload-status" id="status-perf">Aucun fichier</div>
+      </div>
+      <div class="upload-box" id="box-rayon">
+        <input type="file" accept=".pdf" onchange="onFile(this,'rayon')">
+        <div class="upload-icon">📋</div>
+        <div class="upload-label">Classement Rayons</div>
+        <div class="upload-status" id="status-rayon">Aucun fichier</div>
+      </div>
+      <div class="upload-box" id="box-comp">
+        <input type="file" accept=".pdf" onchange="onFile(this,'comp')">
+        <div class="upload-icon">🏪</div>
+        <div class="upload-label">Comparaison Magasins</div>
+        <div class="upload-status" id="status-comp">Aucun fichier</div>
+      </div>
+    </div>
+
+    <div class="api-row">
+      <label>Clé API Anthropic :</label>
+      <input type="password" id="api-key" placeholder="sk-ant-api03-…" autocomplete="off">
+      <span class="api-hint">Ta clé reste dans le navigateur, elle n'est jamais envoyée ailleurs qu'à l'API Anthropic.</span>
+    </div>
+
+    <button class="btn-generate" id="btn-gen" onclick="generateBrief()">
+      ⚡ Générer le brief du jour
+    </button>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader-wrap" id="loader">
+    <div class="spinner"></div>
+    <div class="loader-msg" id="loader-msg">Lecture des PDFs en cours…</div>
+  </div>
+
+  <!-- BRIEF OUTPUT -->
+  <div id="brief-output"></div>
+
+  <!-- BOUTON IMPRIMER -->
+  <button class="btn-print" id="btn-print" onclick="window.print()">
+    🖨️ Imprimer le brief
+  </button>
+
+  <div class="footer" id="footer-src" style="display:none">
+    Source : Darwin — Confidentiel Carrefour · HF7152 Narbonne
+  </div>
+
+</div>
+<script>
+// ── Fichiers chargés ──────────────────────────────────────────────
+const files = { perf: null, rayon: null, comp: null };
+
+// Date du jour
+const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const now   = new Date();
+document.getElementById('today-date').textContent =
+  JOURS[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS[now.getMonth()] + ' ' + now.getFullYear();
+
+// ── Chargement PDF ────────────────────────────────────────────────
+function onFile(input, key) {
+  const file = input.files[0];
+  if (!file) return;
+  files[key] = file;
+  document.getElementById('box-' + key).classList.add('loaded');
+  document.getElementById('status-' + key).textContent = '✓ ' + file.name;
+}
+
+// ── PDF → base64 ──────────────────────────────────────────────────
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Lecture échouée'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ── Génération principale ─────────────────────────────────────────
+async function generateBrief() {
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey)                              { alert('Merci de saisir ta clé API Anthropic.'); return; }
+  if (!files.perf || !files.rayon || !files.comp) { alert('Merci de charger les 3 fichiers PDF Darwin.'); return; }
+
+  const btn = document.getElementById('btn-gen');
+  btn.disabled = true;
+  showLoader('Lecture des PDFs…');
+  const out = document.getElementById('brief-output');
+  out.classList.remove('visible');
+  out.innerHTML = '';
+
+  try {
+    const [b64perf, b64rayon, b64comp] = await Promise.all([
+      toBase64(files.perf), toBase64(files.rayon), toBase64(files.comp)
+    ]);
+
+    setLoaderMsg('Claude analyse les données Darwin…');
+
+    const prompt = `Tu es assistant chef de rayon non alimentaire dans un hypermarché Carrefour (HF7152 Narbonne).
+Tu reçois 3 rapports PDF Darwin :
+1. Performances Globales (magasin global)
+2. Classement Rayons (tous les rayons du magasin)
+3. Comparaison Magasins (rayon 31 Confort de la Maison, région DTF Sud Est)
+
+RÈGLE ABSOLUE : Ne jamais mentionner le VAB top 3000 (indicateur non pertinent pour le rayon 31 Confort de la Maison).
+
+Extrais les données du rayon 31 Confort de la Maison et génère un brief pour les collaborateurs.
+
+Réponds UNIQUEMENT avec un objet JSON valide (sans balises markdown, sans texte avant ou après) respectant cette structure exacte :
+
+{
+  "date": "Lundi 04 mai 2026",
+  "kpis": [
+    {"label": "CA rayon", "value": "X,X K€", "color": "red|green|navy", "sub": "sous-texte court"},
+    {"label": "Évol. vs N-1", "value": "−X,X %", "color": "red|green|navy", "sub": "vs magasin : X %"},
+    {"label": "Écart budget", "value": "−X,X K€", "color": "red|green|navy", "sub": "sous-texte court"},
+    {"label": "Taux de marge", "value": "XX,XX %", "color": "red|green|navy", "sub": "sous-texte court"}
+  ],
+  "bars_perf": [
+    {"type": "red|green|blue|amber", "html": "Commentaire avec <strong>valeurs clés</strong> en gras."},
+    {"type": "red|green|blue|amber", "html": "Commentaire marge."},
+    {"type": "blue", "html": "Contexte magasin global (panier, débits, dispo linéaire uniquement)."}
+  ],
+  "rang": "3",
+  "rang_sur": "31",
+  "rang_label": "Classement régional DTF Sud Est",
+  "rang_detail": "Xème sur 31 magasins — CA Confort de la Maison",
+  "rang_color": "green|red|navy",
+  "bar_rang": {"type": "green|blue|amber|red", "html": "Commentaire sur le classement."},
+  "comp_rows": [
+    {"magasin": "Nom magasin", "ca": "X,X", "evol_ca": "+X,X %", "debits": "XXX", "evol_debits": "+X,X %", "highlight": false},
+    {"magasin": "Narbonne", "ca": "X,X", "evol_ca": "−X,X %", "debits": "XXX", "evol_debits": "−X,X %", "highlight": true}
+  ],
+  "bar_comp": {"type": "blue", "html": "Analyse comparative avec <strong>points clés</strong>."},
+  "tenue_checks": [
+    "Consigne tenue rayon 1",
+    "Consigne tenue rayon 2",
+    "Consigne tenue rayon 3",
+    "Consigne tenue rayon 4",
+    "Consigne tenue rayon 5"
+  ],
+  "cmd_checks": [
+    "Consigne rupture/commande 1",
+    "Consigne rupture/commande 2",
+    "Consigne rupture/commande 3"
+  ],
+  "positif": "Message motivant avec <strong>point fort du jour</strong>. Finir par <strong>Merci et bonne journée !</strong>"
+}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64perf  } },
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64rayon } },
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64comp  } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err?.error?.message || 'Erreur API ' + response.status);
+    }
+
+    setLoaderMsg('Mise en forme du brief…');
+    const data  = await response.json();
+    const raw   = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const brief = JSON.parse(clean);
+
+    renderBrief(brief);
+
+  } catch (e) {
+    out.innerHTML = `<div class="error-card"><p>❌ <strong>Erreur :</strong> ${e.message}</p></div>`;
+    out.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    hideLoader();
+  }
+}
+
+// ── Rendu du brief ────────────────────────────────────────────────
+function renderBrief(d) {
+  if (d.date) document.getElementById('today-date').textContent = d.date;
+
+  // KPIs
+  const kpiHtml = d.kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value ${k.color}">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // Bars perf
+  const barsPerfHtml = d.bars_perf.map(b => `<div class="bar ${b.type}">${b.html}</div>`).join('');
+
+  // Rang couleurs
+  const rankStyle = d.rang_color === 'green'
+    ? 'background:var(--bg-green);border-color:#b8dda0;color:var(--green)'
+    : d.rang_color === 'red'
+    ? 'background:var(--bg-red);border-color:#f0b8b8;color:var(--red)'
+    : 'background:var(--bg-blue);border-color:#c5ddf3;color:var(--navy)';
+  const rankNumColor = d.rang_color === 'green' ? 'var(--green)' : d.rang_color === 'red' ? 'var(--red)' : 'var(--navy)';
+
+  // Lignes tableau
+  const compRows = d.comp_rows.map(r => {
+    const ecaClass = r.evol_ca.startsWith('+')    ? 'evol-pos' : 'evol-neg';
+    const edbClass = r.evol_debits.startsWith('+') ? 'evol-pos' : 'evol-neg';
+    return `<tr ${r.highlight ? 'class="highlight"' : ''}>
+      <td>${r.magasin}</td><td>${r.ca}</td>
+      <td><span class="${ecaClass}">${r.evol_ca}</span></td>
+      <td>${r.debits}</td>
+      <td><span class="${edbClass}">${r.evol_debits}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Checks
+  const tenueHtml = d.tenue_checks.map(t => `
+    <li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
+  const cmdHtml = d.cmd_checks.map(t => `
+    <li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
+  const total = d.tenue_checks.length + d.cmd_checks.length;
+
+  document.getElementById('brief-output').innerHTML = `
+  <div class="card">
+    <div class="section-title"><div class="badge">1</div><h2>Performance CA &amp; Marge — Confort de la Maison</h2></div>
+    <div class="kpi-grid">${kpiHtml}</div>
+    ${barsPerfHtml}
+  </div>
+
+  <div class="card">
+    <div class="section-title"><div class="badge">2</div><h2>Positionnement Narbonne — classement régional DTF Sud Est</h2></div>
+    <div class="rank-block" style="${rankStyle}">
+      <div class="rank-number" style="color:${rankNumColor}">${d.rang}</div>
+      <div class="rank-info">
+        <strong style="color:${rankNumColor}">${d.rang_label}</strong>
+        <span>${d.rang_detail}</span>
+      </div>
+    </div>
+    <div class="bar ${d.bar_rang.type}">${d.bar_rang.html}</div>
+    <div class="spacer"></div>
+    <div class="table-label">Comparaison avec les magasins voisins :</div>
+    <table class="comp-table">
+      <thead><tr><th>Magasin</th><th>CA (K€)</th><th>Évol. CA</th><th>Débits</th><th>Évol. débits</th></tr></thead>
+      <tbody>${compRows}</tbody>
+    </table>
+    <div class="bar ${d.bar_comp.type}">${d.bar_comp.html}</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title"><div class="badge amber">3</div><h2>Consignes du jour</h2></div>
+    <div class="progress-wrap">
+      <span id="progress-label">0 / ${total} faits</span>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="sub-title navy">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Tenue de rayon — excellence visuelle
+    </div>
+    <ul class="check-list">${tenueHtml}</ul>
+    <div class="spacer"></div>
+    <div class="sub-title amber">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Gestion des ruptures — commandes urgentes
+    </div>
+    <ul class="check-list">${cmdHtml}</ul>
+  </div>
+
+  <div class="positive-card">
+    <div class="eyebrow">🌟 Bonne journée à toute l'équipe !</div>
+    <p>${d.positif}</p>
+  </div>`;
+
+  document.getElementById('brief-output').classList.add('visible');
+  document.getElementById('footer-src').style.display = 'block';
+  document.getElementById('btn-print').classList.add('visible');
+  updateProgress();
+  document.getElementById('brief-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Loader ────────────────────────────────────────────────────────
+function showLoader(msg)   { document.getElementById('loader').classList.add('visible'); setLoaderMsg(msg); }
+function hideLoader()      { document.getElementById('loader').classList.remove('visible'); }
+function setLoaderMsg(msg) { document.getElementById('loader-msg').textContent = msg; }
+
+// ── Cochage ───────────────────────────────────────────────────────
+function toggleCheck(li) { li.classList.toggle('done'); updateProgress(); }
+function updateProgress() {
+  const all  = document.querySelectorAll('.check-list li');
+  const done = document.querySelectorAll('.check-list li.done');
+  if (!all.length) return;
+  const pct  = (done.length / all.length) * 100;
+  const fill = document.getElementById('progress-fill');
+  const lbl  = document.getElementById('progress-label');
+  if (fill) fill.style.width = pct + '%';
+  if (lbl)  lbl.textContent = done.length + ' / ' + all.length + ' fait' + (done.length > 1 ? 's' : '');
+}
+</script>
+</body>
+</html>
