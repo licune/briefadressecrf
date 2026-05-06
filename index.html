@@ -317,15 +317,44 @@ Tu reçois 3 rapports PDF Darwin :
 
 RAYON CIBLE : "${rayonCode}"
 
-RÈGLES DE LECTURE — OBLIGATOIRES :
-- Lire chaque chiffre EXACTEMENT tel qu'il apparaît dans le PDF, sans arrondi.
-- TAUX DE MARGE : prendre UNIQUEMENT la colonne "Taux" (Marge Brute Gestion Commerciale) sur la ligne EXACTE du rayon "${rayonCode}". Ne pas confondre avec le différentiel N-1, ni avec un autre rayon. Lire toutes les décimales.
-- CA : valeur K€ exacte de la ligne "${rayonCode}".
-- Évolution % : signe + ou - exact affiché.
-- Écart budget : valeur K€ exacte (positive ou négative).
-- Classement : "Rang CA" exact de la ligne "${rayonCode}" dans le classement régional.
+PROTOCOLE DE LECTURE DES DONNÉES — OBLIGATOIRE ET SANS EXCEPTION :
+
+ÉTAPE 1 — IDENTIFICATION DE LA LIGNE :
+- Dans chaque tableau PDF, repérer visuellement la ligne dont le libellé correspond EXACTEMENT à "${rayonCode}".
+- Mémoriser le numéro de cette ligne dans le tableau (ex : ligne 8 sur 47).
+- Ne jamais confondre avec une ligne de sous-total, une ligne parent (ex: "3 BAZAR"), ou une ligne voisine.
+
+ÉTAPE 2 — DOUBLE VÉRIFICATION AVANT CHAQUE VALEUR :
+Avant de lire chaque valeur, se poser ces 2 questions :
+  ✓ Q1 : Suis-je bien sur la ligne "${rayonCode}" et pas une autre ?
+  ✓ Q2 : Suis-je bien dans la bonne colonne (pas une colonne voisine) ?
+Si la réponse à l'une des deux questions est incertaine → mettre "N/D".
+
+ÉTAPE 3 — LECTURE COLONNE PAR COLONNE sur la ligne "${rayonCode}" :
+- CA (K€) : colonne "Valeur (K€)" — valeur exacte avec décimales, signe positif implicite.
+- ÉVOLUTION % CA : colonne "Evolution %" — signe + ou - exact, toutes décimales. ATTENTION : cette colonne est encadrée entre "Valeur (K€)" et "Ecart budget (K€)". Ne pas prendre l'évolution région ni l'évolution rang.
+- ÉCART BUDGET : colonne "Ecart budget (K€)" — valeur exacte, signe + ou - obligatoire.
+- TAUX DE MARGE — VÉRIFICATION TRIPLE OBLIGATOIRE :
+  * Lecture 1 : Aller sur la ligne "${rayonCode}" → colonne "Taux" du bloc "Marge Brute Gestion Commerciale" → noter la valeur.
+  * Lecture 2 : Recompter les lignes depuis le haut du tableau jusqu'à "${rayonCode}" → relire la colonne "Taux" → confirmer que c'est la même valeur qu'en Lecture 1.
+  * Lecture 3 : Vérifier que la valeur lue est cohérente avec le type de rayon (un taux de marge non alimentaire est généralement entre 30 % et 55 %, alimentaire entre 15 % et 40 %). Si la valeur semble anormale, relire une 4ème fois.
+  * Ne JAMAIS prendre la colonne "Diff % N-1" (colonne suivante), ni le taux d'une ligne voisine.
+  * Si les 3 lectures donnent des résultats différents → mettre "N/D" et signaler l'anomalie dans bars_perf.
+- DIFF MARGE N-1 : colonne "Diff % N-1" dans "Marge Brute Gestion Commerciale" — pour le sous-texte KPI marge uniquement.
+- RANG CA : colonne "Rang CA" dans le bloc "Classement" — chiffre entier exact.
+- ÉVOLUTION RANG : colonne "Evolution Rang" — pour information contexte uniquement.
+
+ÉTAPE 4 — VÉRIFICATION FINALE avant de construire le JSON :
+Relire mentalement chaque valeur extraite et confirmer :
+  ✓ La valeur CA lue correspond bien à "${rayonCode}" et pas à la ligne du dessus ou dessous.
+  ✓ L'évolution % CA est bien dans la colonne Evolution % et pas dans une autre colonne %.
+  ✓ Le taux de marge est bien dans la colonne "Taux" et pas "Diff % N-1".
+  ✓ L'écart budget a bien son signe + ou -.
+  ✓ Le rang est un entier cohérent (entre 1 et 60 environ).
+Si une incohérence est détectée → corriger avant de répondre.
+
 - Ne jamais mentionner le VAB top 3000.
-- Si une donnée est absente : mettre "N/D".
+- Si une donnée est absente ou illisible : mettre "N/D".
 
 Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
 
