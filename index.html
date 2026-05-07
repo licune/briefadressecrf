@@ -21,7 +21,6 @@
   body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
   .page{max-width:860px;margin:0 auto;padding:16px 16px 40px}
 
-  /* HEADER */
   .header{background:var(--navy);border-radius:var(--radius);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;animation:fadeDown .5s ease both}
   .header-left h1{font-size:clamp(1rem,3vw,1.2rem);font-weight:700;color:#fff;line-height:1.3}
   .header-left p{font-size:.75rem;color:#a8c4e0;margin-top:2px}
@@ -29,7 +28,21 @@
   .header-right .store{font-size:.8rem;font-weight:700;color:#fff;letter-spacing:.04em}
   .header-right .date{font-size:.72rem;color:#a8c4e0;margin-top:2px}
 
-  /* UPLOAD SECTION */
+  /* BANDEAU CLÉ GOOGLE */
+  .key-banner{background:var(--bg-green);border:1px solid #b8dda0;border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;animation:fadeUp .4s ease both;display:none}
+  .key-banner.visible{display:block}
+  .key-banner h3{font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:6px}
+  .key-banner p{font-size:.75rem;color:#2e6b18;line-height:1.5;margin-bottom:10px}
+  .key-banner ol{font-size:.75rem;color:#2e6b18;line-height:1.8;padding-left:18px;margin-bottom:10px}
+  .key-banner ol li strong{color:var(--navy)}
+  .key-input-row{display:flex;gap:8px;flex-wrap:wrap}
+  .key-input-row input{flex:1;min-width:200px;border:2px solid var(--green);border-radius:6px;padding:9px 12px;font-size:.82rem;font-family:var(--mono);color:var(--text);background:#fff;outline:none}
+  .key-input-row input:focus{border-color:var(--navy)}
+  .btn-save-key{padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:6px;font-family:var(--font);font-size:.82rem;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap}
+  .btn-save-key:hover{background:var(--navy)}
+  .key-saved-msg{font-size:.72rem;color:var(--green);font-weight:600;margin-top:6px;display:none}
+  .key-saved-msg.visible{display:block}
+
   .upload-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;margin-bottom:16px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
   .upload-section h2{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:6px}
   .upload-section p{font-size:.78rem;color:var(--muted);margin-bottom:16px;line-height:1.5}
@@ -44,36 +57,30 @@
   .upload-status{font-size:.65rem;color:var(--muted);margin-top:4px}
   .upload-box.loaded .upload-status{color:var(--green);font-weight:600}
 
-  /* RAYON SELECT */
   .rayon-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
   .rayon-row label{font-size:.8rem;font-weight:700;color:var(--navy);flex-shrink:0}
   .rayon-select{flex:1;min-width:220px;border:2px solid var(--navy);border-radius:8px;padding:9px 32px 9px 12px;font-family:var(--font);font-size:.85rem;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a3a5c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
   .rayon-select:focus{border-color:var(--navy2)}
 
-  /* BOUTON GÉNÉRER */
   .btn-generate{width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
   .btn-generate:hover{background:var(--navy2)}
   .btn-generate:active{transform:scale(.98)}
   .btn-generate:disabled{background:#aaa;cursor:not-allowed}
 
-  /* LOADER */
   .loader-wrap{display:none;flex-direction:column;align-items:center;padding:36px;gap:14px}
   .loader-wrap.visible{display:flex}
   .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
   .loader-msg{font-size:.85rem;color:var(--muted);text-align:center;max-width:280px;line-height:1.5}
 
-  /* OUTPUT */
   #brief-output{display:none}
   #brief-output.visible{display:block}
 
-  /* CARDS */
   .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
   .section-title{display:flex;align-items:center;gap:10px;margin-bottom:16px}
   .badge{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .badge.amber{background:var(--amber)}
   .section-title h2{font-size:clamp(.9rem,2.5vw,1rem);font-weight:700;color:var(--navy);line-height:1.3}
 
-  /* KPI */
   .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
   @media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
   .kpi{background:var(--bg-gray);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center}
@@ -82,7 +89,6 @@
   .kpi-value.red{color:var(--red)} .kpi-value.green{color:var(--green)} .kpi-value.navy{color:var(--navy)}
   .kpi-sub{font-size:.63rem;color:var(--muted);margin-top:4px;line-height:1.3}
 
-  /* BARS */
   .bar{border-radius:6px;padding:10px 12px 10px 16px;font-size:.82rem;line-height:1.55;margin-bottom:8px;border-left:3px solid transparent}
   .bar:last-child{margin-bottom:0}
   .bar.red{background:var(--bg-red);border-color:var(--red)}
@@ -90,13 +96,11 @@
   .bar.blue{background:var(--bg-blue);border-color:var(--navy)}
   .bar.amber{background:var(--bg-amber);border-color:var(--amber)}
 
-  /* RANG */
   .rank-block{border-radius:8px;display:flex;align-items:center;gap:16px;padding:14px 18px;margin-bottom:14px;border:1px solid}
   .rank-number{font-size:clamp(2.8rem,10vw,3.8rem);font-weight:700;line-height:1;font-family:var(--mono);flex-shrink:0}
   .rank-info strong{display:block;font-size:.85rem;font-weight:700}
   .rank-info span{font-size:.78rem;color:var(--muted);line-height:1.4}
 
-  /* TABLE */
   .table-label{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:8px}
   .comp-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:10px}
   .comp-table thead th{background:var(--navy);color:#fff;padding:7px 8px;font-weight:600;text-align:center;font-size:.7rem;letter-spacing:.03em}
@@ -109,7 +113,6 @@
   .evol-pos{color:var(--green);font-weight:600} .evol-neg{color:var(--red);font-weight:600}
   @media(max-width:480px){.comp-table{font-size:.7rem} .comp-table thead th,.comp-table tbody td{padding:6px 5px}}
 
-  /* CONSIGNES */
   .sub-title{display:flex;align-items:center;gap:8px;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.82rem;font-weight:700;color:#fff}
   .sub-title.navy{background:var(--navy)} .sub-title.amber{background:var(--amber)}
   .check-list{list-style:none;margin-bottom:4px}
@@ -125,26 +128,22 @@
   .progress-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease;width:0%}
   .spacer{height:14px}
 
-  /* POSITIF */
   .positive-card{background:var(--bg-green);border:1px solid #b8dda0;border-radius:var(--radius);padding:20px;margin-bottom:14px}
   .positive-card .eyebrow{font-size:.65rem;font-weight:700;color:#2e6b18;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
   .positive-card p{font-size:.85rem;line-height:1.65;color:#1a4a0e}
 
-  /* ERROR */
   .error-card{background:var(--bg-red);border:1px solid #f0b8b8;border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
   .error-card p{font-size:.82rem;color:var(--red);line-height:1.5}
 
-  /* BOUTON IMPRIMER */
   .btn-print{display:none;width:100%;padding:12px;background:#fff;color:var(--navy);border:2px solid var(--navy);border-radius:8px;font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s,color .2s;margin-bottom:14px;align-items:center;justify-content:center;gap:8px}
   .btn-print:hover{background:var(--navy);color:#fff}
   .btn-print.visible{display:flex}
 
   .footer{text-align:center;font-size:.65rem;color:var(--muted);padding-top:8px}
 
-  /* IMPRESSION */
   @media print{
     body{background:#fff}
-    .upload-section,.loader-wrap,.btn-print,.progress-wrap{display:none !important}
+    .upload-section,.key-banner,.loader-wrap,.btn-print,.progress-wrap{display:none !important}
     .header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .card,.positive-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .page{padding:0;max-width:100%}
@@ -171,6 +170,23 @@
       <div class="date" id="today-date"></div>
     </div>
   </header>
+
+  <!-- BANDEAU CLÉ GOOGLE (affiché seulement si pas de clé mémorisée) -->
+  <div class="key-banner" id="key-banner">
+    <h3>🆓 Clé Google Gemini — Gratuite, sans carte bancaire</h3>
+    <p>Pour utiliser cette application, tu as besoin d'une clé API Google gratuite. À faire <strong>une seule fois</strong> :</p>
+    <ol>
+      <li>Va sur <strong>aistudio.google.com</strong> (connecte-toi avec ton compte Gmail)</li>
+      <li>Clique sur <strong>"Get API key"</strong> puis <strong>"Create API key"</strong></li>
+      <li>Copie la clé <strong>AIzaSy…</strong> et colle-la ci-dessous</li>
+    </ol>
+    <div class="key-input-row">
+      <input type="password" id="api-key-input" placeholder="AIzaSy…" autocomplete="off"
+        onkeydown="if(event.key==='Enter') saveKey()">
+      <button class="btn-save-key" onclick="saveKey()">✓ Enregistrer</button>
+    </div>
+    <div class="key-saved-msg" id="key-saved-msg">✅ Clé enregistrée — elle sera utilisée automatiquement à chaque fois.</div>
+  </div>
 
   <div class="upload-section">
     <h2>📂 Charger les fichiers Darwin du jour</h2>
@@ -269,6 +285,7 @@
 </div>
 <script>
 const files = { perf:null, rayon:null, comp:null };
+const STORAGE_KEY = 'brief_gemini_key';
 
 const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
@@ -276,12 +293,41 @@ const now   = new Date();
 document.getElementById('today-date').textContent =
   JOURS[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS[now.getMonth()] + ' ' + now.getFullYear();
 
+// ── Gestion clé ───────────────────────────────────────────────────
+function initKey() {
+  const k = localStorage.getItem(STORAGE_KEY);
+  if (!k) {
+    document.getElementById('key-banner').classList.add('visible');
+  }
+}
+
+function saveKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val || !val.startsWith('AIza')) {
+    alert('La clé Google doit commencer par "AIza…". Vérifie ta clé sur aistudio.google.com');
+    return;
+  }
+  localStorage.setItem(STORAGE_KEY, val);
+  document.getElementById('key-saved-msg').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('key-banner').style.display = 'none';
+  }, 1500);
+}
+
+function getKey() {
+  return localStorage.getItem(STORAGE_KEY) || '';
+}
+
+initKey();
+
+// ── Rayon header ──────────────────────────────────────────────────
 function updateRayonHeader() {
   const sel = document.getElementById('rayon-select');
   const txt = sel.value ? sel.options[sel.selectedIndex].text : 'Narbonne';
   document.getElementById('header-rayon').textContent = txt + ' · Narbonne';
 }
 
+// ── Fichiers ──────────────────────────────────────────────────────
 function onFile(input, key) {
   const file = input.files[0];
   if (!file) return;
@@ -299,6 +345,7 @@ function toBase64(file) {
   });
 }
 
+// ── Prompt ────────────────────────────────────────────────────────
 function buildPrompt(rayonCode) {
   return `Tu es assistant chef de rayon dans un hypermarché Carrefour (HF7152 Narbonne).
 Tu reçois 3 rapports PDF Darwin :
@@ -311,40 +358,38 @@ RAYON CIBLE : "${rayonCode}"
 PROTOCOLE DE LECTURE DES DONNÉES — OBLIGATOIRE ET SANS EXCEPTION :
 
 ÉTAPE 1 — IDENTIFICATION DE LA LIGNE :
-- Dans chaque tableau PDF, repérer la ligne dont le libellé correspond EXACTEMENT à "${rayonCode}".
-- Mémoriser la position de cette ligne (ex : ligne 8 sur 47).
-- Ne jamais confondre avec une ligne parent (ex: "3 BAZAR"), une ligne de sous-total, ou une ligne voisine.
+- Repérer la ligne dont le libellé correspond EXACTEMENT à "${rayonCode}" (code + nom).
+- Ne jamais confondre avec une ligne parent (ex: "3 BAZAR"), de sous-total, ou voisine.
 
 ÉTAPE 2 — DOUBLE VÉRIFICATION AVANT CHAQUE VALEUR :
-Avant de lire chaque valeur, se poser ces 2 questions :
   ✓ Q1 : Suis-je bien sur la ligne "${rayonCode}" et pas une autre ?
-  ✓ Q2 : Suis-je bien dans la bonne colonne (pas une colonne voisine) ?
-Si l'une des réponses est incertaine → mettre "N/D".
+  ✓ Q2 : Suis-je bien dans la bonne colonne ?
+Si incertain → mettre "N/D".
 
 ÉTAPE 3 — LECTURE COLONNE PAR COLONNE sur la ligne "${rayonCode}" :
 - CA (K€) : colonne "Valeur (K€)" — valeur exacte avec décimales.
-- ÉVOLUTION % CA : colonne "Evolution %" — signe + ou - exact, toutes décimales. ATTENTION : colonne située entre "Valeur (K€)" et "Ecart budget (K€)". Ne pas confondre avec évolution région, évolution rang, ni aucun autre %.
+- ÉVOLUTION % CA : colonne "Evolution %" — signe + ou - exact, toutes décimales. Ne pas confondre avec évolution région, évolution rang, ni aucun autre %.
 - ÉCART BUDGET : colonne "Ecart budget (K€)" — valeur exacte avec signe + ou -.
-- TAUX DE MARGE — VÉRIFICATION TRIPLE OBLIGATOIRE :
-  * Lecture 1 : aller sur ligne "${rayonCode}" → colonne "Taux" du bloc "Marge Brute Gestion Commerciale" → noter la valeur.
-  * Lecture 2 : recompter les lignes depuis le haut → relire la colonne "Taux" → confirmer identique à Lecture 1.
+- TAUX DE MARGE — VÉRIFICATION TRIPLE + CORRESPONDANCE CODE ET NOM :
+  * Lecture 1 : sur la ligne "${rayonCode}" (vérifier code ET nom) → colonne "Taux" du bloc "Marge Brute Gestion Commerciale" → noter la valeur.
+  * Lecture 2 : recompter depuis le début du tableau → relire la colonne "Taux" → confirmer identique.
   * Lecture 3 : vérifier la cohérence (non alim : 30–55 %, alim : 15–40 %). Si anormal → 4ème lecture.
-  * Ne JAMAIS prendre la colonne "Diff % N-1" ni le taux d'une ligne voisine.
-  * Si les lectures divergent → mettre "N/D".
-- DIFF MARGE N-1 : colonne "Diff % N-1" — uniquement pour le sous-texte KPI marge.
-- RANG CA : colonne "Rang CA" dans le bloc "Classement" — entier exact.
-- ÉVOLUTION % COMPARAISON MAGASINS : colonne "Evolution %" du tableau Comparaison Magasins sur la ligne "Narbonne" uniquement.
+  * INTERDIT : colonne "Diff % N-1", ligne parent, ligne voisine.
+  * Si lectures divergent → "N/D".
+- DIFF MARGE N-1 : colonne "Diff % N-1" — pour sous-texte KPI marge uniquement.
+- RANG CA : colonne "Rang CA" — entier exact.
+- ÉVOLUTION % COMPARAISON : colonne "Evolution %" du tableau Comparaison Magasins sur la ligne "Narbonne" uniquement.
 
-ÉTAPE 4 — VÉRIFICATION FINALE avant de construire le JSON :
-  ✓ Le CA correspond bien à "${rayonCode}" et pas à la ligne du dessus/dessous.
-  ✓ L'évolution % CA est bien la colonne Evolution % et pas une autre colonne %.
-  ✓ Le taux de marge est bien la colonne "Taux" et pas "Diff % N-1".
-  ✓ L'écart budget a bien son signe + ou -.
-  ✓ Le rang est un entier cohérent (1 à 60).
+ÉTAPE 4 — VÉRIFICATION FINALE :
+  ✓ CA = ligne "${rayonCode}" colonne "Valeur (K€)"
+  ✓ Évolution % CA = ligne "${rayonCode}" colonne "Evolution %" (pas une autre colonne %)
+  ✓ Taux marge = ligne "${rayonCode}" colonne "Taux" (pas "Diff % N-1")
+  ✓ Écart budget a son signe + ou -
+  ✓ Rang est un entier entre 1 et 60
 Corriger toute incohérence avant de répondre.
 
-- Ne jamais mentionner le VAB top 3000.
-- Si une donnée est absente ou illisible : mettre "N/D".
+Ne jamais mentionner le VAB top 3000.
+Si une donnée est absente : "N/D".
 
 Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
 
@@ -358,7 +403,7 @@ Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
     {"label": "Taux de marge", "value": "XX,XX %", "color": "red|green|navy", "sub": "Diff N-1 : +/−X,XX pts"}
   ],
   "bars_perf": [
-    {"type": "red|green|blue|amber", "html": "Analyse CA avec <strong>chiffres exacts du PDF</strong>."},
+    {"type": "red|green|blue|amber", "html": "Analyse CA avec <strong>chiffres exacts</strong>."},
     {"type": "red|green|blue|amber", "html": "Analyse marge avec <strong>taux exact colonne Taux</strong> vérifié 3 fois."},
     {"type": "blue", "html": "Contexte magasin : panier moyen, débits, dispo linéaire."}
   ],
@@ -379,10 +424,19 @@ Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
 }`;
 }
 
+// ── Génération ────────────────────────────────────────────────────
 async function generateBrief() {
   const rayonCode = document.getElementById('rayon-select').value;
-  if (!rayonCode)                              { alert('Merci de choisir un rayon.'); return; }
+  if (!rayonCode) { alert('Merci de choisir un rayon.'); return; }
   if (!files.perf || !files.rayon || !files.comp) { alert('Merci de charger les 3 fichiers PDF Darwin.'); return; }
+
+  const apiKey = getKey();
+  if (!apiKey) {
+    document.getElementById('key-banner').classList.add('visible');
+    document.getElementById('key-banner').scrollIntoView({ behavior:'smooth' });
+    alert('Merci de saisir ta clé Google Gemini gratuite.');
+    return;
+  }
 
   const btn = document.getElementById('btn-gen');
   btn.disabled = true;
@@ -398,32 +452,39 @@ async function generateBrief() {
       toBase64(files.perf), toBase64(files.rayon), toBase64(files.comp)
     ]);
 
-    setLoaderMsg('Analyse des données Darwin…');
+    setLoaderMsg('Gemini analyse les données Darwin…');
 
-    const response = await fetch('/api/brief', {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64perf  } },
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64rayon } },
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64comp  } },
-            { type: 'text', text: buildPrompt(rayonCode) }
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: 'application/pdf', data: b64perf  } },
+            { inline_data: { mime_type: 'application/pdf', data: b64rayon } },
+            { inline_data: { mime_type: 'application/pdf', data: b64comp  } },
+            { text: buildPrompt(rayonCode) }
           ]
-        }]
+        }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 3000 }
       })
     });
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err?.error?.message || 'Erreur serveur ' + response.status);
+      const msg = err?.error?.message || 'Erreur Gemini ' + response.status;
+      // Si clé invalide, réafficher le bandeau
+      if (response.status === 400 || response.status === 403) {
+        localStorage.removeItem(STORAGE_KEY);
+        document.getElementById('key-banner').classList.add('visible');
+      }
+      throw new Error(msg);
     }
 
     setLoaderMsg('Mise en forme du brief…');
     const data  = await response.json();
-    const raw   = data.content.map(b => b.text || '').join('');
+    const raw   = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const clean = raw.replace(/```json|```/g, '').trim();
     const brief = JSON.parse(clean);
 
@@ -438,101 +499,50 @@ async function generateBrief() {
   }
 }
 
+// ── Rendu ─────────────────────────────────────────────────────────
 function renderBrief(d) {
   if (d.date)      document.getElementById('today-date').textContent = d.date;
   if (d.rayon_nom) document.getElementById('header-rayon').textContent = d.rayon_nom + ' · Narbonne';
 
-  const kpiHtml = d.kpis.map(k => `
-    <div class="kpi">
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value ${k.color}">${k.value}</div>
-      <div class="kpi-sub">${k.sub}</div>
-    </div>`).join('');
-
+  const kpiHtml      = d.kpis.map(k => `<div class="kpi"><div class="kpi-label">${k.label}</div><div class="kpi-value ${k.color}">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
   const barsPerfHtml = d.bars_perf.map(b => `<div class="bar ${b.type}">${b.html}</div>`).join('');
-
-  const rankStyle    = d.rang_color === 'green' ? 'background:var(--bg-green);border-color:#b8dda0'
-                     : d.rang_color === 'red'   ? 'background:var(--bg-red);border-color:#f0b8b8'
-                     :                            'background:var(--bg-blue);border-color:#c5ddf3';
-  const rankNumColor = d.rang_color === 'green' ? 'var(--green)'
-                     : d.rang_color === 'red'   ? 'var(--red)' : 'var(--navy)';
-
-  const compRows = d.comp_rows.map(r => {
-    const ec = (r.evol_ca     || '').startsWith('+') ? 'evol-pos' : 'evol-neg';
-    const ed = (r.evol_debits || '').startsWith('+') ? 'evol-pos' : 'evol-neg';
-    return `<tr ${r.highlight ? 'class="highlight"' : ''}>
-      <td>${r.magasin}</td><td>${r.ca}</td>
-      <td><span class="${ec}">${r.evol_ca}</span></td>
-      <td>${r.debits}</td>
-      <td><span class="${ed}">${r.evol_debits}</span></td>
-    </tr>`;
-  }).join('');
-
-  const tenueHtml = d.tenue_checks.map(t =>
-    `<li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
-  const cmdHtml = d.cmd_checks.map(t =>
-    `<li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
-  const total = d.tenue_checks.length + d.cmd_checks.length;
+  const rankStyle    = d.rang_color==='green' ? 'background:var(--bg-green);border-color:#b8dda0' : d.rang_color==='red' ? 'background:var(--bg-red);border-color:#f0b8b8' : 'background:var(--bg-blue);border-color:#c5ddf3';
+  const rankNumColor = d.rang_color==='green' ? 'var(--green)' : d.rang_color==='red' ? 'var(--red)' : 'var(--navy)';
+  const compRows     = d.comp_rows.map(r => `<tr ${r.highlight?'class="highlight"':''}><td>${r.magasin}</td><td>${r.ca}</td><td><span class="${(r.evol_ca||'').startsWith('+')?'evol-pos':'evol-neg'}">${r.evol_ca}</span></td><td>${r.debits}</td><td><span class="${(r.evol_debits||'').startsWith('+')?'evol-pos':'evol-neg'}">${r.evol_debits}</span></td></tr>`).join('');
+  const tenueHtml    = d.tenue_checks.map(t => `<li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
+  const cmdHtml      = d.cmd_checks.map(t => `<li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
+  const total        = d.tenue_checks.length + d.cmd_checks.length;
 
   document.getElementById('brief-output').innerHTML = `
   <div class="card">
-    <div class="section-title"><div class="badge">1</div>
-      <h2>Performance CA &amp; Marge — ${d.rayon_nom || 'Rayon'}</h2>
-    </div>
-    <div class="kpi-grid">${kpiHtml}</div>
-    ${barsPerfHtml}
+    <div class="section-title"><div class="badge">1</div><h2>Performance CA &amp; Marge — ${d.rayon_nom||'Rayon'}</h2></div>
+    <div class="kpi-grid">${kpiHtml}</div>${barsPerfHtml}
   </div>
   <div class="card">
-    <div class="section-title"><div class="badge">2</div>
-      <h2>Positionnement Narbonne — classement régional DTF Sud Est</h2>
-    </div>
+    <div class="section-title"><div class="badge">2</div><h2>Positionnement Narbonne — classement régional DTF Sud Est</h2></div>
     <div class="rank-block" style="${rankStyle}">
       <div class="rank-number" style="color:${rankNumColor}">${d.rang}</div>
-      <div class="rank-info">
-        <strong style="color:${rankNumColor}">${d.rang_label}</strong>
-        <span>${d.rang_detail}</span>
-      </div>
+      <div class="rank-info"><strong style="color:${rankNumColor}">${d.rang_label}</strong><span>${d.rang_detail}</span></div>
     </div>
     <div class="bar ${d.bar_rang.type}">${d.bar_rang.html}</div>
     <div class="spacer"></div>
     <div class="table-label">Comparaison avec les magasins voisins :</div>
     <table class="comp-table">
-      <thead><tr>
-        <th>Magasin</th><th>CA (K€)</th><th>Évol. CA</th><th>Débits</th><th>Évol. débits</th>
-      </tr></thead>
+      <thead><tr><th>Magasin</th><th>CA (K€)</th><th>Évol. CA</th><th>Débits</th><th>Évol. débits</th></tr></thead>
       <tbody>${compRows}</tbody>
     </table>
     <div class="bar ${d.bar_comp.type}">${d.bar_comp.html}</div>
   </div>
   <div class="card">
     <div class="section-title"><div class="badge amber">3</div><h2>Consignes du jour</h2></div>
-    <div class="progress-wrap">
-      <span id="progress-label">0 / ${total} faits</span>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
-    </div>
-    <div class="sub-title navy">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-      Tenue de rayon — excellence visuelle
-    </div>
+    <div class="progress-wrap"><span id="progress-label">0 / ${total} faits</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div></div>
+    <div class="sub-title navy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Tenue de rayon — excellence visuelle</div>
     <ul class="check-list">${tenueHtml}</ul>
     <div class="spacer"></div>
-    <div class="sub-title amber">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      Gestion des ruptures — commandes urgentes
-    </div>
+    <div class="sub-title amber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Gestion des ruptures — commandes urgentes</div>
     <ul class="check-list">${cmdHtml}</ul>
   </div>
-  <div class="positive-card">
-    <div class="eyebrow">🌟 Bonne journée à toute l'équipe !</div>
-    <p>${d.positif}</p>
-  </div>`;
+  <div class="positive-card"><div class="eyebrow">🌟 Bonne journée à toute l'équipe !</div><p>${d.positif}</p></div>`;
 
   document.getElementById('brief-output').classList.add('visible');
   document.getElementById('footer-src').style.display = 'block';
