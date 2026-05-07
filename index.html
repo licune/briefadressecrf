@@ -3,568 +3,829 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1a3a5c">
-<title>Brief Collaborateur — Carrefour Narbonne</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Brief Journalier — Carrefour Narbonne HF7152</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+
   :root {
-    --navy:#1a3a5c; --navy2:#2a5080; --red:#b83232; --green:#1a7a4a; --amber:#c47a15;
-    --bg:#f5f4f1; --bg-card:#ffffff; --bg-gray:#f4f3f0; --bg-blue:#eaf2fb;
-    --bg-green:#eaf3de; --bg-amber:#fdf3e0; --bg-red:#fdf0f0;
-    --border:#d8d6ce; --text:#1e1e1c; --muted:#6b6a65;
-    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
-    --radius:12px; --shadow:0 2px 12px rgba(26,58,92,.07);
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{font-size:16px;scroll-behavior:smooth}
-  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-  .page{max-width:860px;margin:0 auto;padding:16px 16px 40px}
-
-  .header{background:var(--navy);border-radius:var(--radius);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;animation:fadeDown .5s ease both}
-  .header-left h1{font-size:clamp(1rem,3vw,1.2rem);font-weight:700;color:#fff;line-height:1.3}
-  .header-left p{font-size:.75rem;color:#a8c4e0;margin-top:2px}
-  .header-right{text-align:right;flex-shrink:0}
-  .header-right .store{font-size:.8rem;font-weight:700;color:#fff;letter-spacing:.04em}
-  .header-right .date{font-size:.72rem;color:#a8c4e0;margin-top:2px}
-
-  /* BANDEAU CLÉ GOOGLE */
-  .key-banner{background:var(--bg-green);border:1px solid #b8dda0;border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;animation:fadeUp .4s ease both;display:none}
-  .key-banner.visible{display:block}
-  .key-banner h3{font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:6px}
-  .key-banner p{font-size:.75rem;color:#2e6b18;line-height:1.5;margin-bottom:10px}
-  .key-banner ol{font-size:.75rem;color:#2e6b18;line-height:1.8;padding-left:18px;margin-bottom:10px}
-  .key-banner ol li strong{color:var(--navy)}
-  .key-input-row{display:flex;gap:8px;flex-wrap:wrap}
-  .key-input-row input{flex:1;min-width:200px;border:2px solid var(--green);border-radius:6px;padding:9px 12px;font-size:.82rem;font-family:var(--mono);color:var(--text);background:#fff;outline:none}
-  .key-input-row input:focus{border-color:var(--navy)}
-  .btn-save-key{padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:6px;font-family:var(--font);font-size:.82rem;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap}
-  .btn-save-key:hover{background:var(--navy)}
-  .key-saved-msg{font-size:.72rem;color:var(--green);font-weight:600;margin-top:6px;display:none}
-  .key-saved-msg.visible{display:block}
-
-  .upload-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;margin-bottom:16px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
-  .upload-section h2{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:6px}
-  .upload-section p{font-size:.78rem;color:var(--muted);margin-bottom:16px;line-height:1.5}
-  .upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-  @media(max-width:600px){.upload-grid{grid-template-columns:1fr}}
-  .upload-box{border:2px dashed var(--border);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
-  .upload-box:hover{border-color:var(--navy2);background:var(--bg-blue)}
-  .upload-box.loaded{border-color:var(--green);background:var(--bg-green)}
-  .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-  .upload-icon{font-size:1.5rem;margin-bottom:6px}
-  .upload-label{font-size:.72rem;font-weight:700;color:var(--navy);line-height:1.3}
-  .upload-status{font-size:.65rem;color:var(--muted);margin-top:4px}
-  .upload-box.loaded .upload-status{color:var(--green);font-weight:600}
-
-  .rayon-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-  .rayon-row label{font-size:.8rem;font-weight:700;color:var(--navy);flex-shrink:0}
-  .rayon-select{flex:1;min-width:220px;border:2px solid var(--navy);border-radius:8px;padding:9px 32px 9px 12px;font-family:var(--font);font-size:.85rem;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a3a5c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-  .rayon-select:focus{border-color:var(--navy2)}
-
-  .btn-generate{width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
-  .btn-generate:hover{background:var(--navy2)}
-  .btn-generate:active{transform:scale(.98)}
-  .btn-generate:disabled{background:#aaa;cursor:not-allowed}
-
-  .loader-wrap{display:none;flex-direction:column;align-items:center;padding:36px;gap:14px}
-  .loader-wrap.visible{display:flex}
-  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
-  .loader-msg{font-size:.85rem;color:var(--muted);text-align:center;max-width:280px;line-height:1.5}
-
-  #brief-output{display:none}
-  #brief-output.visible{display:block}
-
-  .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
-  .section-title{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-  .badge{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .badge.amber{background:var(--amber)}
-  .section-title h2{font-size:clamp(.9rem,2.5vw,1rem);font-weight:700;color:var(--navy);line-height:1.3}
-
-  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-  @media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-  .kpi{background:var(--bg-gray);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center}
-  .kpi-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-  .kpi-value{font-size:clamp(1.2rem,4vw,1.6rem);font-weight:700;line-height:1.1;font-family:var(--mono)}
-  .kpi-value.red{color:var(--red)} .kpi-value.green{color:var(--green)} .kpi-value.navy{color:var(--navy)}
-  .kpi-sub{font-size:.63rem;color:var(--muted);margin-top:4px;line-height:1.3}
-
-  .bar{border-radius:6px;padding:10px 12px 10px 16px;font-size:.82rem;line-height:1.55;margin-bottom:8px;border-left:3px solid transparent}
-  .bar:last-child{margin-bottom:0}
-  .bar.red{background:var(--bg-red);border-color:var(--red)}
-  .bar.green{background:var(--bg-green);border-color:var(--green)}
-  .bar.blue{background:var(--bg-blue);border-color:var(--navy)}
-  .bar.amber{background:var(--bg-amber);border-color:var(--amber)}
-
-  .rank-block{border-radius:8px;display:flex;align-items:center;gap:16px;padding:14px 18px;margin-bottom:14px;border:1px solid}
-  .rank-number{font-size:clamp(2.8rem,10vw,3.8rem);font-weight:700;line-height:1;font-family:var(--mono);flex-shrink:0}
-  .rank-info strong{display:block;font-size:.85rem;font-weight:700}
-  .rank-info span{font-size:.78rem;color:var(--muted);line-height:1.4}
-
-  .table-label{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:8px}
-  .comp-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:10px}
-  .comp-table thead th{background:var(--navy);color:#fff;padding:7px 8px;font-weight:600;text-align:center;font-size:.7rem;letter-spacing:.03em}
-  .comp-table thead th:first-child{text-align:left}
-  .comp-table tbody tr:nth-child(odd){background:var(--bg-gray)}
-  .comp-table tbody tr:nth-child(even){background:#fff}
-  .comp-table tbody tr.highlight{background:var(--bg-blue)}
-  .comp-table tbody td{padding:7px 8px;text-align:center;border-bottom:1px solid var(--border)}
-  .comp-table tbody td:first-child{text-align:left;font-weight:600;color:var(--navy)}
-  .evol-pos{color:var(--green);font-weight:600} .evol-neg{color:var(--red);font-weight:600}
-  @media(max-width:480px){.comp-table{font-size:.7rem} .comp-table thead th,.comp-table tbody td{padding:6px 5px}}
-
-  .sub-title{display:flex;align-items:center;gap:8px;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.82rem;font-weight:700;color:#fff}
-  .sub-title.navy{background:var(--navy)} .sub-title.amber{background:var(--amber)}
-  .check-list{list-style:none;margin-bottom:4px}
-  .check-list li{display:flex;align-items:flex-start;gap:10px;padding:7px 4px;border-bottom:1px solid var(--bg-gray);font-size:.82rem;line-height:1.5;cursor:pointer;border-radius:4px;transition:background .15s}
-  .check-list li:last-child{border-bottom:none}
-  .check-list li:hover{background:var(--bg-gray)}
-  .check-box{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:2px;transition:all .2s;display:flex;align-items:center;justify-content:center;background:#fff}
-  .check-list li.done .check-box{background:var(--green);border-color:var(--green)}
-  .check-list li.done .check-box::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px)}
-  .check-list li.done .check-text{text-decoration:line-through;color:var(--muted)}
-  .progress-wrap{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:.75rem;color:var(--muted)}
-  .progress-bar-bg{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
-  .progress-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease;width:0%}
-  .spacer{height:14px}
-
-  .positive-card{background:var(--bg-green);border:1px solid #b8dda0;border-radius:var(--radius);padding:20px;margin-bottom:14px}
-  .positive-card .eyebrow{font-size:.65rem;font-weight:700;color:#2e6b18;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-  .positive-card p{font-size:.85rem;line-height:1.65;color:#1a4a0e}
-
-  .error-card{background:var(--bg-red);border:1px solid #f0b8b8;border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
-  .error-card p{font-size:.82rem;color:var(--red);line-height:1.5}
-
-  .btn-print{display:none;width:100%;padding:12px;background:#fff;color:var(--navy);border:2px solid var(--navy);border-radius:8px;font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s,color .2s;margin-bottom:14px;align-items:center;justify-content:center;gap:8px}
-  .btn-print:hover{background:var(--navy);color:#fff}
-  .btn-print.visible{display:flex}
-
-  .footer{text-align:center;font-size:.65rem;color:var(--muted);padding-top:8px}
-
-  @media print{
-    body{background:#fff}
-    .upload-section,.key-banner,.loader-wrap,.btn-print,.progress-wrap{display:none !important}
-    .header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .card,.positive-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .page{padding:0;max-width:100%}
-    .kpi-grid{grid-template-columns:repeat(4,1fr) !important}
-    .footer{display:block !important}
-    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    --blue: #003d8f;
+    --red: #e20e17;
+    --light-blue: #0066cc;
+    --bg: #f0f3f8;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --orange: #ea580c;
+    --border: #d1d9e6;
+    --alert: #fff7ed;
   }
 
-  @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes spin{to{transform:rotate(360deg)}}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--blue);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-badge {
+    width: 44px; height: 44px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .header-sub { font-size: 12px; opacity: 0.75; }
+  .header-date { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; opacity: 0.85; text-align: right; }
+
+  /* ─── MAIN CONTENT ─── */
+  .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+  /* ─── CONTROLS ─── */
+  .controls-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+  }
+  .control-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+  .control-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: .5px; }
+  select, .btn-file {
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  select:focus { outline: none; border-color: var(--light-blue); }
+  .btn-file input[type=file] { display: none; }
+  .btn-file {
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .btn-file:hover { border-color: var(--light-blue); background: #f0f6ff; }
+  .btn-file .icon { font-size: 16px; }
+  .btn-file .fname { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .file-loaded { border-color: var(--green) !important; background: #f0fdf4 !important; }
+
+  .btn-generate {
+    padding: 10px 20px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+    white-space: nowrap;
+  }
+  .btn-generate:hover { background: var(--light-blue); }
+  .btn-print {
+    padding: 10px 16px;
+    background: #fff;
+    color: var(--blue);
+    border: 1.5px solid var(--blue);
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-print:hover { background: var(--blue); color: #fff; }
+  .btn-region {
+    padding: 10px 16px;
+    background: #fff;
+    color: var(--orange);
+    border: 1.5px solid var(--orange);
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-region:hover { background: var(--orange); color: #fff; }
+  .btn-region:disabled { opacity: .4; cursor: default; }
+
+  /* ─── BRIEF CONTENT ─── */
+  #brief-output { display: none; }
+
+  .brief-header {
+    background: linear-gradient(135deg, var(--blue) 60%, #0055b3);
+    color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brief-rayon-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .brief-rayon-id { font-size: 13px; opacity: .7; }
+  .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kpi {
+    background: rgba(255,255,255,.12);
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-width: 110px;
+    text-align: center;
+  }
+  .kpi-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .kpi-label { font-size: 11px; opacity: .75; margin-top: 2px; }
+  .up { color: #86efac; }
+  .down { color: #fca5a5; }
+  .neutral { color: #fde68a; }
+
+  /* ─── SECTIONS ─── */
+  .sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .sections-grid { grid-template-columns: 1fr; } }
+
+  .section-card {
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .section-card.full { grid-column: 1 / -1; }
+
+  .section-head {
+    padding: 10px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: .3px;
+  }
+  .section-head.op { background: #eff6ff; color: var(--blue); border-bottom: 1px solid #dbeafe; }
+  .section-head.clean { background: #f0fdf4; color: #166534; border-bottom: 1px solid #bbf7d0; }
+  .section-head.alerte { background: #fff7ed; color: #9a3412; border-bottom: 1px solid #fed7aa; }
+  .section-head.region { background: #fdf4ff; color: #6b21a8; border-bottom: 1px solid #e9d5ff; }
+
+  .consignes-list { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .consigne {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f9fafb;
+    border-left: 3px solid transparent;
+  }
+  .consigne.op { border-left-color: var(--blue); }
+  .consigne.clean { border-left-color: var(--green); }
+  .consigne-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--blue);
+    min-width: 22px;
+    line-height: 1.3;
+  }
+  .consigne.clean .consigne-num { color: var(--green); }
+  .consigne-text { font-size: 13.5px; line-height: 1.5; }
+  .consigne-text strong { color: var(--text); }
+  .consigne-text .tag {
+    display: inline-block;
+    background: #e0e7ff;
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+  }
+  .consigne-text .tag.warn { background: #fff3cd; color: #92400e; }
+  .consigne-text .tag.ok { background: #dcfce7; color: #166534; }
+  .consigne-text .tag.err { background: #fee2e2; color: #991b1b; }
+
+  /* ─── ALERTES ─── */
+  .alert-row {
+    padding: 10px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .alert-chip {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .alert-chip.warn { background: #fff3cd; color: #92400e; }
+  .alert-chip.bad { background: #fee2e2; color: #991b1b; }
+  .alert-chip.good { background: #dcfce7; color: #166534; }
+
+  /* ─── CLASSEMENT REGION ─── */
+  .region-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .region-table th {
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .region-table td { padding: 7px 10px; border-bottom: 1px solid #f0f3f8; }
+  .region-table tr.highlight { background: #fffbeb; }
+  .region-table tr.highlight td { font-weight: 600; }
+  .rank-badge {
+    display: inline-block;
+    min-width: 26px;
+    text-align: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    background: #e0e7ff;
+    color: var(--blue);
+  }
+  .rank-badge.top3 { background: #fef9c3; color: #854d0e; }
+  .rank-badge.narbonne { background: var(--blue); color: #fff; }
+
+  /* ─── SIGNATURE ─── */
+  .brief-footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 10px 0 20px;
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: #fff; }
+    .controls-card, .no-print { display: none !important; }
+    #brief-output { display: block !important; }
+    .header { background: #003d8f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .brief-header { background: #003d8f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section-head.op, .section-head.clean, .section-head.alerte, .section-head.region { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .sections-grid { grid-template-columns: 1fr 1fr; }
+    .container { padding: 0 10px; }
+  }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <header class="header">
-    <div class="header-left">
-      <h1>Brief collaborateur<br><span id="header-rayon">Narbonne</span></h1>
-      <p>HF7152 · Source Darwin</p>
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-badge">C</div>
+    <div>
+      <div class="header-title">Brief Journalier — Carrefour Narbonne</div>
+      <div class="header-sub">Magasin HF7152 · DTF SUD EST · Source Darwin</div>
     </div>
-    <div class="header-right">
-      <div class="store">Carrefour Narbonne</div>
-      <div class="date" id="today-date"></div>
-    </div>
-  </header>
-
-  <!-- BANDEAU CLÉ GOOGLE (affiché seulement si pas de clé mémorisée) -->
-  <div class="key-banner" id="key-banner">
-    <h3>🆓 Clé Google Gemini — Gratuite, sans carte bancaire</h3>
-    <p>Pour utiliser cette application, tu as besoin d'une clé API Google gratuite. À faire <strong>une seule fois</strong> :</p>
-    <ol>
-      <li>Va sur <strong>aistudio.google.com</strong> (connecte-toi avec ton compte Gmail)</li>
-      <li>Clique sur <strong>"Get API key"</strong> puis <strong>"Create API key"</strong></li>
-      <li>Copie la clé <strong>AIzaSy…</strong> et colle-la ci-dessous</li>
-    </ol>
-    <div class="key-input-row">
-      <input type="password" id="api-key-input" placeholder="AIzaSy…" autocomplete="off"
-        onkeydown="if(event.key==='Enter') saveKey()">
-      <button class="btn-save-key" onclick="saveKey()">✓ Enregistrer</button>
-    </div>
-    <div class="key-saved-msg" id="key-saved-msg">✅ Clé enregistrée — elle sera utilisée automatiquement à chaque fois.</div>
   </div>
+  <div class="header-date">
+    Journée du<br><strong>Mardi 05/05/2026</strong>
+  </div>
+</div>
 
-  <div class="upload-section">
-    <h2>📂 Charger les fichiers Darwin du jour</h2>
-    <p>Charge les 3 rapports PDF, choisis ton rayon, puis clique sur <strong>Générer le brief</strong>.</p>
+<div class="container">
 
-    <div class="upload-grid">
-      <div class="upload-box" id="box-perf">
-        <input type="file" accept=".pdf" onchange="onFile(this,'perf')">
-        <div class="upload-icon">📊</div>
-        <div class="upload-label">Performances Globales</div>
-        <div class="upload-status" id="status-perf">Aucun fichier</div>
-      </div>
-      <div class="upload-box" id="box-rayon">
-        <input type="file" accept=".pdf" onchange="onFile(this,'rayon')">
-        <div class="upload-icon">📋</div>
-        <div class="upload-label">Classement Rayons</div>
-        <div class="upload-status" id="status-rayon">Aucun fichier</div>
-      </div>
-      <div class="upload-box" id="box-comp">
-        <input type="file" accept=".pdf" onchange="onFile(this,'comp')">
-        <div class="upload-icon">🏪</div>
-        <div class="upload-label">Comparaison Magasins</div>
-        <div class="upload-status" id="status-comp">Aucun fichier</div>
-      </div>
+  <!-- CONTROLS -->
+  <div class="controls-card no-print">
+
+    <div class="control-group">
+      <label>📄 PDF Performances Globales</label>
+      <label class="btn-file" id="lbl-perf">
+        <input type="file" id="file-perf" accept=".pdf">
+        <span class="icon">📥</span>
+        <span id="fname-perf" class="fname">Charger le PDF…</span>
+      </label>
     </div>
 
-    <div class="rayon-row">
-      <label>🏬 Rayon :</label>
-      <select class="rayon-select" id="rayon-select" onchange="updateRayonHeader()">
-        <option value="">— Choisir un rayon —</option>
-        <optgroup label="── BAZAR ──">
-          <option value="30 BRICOLAGE">30 · Bricolage</option>
-          <option value="31 CONFORT DE LA MAISON">31 · Confort de la Maison</option>
-          <option value="32 PAPETERIE">32 · Papeterie</option>
-          <option value="33 JOUET SPORT">33 · Jouet Sport</option>
-          <option value="34 JARDIN ET ANIMALERIE">34 · Jardin &amp; Animalerie</option>
-          <option value="35 AUTO">35 · Auto</option>
-          <option value="8X CULTURE">8X · Culture</option>
+    <div class="control-group">
+      <label>📊 PDF Classement Rayons</label>
+      <label class="btn-file" id="lbl-rayons">
+        <input type="file" id="file-rayons" accept=".pdf">
+        <span class="icon">📥</span>
+        <span id="fname-rayons" class="fname">Charger le PDF…</span>
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>🗂️ PDF Comparaison Magasins (optionnel)</label>
+      <label class="btn-file" id="lbl-compar">
+        <input type="file" id="file-compar" accept=".pdf">
+        <span class="icon">📥</span>
+        <span id="fname-compar" class="fname">Charger le PDF…</span>
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>Choisir le rayon</label>
+      <select id="select-rayon">
+        <option value="">— Sélectionner un rayon —</option>
+        <optgroup label="Alimentaire PGC">
+          <option value="10">10 — Boissons</option>
+          <option value="11">11 — Droguerie</option>
+          <option value="12">12 — Parfumerie Hygiène</option>
+          <option value="14">14 — Épicerie</option>
+          <option value="19">19 — Parapharmacie</option>
         </optgroup>
-        <optgroup label="── ÉPCS ──">
-          <option value="40 GEM">40 · GEM</option>
-          <option value="41 PEM">41 · PEM</option>
-          <option value="42 PHOTO COMMUNICATION">42 · Photo Communication</option>
-          <option value="43 IMAGE ET SON">43 · Image &amp; Son</option>
-          <option value="44 MICRO INFORMATIQUE">44 · Micro Informatique</option>
-          <option value="45 RADIOTELEPHONIE">45 · Radiotéléphonie</option>
+        <optgroup label="Alimentaire PFT">
+          <option value="20">20 — Charcuterie / Traiteur</option>
+          <option value="21">21 — Poissonnerie</option>
+          <option value="22">22 — Fruits et Légumes</option>
+          <option value="23">23 — Boulangerie / Pâtisserie</option>
+          <option value="24">24 — Boucherie Volaille</option>
+          <option value="25">25 — PLS (Produits Libres Service)</option>
         </optgroup>
-        <optgroup label="── TEXTILE ──">
-          <option value="60 CHAUSSURE">60 · Chaussure</option>
-          <option value="61 BEBE">61 · Bébé</option>
-          <option value="62 ENFANT">62 · Enfant</option>
-          <option value="63 FEMME">63 · Femme</option>
-          <option value="64 HOMME">64 · Homme</option>
-          <option value="65 LINGE DE MAISON">65 · Linge de Maison</option>
-          <option value="66 ACCESSOIRES">66 · Accessoires</option>
-          <option value="67 BIJOUTERIE">67 · Bijouterie</option>
+        <optgroup label="Non Alimentaire — Bazar">
+          <option value="30">30 — Bricolage</option>
+          <option value="31">31 — Confort de la Maison</option>
+          <option value="32">32 — Papeterie</option>
+          <option value="33">33 — Jouet Sport</option>
+          <option value="34">34 — Jardin et Animalerie</option>
+          <option value="35">35 — Auto</option>
+          <option value="8X">8X — Culture</option>
         </optgroup>
-        <optgroup label="── ALIMENTAIRE PGC ──">
-          <option value="10 BOISSONS">10 · Boissons</option>
-          <option value="11 DROGUERIE">11 · Droguerie</option>
-          <option value="12 PARFUMERIE HYGIENE">12 · Parfumerie Hygiène</option>
-          <option value="14 EPICERIE">14 · Épicerie</option>
-          <option value="19 PARAPHARMACIE">19 · Parapharmacie</option>
-          <option value="25 PLS">25 · P.L.S.</option>
+        <optgroup label="Non Alimentaire — EPCS">
+          <option value="40">40 — GEM</option>
+          <option value="41">41 — PEM</option>
+          <option value="43">43 — Image et Son</option>
+          <option value="44">44 — Micro Informatique</option>
+          <option value="45">45 — Radiotéléphonie</option>
         </optgroup>
-        <optgroup label="── ALIMENTAIRE PFT ──">
-          <option value="20 CHARCUT.TRAITEUR">20 · Charcuterie Traiteur</option>
-          <option value="21 POISSONNERIE">21 · Poissonnerie</option>
-          <option value="22 FRUITS ET LEGUMES">22 · Fruits &amp; Légumes</option>
-          <option value="23 BOULANGERIE/PATISSERIE">23 · Boulangerie / Pâtisserie</option>
-          <option value="24 BOUCHERIE VOLAILLE">24 · Boucherie Volaille</option>
+        <optgroup label="Textile">
+          <option value="60">60 — Chaussure</option>
+          <option value="61">61 — Bébé</option>
+          <option value="62">62 — Enfant</option>
+          <option value="63">63 — Femme</option>
+          <option value="64">64 — Homme</option>
+          <option value="65">65 — Linge de Maison</option>
+          <option value="66">66 — Accessoires</option>
         </optgroup>
       </select>
     </div>
 
-    <button class="btn-generate" id="btn-gen" onclick="generateBrief()">
-      ⚡ Générer le brief du jour
-    </button>
+    <button class="btn-generate" onclick="generateBrief()">▶ Générer le brief</button>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+    <button class="btn-region" id="btn-region" onclick="showRegion()" disabled>🌍 Classement Région</button>
+
   </div>
 
-  <div class="loader-wrap" id="loader">
-    <div class="spinner"></div>
-    <div class="loader-msg" id="loader-msg">Lecture des PDFs…</div>
-  </div>
-
-  <div id="brief-output"></div>
-
-  <button class="btn-print" id="btn-print" onclick="window.print()">
-    🖨️ Imprimer le brief
-  </button>
-
-  <div class="footer" id="footer-src" style="display:none">
-    Source : Darwin — Confidentiel Carrefour · HF7152 Narbonne
+  <!-- BRIEF OUTPUT -->
+  <div id="brief-output">
+    <div id="brief-content"></div>
   </div>
 
 </div>
+
 <script>
-const files = { perf:null, rayon:null, comp:null };
-const STORAGE_KEY = 'brief_gemini_key';
+// ═══════════════════════════════════════════════════════════
+// DATA — Extraite des PDFs Darwin HF7152 Narbonne 05/05/2026
+// ═══════════════════════════════════════════════════════════
+const STORE = {
+  magasin: "HF7152 - Narbonne",
+  date: "Mardi 05/05/2026",
+  caJour: 317.4,
+  caJourEvol: -3.2,
+  caJourBudget: -19.4,
+  panierMoyen: 56.6,
+  panierEvol: -0.5,
+  debits: 5609,
+  debitsEvol: -2.7,
+  dispoLineaire: 91.5,
+  vabTop3000: 92.6,
+  mbgcTaux: 28.43,
+  prevJour: 335.3,
+};
 
-const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-const now   = new Date();
-document.getElementById('today-date').textContent =
-  JOURS[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS[now.getMonth()] + ' ' + now.getFullYear();
+// Données par rayon : [num, nom, CA(K€), evolCA%, ecartBudget, taux_marge%, diff_marge_N1, rang_CA, evol_rang, evol_region%, rupt_assort, vab_top3000, stk_negatif]
+const RAYONS = {
+  "10": { num:"10", nom:"Boissons", parent:"PGC", type:"alim_pgc",
+    ca:30.4, evolCA:-11.8, budget:-7.8, taux:20.05, diffMarge:-0.31, rang:71, evolRang:-17, evolRegion:2.4,
+    ruptAssort:60, vab:37, stkNeg:100, notes:"CA e-com: 2,0 K€ (-25,2%)" },
+  "11": { num:"11", nom:"Droguerie", parent:"PGC", type:"alim_pgc",
+    ca:10.8, evolCA:4.4, budget:0.2, taux:24.49, diffMarge:-4.56, rang:58, evolRang:-1, evolRegion:10.4,
+    ruptAssort:28, vab:1, stkNeg:18, notes:"CA e-com: 0,8 K€ (+22,4%)" },
+  "12": { num:"12", nom:"Parfumerie Hygiène", parent:"PGC", type:"alim_pgc",
+    ca:19.9, evolCA:-3.9, budget:-1.7, taux:28.13, diffMarge:0.83, rang:42, evolRang:-4, evolRegion:8.9,
+    ruptAssort:60, vab:4, stkNeg:76, notes:"CA e-com: 1,1 K€ (+24,6%)" },
+  "14": { num:"14", nom:"Épicerie", parent:"PGC", type:"alim_pgc",
+    ca:64.5, evolCA:2.6, budget:0.4, taux:24.26, diffMarge:-1.14, rang:49, evolRang:1, evolRegion:9.3,
+    ruptAssort:25, vab:75, stkNeg:113, notes:"CA e-com: 5,8 K€ (+18,2%)" },
+  "19": { num:"19", nom:"Parapharmacie", parent:"PGC", type:"alim_pgc",
+    ca:6.0, evolCA:-20.9, budget:-1.6, taux:35.40, diffMarge:1.24, rang:7, evolRang:-5, evolRegion:-8.9,
+    ruptAssort:0, vab:0, stkNeg:41, notes:"CA e-com: 0,1 K€ (+92,6%)" },
+  "20": { num:"20", nom:"Charcuterie / Traiteur", parent:"PFT", type:"alim_pft",
+    ca:11.3, evolCA:-16.9, budget:-2.5, taux:39.53, diffMarge:1.04, rang:34, evolRang:-12, evolRegion:-0.1,
+    ruptAssort:0, vab:0, stkNeg:22, notes:"Traçabilité & origine obligatoires" },
+  "21": { num:"21", nom:"Poissonnerie", parent:"PFT", type:"alim_pft",
+    ca:9.2, evolCA:-6.9, budget:-0.7, taux:25.28, diffMarge:-0.15, rang:32, evolRang:-7, evolRegion:7.7,
+    ruptAssort:0, vab:0, stkNeg:4, notes:"DLC courtes — contrôle J" },
+  "22": { num:"22", nom:"Fruits et Légumes", parent:"PFT", type:"alim_pft",
+    ca:21.1, evolCA:-6.0, budget:-1.8, taux:31.30, diffMarge:2.58, rang:49, evolRang:-6, evolRegion:2.6,
+    ruptAssort:0, vab:0, stkNeg:26, notes:"Origine & traçabilité — fiches produits" },
+  "23": { num:"23", nom:"Boulangerie / Pâtisserie", parent:"PFT", type:"alim_pft",
+    ca:5.5, evolCA:-10.1, budget:-1.4, taux:64.74, diffMarge:1.77, rang:41, evolRang:-8, evolRegion:-0.6,
+    ruptAssort:0, vab:0, stkNeg:0, notes:"Étiquetage allergènes obligatoire" },
+  "24": { num:"24", nom:"Boucherie Volaille", parent:"PFT", type:"alim_pft",
+    ca:16.2, evolCA:-7.8, budget:-1.9, taux:27.78, diffMarge:0.86, rang:29, evolRang:-7, evolRegion:4.2,
+    ruptAssort:0, vab:0, stkNeg:0, notes:"Traçabilité obligatoire + affichage origine" },
+  "25": { num:"25", nom:"PLS (Libre Service)", parent:"PFT", type:"alim_pls",
+    ca:63.8, evolCA:-0.1, budget:-1.9, taux:25.24, diffMarge:-0.84, rang:66, evolRang:-12, evolRegion:9.7,
+    ruptAssort:154, vab:89, stkNeg:117, notes:"CA e-com: 7,0 K€ (+12,2%)" },
+  "30": { num:"30", nom:"Bricolage", parent:"Bazar", type:"non_alim",
+    ca:2.7, evolCA:15.8, budget:0.4, taux:46.64, diffMarge:4.33, rang:16, evolRang:25, evolRegion:-11.2,
+    ruptAssort:28, vab:0, stkNeg:26, notes:"Bon évolution +15,8%" },
+  "31": { num:"31", nom:"Confort de la Maison", parent:"Bazar", type:"non_alim",
+    ca:8.4, evolCA:7.2, budget:-0.4, taux:46.02, diffMarge:-0.16, rang:16, evolRang:19, evolRegion:-5.0,
+    ruptAssort:24, vab:0, stkNeg:49, notes:"Rang 16/31 DTF — progression +19 rangs" },
+  "32": { num:"32", nom:"Papeterie", parent:"Bazar", type:"non_alim",
+    ca:1.3, evolCA:-8.9, budget:-0.2, taux:41.84, diffMarge:-0.60, rang:33, evolRang:-11, evolRegion:7.5,
+    ruptAssort:44, vab:0, stkNeg:34, notes:"" },
+  "33": { num:"33", nom:"Jouet Sport", parent:"Bazar", type:"non_alim",
+    ca:2.9, evolCA:-1.7, budget:0.1, taux:34.82, diffMarge:1.20, rang:25, evolRang:5, evolRegion:-6.1,
+    ruptAssort:152, vab:0, stkNeg:49, notes:"152 ruptures assortiment à traiter" },
+  "34": { num:"34", nom:"Jardin et Animalerie", parent:"Bazar", type:"non_alim",
+    ca:4.5, evolCA:-30.4, budget:-3.5, taux:34.40, diffMarge:5.08, rang:53, evolRang:-16, evolRegion:-14.1,
+    ruptAssort:8, vab:1, stkNeg:99, notes:"Forte baisse CA -30,4% — 99 stocks négatifs" },
+  "35": { num:"35", nom:"Auto", parent:"Bazar", type:"non_alim",
+    ca:1.3, evolCA:-0.2, budget:0.0, taux:47.21, diffMarge:-0.95, rang:47, evolRang:-1, evolRegion:-5.5,
+    ruptAssort:0, vab:0, stkNeg:19, notes:"" },
+  "8X": { num:"8X", nom:"Culture", parent:"Bazar", type:"non_alim",
+    ca:2.7, evolCA:5.8, budget:0.1, taux:21.07, diffMarge:-7.29, rang:66, evolRang:-1, evolRegion:8.4,
+    ruptAssort:0, vab:0, stkNeg:106, notes:"Marge en recul -7,29 pts" },
+  "40": { num:"40", nom:"GEM (Gros Électro Ménager)", parent:"EPCS", type:"non_alim",
+    ca:0.8, evolCA:94.8, budget:0.4, taux:32.35, diffMarge:0.11, rang:19, evolRang:34, evolRegion:20.9,
+    ruptAssort:1, vab:0, stkNeg:0, notes:"Très forte progression +94,8%" },
+  "41": { num:"41", nom:"PEM (Petit Électro Ménager)", parent:"EPCS", type:"non_alim",
+    ca:6.6, evolCA:-2.7, budget:-0.2, taux:21.61, diffMarge:-2.22, rang:24, evolRang:-13, evolRegion:3.5,
+    ruptAssort:13, vab:0, stkNeg:4, notes:"CA e-com: 0 (-94,7%)" },
+  "43": { num:"43", nom:"Image et Son", parent:"EPCS", type:"non_alim",
+    ca:4.7, evolCA:44.6, budget:2.0, taux:17.34, diffMarge:-0.26, rang:7, evolRang:14, evolRegion:9.9,
+    ruptAssort:34, vab:0, stkNeg:2, notes:"Bonne dynamique CA +44,6%" },
+  "44": { num:"44", nom:"Micro Informatique", parent:"EPCS", type:"non_alim",
+    ca:4.3, evolCA:-6.9, budget:0.4, taux:23.84, diffMarge:-1.26, rang:14, evolRang:-5, evolRegion:-2.5,
+    ruptAssort:56, vab:0, stkNeg:3, notes:"" },
+  "45": { num:"45", nom:"Radiotéléphonie", parent:"EPCS", type:"non_alim",
+    ca:3.2, evolCA:-6.3, budget:0.0, taux:16.28, diffMarge:-6.29, rang:59, evolRang:-27, evolRegion:25.8,
+    ruptAssort:0, vab:0, stkNeg:12, notes:"Marge en forte baisse -6,29 pts" },
+  "60": { num:"60", nom:"Chaussure", parent:"Textile", type:"non_alim",
+    ca:1.9, evolCA:25.5, budget:0.4, taux:45.27, diffMarge:-1.59, rang:2, evolRang:6, evolRegion:8.8,
+    ruptAssort:417, vab:0, stkNeg:53, notes:"Rang 2 DTF — 417 ruptures assortiment" },
+  "61": { num:"61", nom:"Bébé", parent:"Textile", type:"non_alim",
+    ca:1.0, evolCA:-33.4, budget:-0.1, taux:47.77, diffMarge:1.25, rang:61, evolRang:-35, evolRegion:-9.1,
+    ruptAssort:97, vab:0, stkNeg:25, notes:"Forte baisse -33,4%" },
+  "62": { num:"62", nom:"Enfant", parent:"Textile", type:"non_alim",
+    ca:1.2, evolCA:0.4, budget:0.2, taux:54.66, diffMarge:1.80, rang:14, evolRang:12, evolRegion:-12.6,
+    ruptAssort:77, vab:0, stkNeg:59, notes:"" },
+  "63": { num:"63", nom:"Femme", parent:"Textile", type:"non_alim",
+    ca:4.0, evolCA:-3.3, budget:0.0, taux:45.04, diffMarge:-0.06, rang:11, evolRang:5, evolRegion:-9.5,
+    ruptAssort:359, vab:0, stkNeg:105, notes:"" },
+  "64": { num:"64", nom:"Homme", parent:"Textile", type:"non_alim",
+    ca:2.8, evolCA:0.6, budget:0.3, taux:48.45, diffMarge:3.35, rang:12, evolRang:7, evolRegion:-0.9,
+    ruptAssort:312, vab:0, stkNeg:65, notes:"" },
+  "65": { num:"65", nom:"Linge de Maison", parent:"Textile", type:"non_alim",
+    ca:3.4, evolCA:25.2, budget:0.7, taux:53.16, diffMarge:2.31, rang:7, evolRang:3, evolRegion:14.4,
+    ruptAssort:122, vab:0, stkNeg:36, notes:"" },
+  "66": { num:"66", nom:"Accessoires", parent:"Textile", type:"non_alim",
+    ca:0.6, evolCA:15.9, budget:0.1, taux:44.29, diffMarge:7.47, rang:25, evolRang:-11, evolRegion:45.5,
+    ruptAssort:31, vab:0, stkNeg:3, notes:"Meilleur taux marge diff: +7,47 pts" },
+};
 
-// ── Gestion clé ───────────────────────────────────────────────────
-function initKey() {
-  const k = localStorage.getItem(STORAGE_KEY);
-  if (!k) {
-    document.getElementById('key-banner').classList.add('visible');
+// Données comparaison région — Rayon 31 Confort de la Maison
+const REGION_DATA = {
+  "31": {
+    dtfCA: 130.2, dtfEvol: -5.0, dtfDebits: 26116, dtfPanier: 5.0,
+    magasins: [
+      {rang:1, nom:"Nice Tnl", ca:10.2, evolCA:-12.2, debits:2200, panier:4.6, isNarbonne:false},
+      {rang:2, nom:"Narbonne", ca:8.4, evolCA:7.2, debits:1273, panier:6.6, isNarbonne:true},
+      {rang:3, nom:"Montélimar", ca:3.5, evolCA:-0.7, debits:504, panier:6.9, isNarbonne:false},
+      {rang:4, nom:"Sainte Maxime", ca:4.6, evolCA:-1.8, debits:587, panier:7.8, isNarbonne:false},
+      {rang:5, nom:"Marseille Grand Littoral", ca:7.0, evolCA:-14.6, debits:1513, panier:4.6, isNarbonne:false},
+      {rang:6, nom:"Portet-sur-Garonne", ca:4.6, evolCA:-18.2, debits:728, panier:6.3, isNarbonne:false},
+      {rang:7, nom:"Toulon Mayol", ca:5.6, evolCA:-17.1, debits:1807, panier:3.1, isNarbonne:false},
+      {rang:8, nom:"Avignon", ca:1.2, evolCA:-28.6, debits:444, panier:2.8, isNarbonne:false},
+      {rang:9, nom:"Ajaccio 2", ca:5.5, evolCA:-10.6, debits:1233, panier:4.4, isNarbonne:false},
+      {rang:10, nom:"Vaulx En Velin", ca:5.5, evolCA:-5.3, debits:1108, panier:4.9, isNarbonne:false},
+      {rang:11, nom:"Perpignan", ca:5.0, evolCA:10.2, debits:807, panier:6.2, isNarbonne:false},
+      {rang:12, nom:"Saint Jean De Védas", ca:4.6, evolCA:8.4, debits:898, panier:5.2, isNarbonne:false},
+      {rang:13, nom:"Sainte Maxime", ca:4.6, evolCA:-1.8, debits:587, panier:7.8, isNarbonne:false},
+      {rang:14, nom:"Vitrolles", ca:7.6, evolCA:-10.6, debits:1224, panier:6.2, isNarbonne:false},
+      {rang:15, nom:"Nîmes Ouest", ca:4.4, evolCA:-15.5, debits:1117, panier:3.9, isNarbonne:false},
+      {rang:16, nom:"Orange", ca:3.7, evolCA:-18.2, debits:759, panier:4.9, isNarbonne:false},
+      {rang:17, nom:"L\'Isle D\'abeau", ca:3.5, evolCA:-26.1, debits:814, panier:4.3, isNarbonne:false},
+      {rang:18, nom:"Montélimar", ca:3.5, evolCA:-0.7, debits:504, panier:6.9, isNarbonne:false},
+      {rang:19, nom:"Sérignan", ca:3.2, evolCA:-1.6, debits:619, panier:5.2, isNarbonne:false},
+      {rang:20, nom:"Port De Bouc", ca:2.3, evolCA:13.0, debits:725, panier:3.2, isNarbonne:false},
+      {rang:21, nom:"Salaise Sur Sanne", ca:3.1, evolCA:-12.8, debits:617, panier:5.1, isNarbonne:false},
+      {rang:22, nom:"Le Crès", ca:3.0, evolCA:-21.4, debits:609, panier:4.8, isNarbonne:false},
+      {rang:23, nom:"Trans En Provence", ca:2.8, evolCA:-1.2, debits:577, panier:4.9, isNarbonne:false},
+      {rang:24, nom:"Aussi", ca:1.3, evolCA:14.9, debits:340, panier:3.8, isNarbonne:false},
+      {rang:25, nom:"Cahors", ca:1.6, evolCA:-4.1, debits:256, panier:6.1, isNarbonne:false},
+      {rang:26, nom:"Aurillac", ca:2.1, evolCA:-10.9, debits:376, panier:5.6, isNarbonne:false},
+      {rang:27, nom:"Montauban", ca:1.5, evolCA:-12.2, debits:287, panier:5.1, isNarbonne:false},
+      {rang:28, nom:"Villefranche De Rouergue", ca:1.4, evolCA:-14.9, debits:291, panier:4.8, isNarbonne:false},
+      {rang:29, nom:"Issoire", ca:3.1, evolCA:-12.2, debits:525, panier:6.0, isNarbonne:false},
+      {rang:30, nom:"Boe", ca:1.6, evolCA:-17.1, debits:202, panier:5.0, isNarbonne:false},
+      {rang:31, nom:"Marseille Le Merlan", ca:5.7, evolCA:-5.1, debits:1329, panier:4.3, isNarbonne:false},
+    ]
   }
-}
+};
 
-function saveKey() {
-  const val = document.getElementById('api-key-input').value.trim();
-  if (!val || !val.startsWith('AIza')) {
-    alert('La clé Google doit commencer par "AIza…". Vérifie ta clé sur aistudio.google.com');
-    return;
+// ═══════════════════════════════════════════════════════════
+// CONSIGNES PAR TYPE DE RAYON
+// ═══════════════════════════════════════════════════════════
+function getConsignes(rayon) {
+  const op = [];
+  const clean = [];
+  const type = rayon.type;
+  const stkNeg = rayon.stkNeg;
+  const rupt = rayon.ruptAssort;
+
+  // ─────────────────────────────────────────────
+  // PGC (hors PLS)
+  // ─────────────────────────────────────────────
+  if (type === "alim_pgc") {
+    op.push(`<strong>Contrôle DLC / DDM obligatoire :</strong> Effectuer un tour complet du rayon et retirer tout produit dont la date est dépassée ou à moins de 3 jours. Vérifier en priorité les zones de bas-de-rayon et les têtes de gondole.`);
+    op.push(`<strong>Chasse aux ruptures & commande :</strong> Identifier chaque référence absente du linéaire. Pour chaque rupture confirmée : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
+    op.push(`<strong>Mise à jour des SMP :</strong> Sur les références en rupture traitées, vérifier que le Stock Mini Permanent est cohérent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster pour éviter les ruptures futures.`);
+
+    // Propreté PGC : rangement réserve + vérification linéaire
+    clean.push(`<strong>Rangement de la réserve :</strong> Ranger la réserve, évacuer les cartons vides et les emballages, vérifier que les allées de sécurité sont dégagées.`);
+    clean.push(`<strong>Vérification du linéaire — étagères & rayonnages :</strong> Contrôler l'état de chaque étagère, redresser les articles tombés ou mal positionnés, vérifier que les tablettes sont propres et stables.`);
+    clean.push(`<strong>Facing & tenue générale du rayon :</strong> Remettre chaque produit face-client sur l'ensemble des emplacements, combler les trous de présentation, vérifier l'affichage des prix et retirer les étiquettes obsolètes.`);
   }
-  localStorage.setItem(STORAGE_KEY, val);
-  document.getElementById('key-saved-msg').classList.add('visible');
-  setTimeout(() => {
-    document.getElementById('key-banner').style.display = 'none';
-  }, 1500);
+
+  // ─────────────────────────────────────────────
+  // PLS
+  // ─────────────────────────────────────────────
+  else if (type === "alim_pls") {
+    op.push(`<strong>Contrôle DLC produits frais LS :</strong> Effectuer un tour complet des meubles réfrigérés et retirer tout produit dont la DLC est dépassée ou à moins de 3 jours. Vérifier les étiquettes de traçabilité et l'intégrité des emballages.`);
+    op.push(`<strong>Chasse aux ruptures & commande :</strong> Identifier chaque référence absente. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
+    op.push(`<strong>Mise à jour des SMP :</strong> Sur les références en rupture traitées, vérifier la cohérence du Stock Mini Permanent avec la rotation journalière. Ajuster si le SMP est à 0 ou sous-dimensionné.`);
+
+    // Propreté PLS : réserve + meubles froids (températures)
+    clean.push(`<strong>Rangement de la réserve :</strong> Ranger la chambre froide et la réserve PLS, évacuer les cartons vides, vérifier que les allées sont dégagées et que les produits sont bien identifiés.`);
+    clean.push(`<strong>Vérification & nettoyage des meubles froids :</strong> Contrôler les températures de chaque meuble réfrigéré (maxi +4 °C pour les frais, -18 °C pour les surgelés). Nettoyer les vitrines, joints et étagères des meubles. Signaler toute anomalie thermique.`);
+    clean.push(`<strong>Tenue du linéaire — étagères & rayonnages :</strong> Vérifier l'état et la propreté des étagères, redresser les articles mal positionnés, contrôler l'affichage des prix et retirer les étiquettes de références absentes.`);
+  }
+
+  // ─────────────────────────────────────────────
+  // PFT
+  // ─────────────────────────────────────────────
+  else if (type === "alim_pft") {
+    if (rayon.num === "20" || rayon.num === "21" || rayon.num === "24") {
+      op.push(`<strong>Traçabilité & origine obligatoires :</strong> Vérifier que chaque produit en vitrine dispose de sa fiche traçabilité complète (numéro de lot, date de réception, origine géographique). Contrôler l'affichage réglementaire de l'origine sur les étiquettes.`);
+    } else if (rayon.num === "22") {
+      op.push(`<strong>Traçabilité & fiches origine :</strong> Vérifier que les étiquettes affichent l'origine de chaque produit (pays + exploitation si bio). Retirer tout produit sans fiche traçabilité conforme. Contrôler la fraîcheur visuelle de l'ensemble de l'étalage.`);
+    } else if (rayon.num === "23") {
+      op.push(`<strong>Étiquetage allergènes & DLC :</strong> Contrôler que l'affichage des 14 allergènes réglementaires est présent et lisible pour chaque produit fabriqué sur place. Vérifier les DLC des produits et retirer ceux arrivés à date.`);
+    } else {
+      op.push(`<strong>Contrôle DLC & qualité produits frais :</strong> Vérifier les DLC de tous les produits en vitrine et en réserve. Retirer tout produit arrivé à date ou présentant des défauts d'aspect. Contrôler l'intégrité des conditionnements.`);
+    }
+    op.push(`<strong>Chasse aux ruptures & stock :</strong> Identifier chaque emplacement vide. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
+    op.push(`<strong>Mise à jour des SMP :</strong> Sur les références traitées en rupture, vérifier la cohérence du Stock Mini Permanent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster. Contrôler le coût d'achat des dernières réceptions pour veiller à la tenue de marge.`);
+
+    // Propreté PFT : réserve + meubles froids + plan HACCP
+    clean.push(`<strong>Nettoyage & désinfection des meubles froids :</strong> Contrôler les températures de chaque meuble ou vitrine réfrigérée. Nettoyer les vitrines, joints, bacs et étagères selon le plan HACCP. Signaler toute anomalie thermique dans le cahier d'hygiène.`);
+    clean.push(`<strong>Rangement de la réserve & chambre froide :</strong> Ranger la réserve et la chambre froide, évacuer les déchets et emballages de découpe, vérifier que les allées et sorties de secours sont dégagées.`);
+    clean.push(`<strong>Nettoyage plans de travail & zone de production :</strong> Désinfecter les plans de travail, planches et ustensiles après chaque utilisation. Nettoyer le sol de la zone PFT et consigner les opérations dans le cahier d'hygiène.`);
+  }
+
+  // ─────────────────────────────────────────────
+  // NON ALIMENTAIRE
+  // ─────────────────────────────────────────────
+  else if (type === "non_alim") {
+    op.push(`<strong>Facing & rangement complet du rayon :</strong> Remettre chaque article à sa place selon le plan de masse, effectuer un facing soigné face-client sur toutes les étagères. Vérifier le balisage prix de chaque référence et corriger les erreurs d'affichage.`);
+    op.push(`<strong>Chasse aux ruptures — commander 1 carton :</strong> Identifier toutes les références manquantes en rayon. Pour chaque rupture : 1) vérifier le stock informatique, 2) si stock négatif ou nul par erreur corriger le stock, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
+    op.push(`<strong>Mise à jour des SMP :</strong> Pour chaque référence traitée en rupture, vérifier que le SMP est cohérent avec la vitesse de vente. Si SMP = 0 ou sous-évalué, le corriger pour sécuriser le réapprovisionnement automatique.`);
+
+    // Propreté Non Alim : rangement réserve + vérification linéaire
+    clean.push(`<strong>Rangement de la réserve :</strong> Ranger la réserve, évacuer les cartons vides et emballages, vérifier que les allées et sorties de secours sont libres. Contrôler l'état du mobilier de stockage.`);
+    clean.push(`<strong>Vérification du linéaire — étagères & rayonnages :</strong> Contrôler l'état de chaque étagère et rayonnage, redresser les articles tombés ou mal positionnés, vérifier la stabilité des tablettes et signaler toute dégradation du mobilier.`);
+    clean.push(`<strong>Tenue visuelle du rayon :</strong> Dépoussiérer les étagères et les articles en exposition, soigner la présentation des têtes de gondole, vérifier que l'allée centrale et les allées secondaires sont propres et dégagées.`);
+  }
+
+  return { op, clean };
 }
 
-function getKey() {
-  return localStorage.getItem(STORAGE_KEY) || '';
+// ═══════════════════════════════════════════════════════════
+// GÉNÉRATION DU BRIEF
+// ═══════════════════════════════════════════════════════════
+let currentRayonKey = null;
+
+function generateBrief() {
+  const key = document.getElementById("select-rayon").value;
+  if (!key) { alert("Veuillez choisir un rayon."); return; }
+  currentRayonKey = key;
+
+  const rayon = RAYONS[key];
+  if (!rayon) { alert("Données non disponibles pour ce rayon."); return; }
+
+  const { op, clean } = getConsignes(rayon);
+
+  // KPIs header
+  const evolSign = rayon.evolCA >= 0 ? "up" : "down";
+  const margeSign = rayon.diffMarge >= 0 ? "up" : "down";
+  const budgSign = rayon.budget >= 0 ? "up" : "down";
+  const rangSign = rayon.evolRang > 0 ? "up" : rayon.evolRang < 0 ? "down" : "neutral";
+
+  // Alertes
+  const alertes = [];
+  if (rayon.stkNeg > 20) alertes.push({type:"bad", label:`⚠ ${rayon.stkNeg} stocks négatifs`});
+  else if (rayon.stkNeg > 0) alertes.push({type:"warn", label:`${rayon.stkNeg} stocks négatifs`});
+  if (rayon.ruptAssort > 50) alertes.push({type:"bad", label:`⚠ ${rayon.ruptAssort} ruptures assortiment`});
+  else if (rayon.ruptAssort > 0) alertes.push({type:"warn", label:`${rayon.ruptAssort} ruptures assortiment`});
+  if (rayon.evolCA < -15) alertes.push({type:"bad", label:`CA en forte baisse ${rayon.evolCA}%`});
+  if (rayon.diffMarge < -3) alertes.push({type:"bad", label:`Marge en recul de ${rayon.diffMarge.toFixed(1)} pts`});
+  if (rayon.diffMarge > 2) alertes.push({type:"good", label:`✓ Marge en progression +${rayon.diffMarge.toFixed(1)} pts`});
+  if (rayon.evolRang > 10) alertes.push({type:"good", label:`✓ Progression région +${rayon.evolRang} rangs`});
+  if (rayon.budget < -2) alertes.push({type:"warn", label:`Écart budget ${rayon.budget.toFixed(1)} K€`});
+  if (alertes.length === 0) alertes.push({type:"good", label:"✓ Situation globale correcte"});
+
+  // Region button
+  const hasRegion = !!REGION_DATA[key];
+  document.getElementById("btn-region").disabled = !hasRegion;
+
+  const html = `
+  <div class="brief-header">
+    <div>
+      <div class="brief-rayon-id">Rayon ${rayon.num} · ${rayon.parent} · ${STORE.magasin}</div>
+      <div class="brief-rayon-name">${rayon.nom}</div>
+      <div style="font-size:12px;opacity:.65;margin-top:4px">${STORE.date} — Source Darwin</div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-val ${evolSign}">${rayon.ca.toFixed(1)} K€</div>
+        <div class="kpi-label">CA Jour</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val ${evolSign}">${rayon.evolCA > 0 ? '+' : ''}${rayon.evolCA.toFixed(1)}%</div>
+        <div class="kpi-label">Évol vs N-1</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val ${margeSign}">${rayon.taux.toFixed(1)}%</div>
+        <div class="kpi-label">Taux Marge</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val ${margeSign}">${rayon.diffMarge > 0 ? '+' : ''}${rayon.diffMarge.toFixed(2)} pts</div>
+        <div class="kpi-label">Diff Marge N-1</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val ${budgSign}">${rayon.budget > 0 ? '+' : ''}${rayon.budget.toFixed(1)} K€</div>
+        <div class="kpi-label">Écart Budget</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val ${rangSign}">Rang ${rayon.rang}</div>
+        <div class="kpi-label">Région (${rayon.evolRang > 0 ? '+' : ''}${rayon.evolRang})</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card full" style="margin-bottom:14px">
+    <div class="section-head alerte">⚡ Points d'attention du jour</div>
+    <div class="alert-row">
+      ${alertes.map(a => `<span class="alert-chip ${a.type}">${a.label}</span>`).join('')}
+    </div>
+  </div>
+
+  <div class="sections-grid">
+    <div class="section-card">
+      <div class="section-head op">⚙️ Consignes Opérationnelles (3 priorités)</div>
+      <div class="consignes-list">
+        ${op.map((c,i) => `<div class="consigne op"><div class="consigne-num">${i+1}</div><div class="consigne-text">${c}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-head clean">🧹 Propreté & Tenue du Rayon</div>
+      <div class="consignes-list">
+        ${clean.map((c,i) => `<div class="consigne clean"><div class="consigne-num">${i+1}</div><div class="consigne-text">${c}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div id="region-section" style="display:none"></div>
+
+  <div class="brief-footer">
+    Brief généré le ${STORE.date} — Carrefour ${STORE.magasin} — Confidentiel Carrefour
+  </div>
+  `;
+
+  document.getElementById("brief-content").innerHTML = html;
+  document.getElementById("brief-output").style.display = "block";
+  document.getElementById("brief-output").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
-initKey();
+function showRegion() {
+  const key = currentRayonKey;
+  if (!key || !REGION_DATA[key]) return;
+  const rayon = RAYONS[key];
+  const data = REGION_DATA[key];
 
-// ── Rayon header ──────────────────────────────────────────────────
-function updateRayonHeader() {
-  const sel = document.getElementById('rayon-select');
-  const txt = sel.value ? sel.options[sel.selectedIndex].text : 'Narbonne';
-  document.getElementById('header-rayon').textContent = txt + ' · Narbonne';
+  const rows = data.magasins.map(m => `
+    <tr class="${m.isNarbonne ? 'highlight' : ''}">
+      <td><span class="rank-badge ${m.rang <= 3 ? 'top3' : ''} ${m.isNarbonne ? 'narbonne' : ''}">${m.rang}</span></td>
+      <td><strong>${m.nom}${m.isNarbonne ? " ← Vous" : ""}</strong></td>
+      <td>${m.ca.toFixed(1)} K€</td>
+      <td style="color:${m.evolCA >= 0 ? 'var(--green)' : 'var(--red)'}">${m.evolCA > 0 ? '+' : ''}${m.evolCA.toFixed(1)}%</td>
+      <td>${m.debits.toLocaleString('fr')}</td>
+      <td>${m.panier.toFixed(1)} €</td>
+    </tr>
+  `).join('');
+
+  const html = `
+    <div class="section-card full" style="margin-bottom:14px">
+      <div class="section-head region">🌍 Classement Régional — Rayon ${rayon.num} ${rayon.nom} · DTF SUD EST · ${STORE.date}</div>
+      <div style="padding:10px 14px 4px;font-size:12px;color:var(--muted)">
+        DTF SUD EST total : <strong>${data.dtfCA} M€</strong> (${data.dtfEvol}% vs N-1) · 
+        Débits : <strong>${data.dtfDebits.toLocaleString('fr')}</strong> · 
+        Panier moyen : <strong>${data.dtfPanier} €</strong>
+      </div>
+      <div style="overflow-x:auto;padding:0 8px 12px">
+        <table class="region-table">
+          <thead>
+            <tr>
+              <th>Rang</th>
+              <th>Magasin</th>
+              <th>CA (K€)</th>
+              <th>Évol %</th>
+              <th>Débits</th>
+              <th>Panier</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  const section = document.getElementById("region-section");
+  section.style.display = "block";
+  section.innerHTML = html;
+  section.scrollIntoView({behavior:"smooth"});
 }
 
-// ── Fichiers ──────────────────────────────────────────────────────
-function onFile(input, key) {
-  const file = input.files[0];
-  if (!file) return;
-  files[key] = file;
-  document.getElementById('box-' + key).classList.add('loaded');
-  document.getElementById('status-' + key).textContent = '✓ ' + file.name;
-}
-
-function toBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload  = () => res(r.result.split(',')[1]);
-    r.onerror = () => rej(new Error('Lecture échouée'));
-    r.readAsDataURL(file);
+// ── File upload handlers ──
+function setupFileInput(inputId, labelId, fnameId) {
+  document.getElementById(inputId).addEventListener('change', function() {
+    if (this.files[0]) {
+      document.getElementById(fnameId).textContent = this.files[0].name;
+      document.getElementById(labelId).classList.add('file-loaded');
+    }
   });
 }
-
-// ── Prompt ────────────────────────────────────────────────────────
-function buildPrompt(rayonCode) {
-  return `Tu es assistant chef de rayon dans un hypermarché Carrefour (HF7152 Narbonne).
-Tu reçois 3 rapports PDF Darwin :
-1. Performances Globales (magasin global)
-2. Classement Rayons (tous les rayons)
-3. Comparaison Magasins (rayon sélectionné, région DTF Sud Est)
-
-RAYON CIBLE : "${rayonCode}"
-
-PROTOCOLE DE LECTURE DES DONNÉES — OBLIGATOIRE ET SANS EXCEPTION :
-
-ÉTAPE 1 — IDENTIFICATION DE LA LIGNE :
-- Repérer la ligne dont le libellé correspond EXACTEMENT à "${rayonCode}" (code + nom).
-- Ne jamais confondre avec une ligne parent (ex: "3 BAZAR"), de sous-total, ou voisine.
-
-ÉTAPE 2 — DOUBLE VÉRIFICATION AVANT CHAQUE VALEUR :
-  ✓ Q1 : Suis-je bien sur la ligne "${rayonCode}" et pas une autre ?
-  ✓ Q2 : Suis-je bien dans la bonne colonne ?
-Si incertain → mettre "N/D".
-
-ÉTAPE 3 — LECTURE COLONNE PAR COLONNE sur la ligne "${rayonCode}" :
-- CA (K€) : colonne "Valeur (K€)" — valeur exacte avec décimales.
-- ÉVOLUTION % CA : colonne "Evolution %" — signe + ou - exact, toutes décimales. Ne pas confondre avec évolution région, évolution rang, ni aucun autre %.
-- ÉCART BUDGET : colonne "Ecart budget (K€)" — valeur exacte avec signe + ou -.
-- TAUX DE MARGE — VÉRIFICATION TRIPLE + CORRESPONDANCE CODE ET NOM :
-  * Lecture 1 : sur la ligne "${rayonCode}" (vérifier code ET nom) → colonne "Taux" du bloc "Marge Brute Gestion Commerciale" → noter la valeur.
-  * Lecture 2 : recompter depuis le début du tableau → relire la colonne "Taux" → confirmer identique.
-  * Lecture 3 : vérifier la cohérence (non alim : 30–55 %, alim : 15–40 %). Si anormal → 4ème lecture.
-  * INTERDIT : colonne "Diff % N-1", ligne parent, ligne voisine.
-  * Si lectures divergent → "N/D".
-- DIFF MARGE N-1 : colonne "Diff % N-1" — pour sous-texte KPI marge uniquement.
-- RANG CA : colonne "Rang CA" — entier exact.
-- ÉVOLUTION % COMPARAISON : colonne "Evolution %" du tableau Comparaison Magasins sur la ligne "Narbonne" uniquement.
-
-ÉTAPE 4 — VÉRIFICATION FINALE :
-  ✓ CA = ligne "${rayonCode}" colonne "Valeur (K€)"
-  ✓ Évolution % CA = ligne "${rayonCode}" colonne "Evolution %" (pas une autre colonne %)
-  ✓ Taux marge = ligne "${rayonCode}" colonne "Taux" (pas "Diff % N-1")
-  ✓ Écart budget a son signe + ou -
-  ✓ Rang est un entier entre 1 et 60
-Corriger toute incohérence avant de répondre.
-
-Ne jamais mentionner le VAB top 3000.
-Si une donnée est absente : "N/D".
-
-Génère UNIQUEMENT un objet JSON valide (sans markdown, sans texte autour) :
-
-{
-  "date": "Lundi 04 mai 2026",
-  "rayon_nom": "Confort de la Maison",
-  "kpis": [
-    {"label": "CA rayon", "value": "X,X K€", "color": "red|green|navy", "sub": "Période"},
-    {"label": "Évol. vs N-1", "value": "−X,X %", "color": "red|green|navy", "sub": "vs magasin : −X,X %"},
-    {"label": "Écart budget", "value": "−X,X K€", "color": "red|green|navy", "sub": "Sous/Au-dessus cible"},
-    {"label": "Taux de marge", "value": "XX,XX %", "color": "red|green|navy", "sub": "Diff N-1 : +/−X,XX pts"}
-  ],
-  "bars_perf": [
-    {"type": "red|green|blue|amber", "html": "Analyse CA avec <strong>chiffres exacts</strong>."},
-    {"type": "red|green|blue|amber", "html": "Analyse marge avec <strong>taux exact colonne Taux</strong> vérifié 3 fois."},
-    {"type": "blue", "html": "Contexte magasin : panier moyen, débits, dispo linéaire."}
-  ],
-  "rang": "X",
-  "rang_sur": "31",
-  "rang_label": "Classement régional DTF Sud Est",
-  "rang_detail": "Xème sur 31 magasins — ${rayonCode}",
-  "rang_color": "green|red|navy",
-  "bar_rang": {"type": "green|blue|amber|red", "html": "Commentaire classement."},
-  "comp_rows": [
-    {"magasin": "Nom", "ca": "X,X", "evol_ca": "+X,X %", "debits": "XXX", "evol_debits": "+X,X %", "highlight": false},
-    {"magasin": "Narbonne", "ca": "X,X", "evol_ca": "−X,X %", "debits": "XXX", "evol_debits": "−X,X %", "highlight": true}
-  ],
-  "bar_comp": {"type": "blue", "html": "Analyse comparative."},
-  "tenue_checks": ["Consigne 1","Consigne 2","Consigne 3","Consigne 4","Consigne 5"],
-  "cmd_checks": ["Rupture 1","Rupture 2","Rupture 3"],
-  "positif": "Message motivant. Finir par <strong>Merci et bonne journée !</strong>"
-}`;
-}
-
-// ── Génération ────────────────────────────────────────────────────
-async function generateBrief() {
-  const rayonCode = document.getElementById('rayon-select').value;
-  if (!rayonCode) { alert('Merci de choisir un rayon.'); return; }
-  if (!files.perf || !files.rayon || !files.comp) { alert('Merci de charger les 3 fichiers PDF Darwin.'); return; }
-
-  const apiKey = getKey();
-  if (!apiKey) {
-    document.getElementById('key-banner').classList.add('visible');
-    document.getElementById('key-banner').scrollIntoView({ behavior:'smooth' });
-    alert('Merci de saisir ta clé Google Gemini gratuite.');
-    return;
-  }
-
-  const btn = document.getElementById('btn-gen');
-  btn.disabled = true;
-  showLoader('Lecture des PDFs…');
-  const out = document.getElementById('brief-output');
-  out.classList.remove('visible');
-  out.innerHTML = '';
-  document.getElementById('btn-print').classList.remove('visible');
-
-  try {
-    setLoaderMsg('Conversion des PDFs…');
-    const [b64perf, b64rayon, b64comp] = await Promise.all([
-      toBase64(files.perf), toBase64(files.rayon), toBase64(files.comp)
-    ]);
-
-    setLoaderMsg('Gemini analyse les données Darwin…');
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            { inline_data: { mime_type: 'application/pdf', data: b64perf  } },
-            { inline_data: { mime_type: 'application/pdf', data: b64rayon } },
-            { inline_data: { mime_type: 'application/pdf', data: b64comp  } },
-            { text: buildPrompt(rayonCode) }
-          ]
-        }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 3000 }
-      })
-    });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      const msg = err?.error?.message || 'Erreur Gemini ' + response.status;
-      // Si clé invalide, réafficher le bandeau
-      if (response.status === 400 || response.status === 403) {
-        localStorage.removeItem(STORAGE_KEY);
-        document.getElementById('key-banner').classList.add('visible');
-      }
-      throw new Error(msg);
-    }
-
-    setLoaderMsg('Mise en forme du brief…');
-    const data  = await response.json();
-    const raw   = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const brief = JSON.parse(clean);
-
-    renderBrief(brief);
-
-  } catch (e) {
-    out.innerHTML = `<div class="error-card"><p>❌ <strong>Erreur :</strong> ${e.message}</p></div>`;
-    out.classList.add('visible');
-  } finally {
-    btn.disabled = false;
-    hideLoader();
-  }
-}
-
-// ── Rendu ─────────────────────────────────────────────────────────
-function renderBrief(d) {
-  if (d.date)      document.getElementById('today-date').textContent = d.date;
-  if (d.rayon_nom) document.getElementById('header-rayon').textContent = d.rayon_nom + ' · Narbonne';
-
-  const kpiHtml      = d.kpis.map(k => `<div class="kpi"><div class="kpi-label">${k.label}</div><div class="kpi-value ${k.color}">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
-  const barsPerfHtml = d.bars_perf.map(b => `<div class="bar ${b.type}">${b.html}</div>`).join('');
-  const rankStyle    = d.rang_color==='green' ? 'background:var(--bg-green);border-color:#b8dda0' : d.rang_color==='red' ? 'background:var(--bg-red);border-color:#f0b8b8' : 'background:var(--bg-blue);border-color:#c5ddf3';
-  const rankNumColor = d.rang_color==='green' ? 'var(--green)' : d.rang_color==='red' ? 'var(--red)' : 'var(--navy)';
-  const compRows     = d.comp_rows.map(r => `<tr ${r.highlight?'class="highlight"':''}><td>${r.magasin}</td><td>${r.ca}</td><td><span class="${(r.evol_ca||'').startsWith('+')?'evol-pos':'evol-neg'}">${r.evol_ca}</span></td><td>${r.debits}</td><td><span class="${(r.evol_debits||'').startsWith('+')?'evol-pos':'evol-neg'}">${r.evol_debits}</span></td></tr>`).join('');
-  const tenueHtml    = d.tenue_checks.map(t => `<li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
-  const cmdHtml      = d.cmd_checks.map(t => `<li onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-text">${t}</span></li>`).join('');
-  const total        = d.tenue_checks.length + d.cmd_checks.length;
-
-  document.getElementById('brief-output').innerHTML = `
-  <div class="card">
-    <div class="section-title"><div class="badge">1</div><h2>Performance CA &amp; Marge — ${d.rayon_nom||'Rayon'}</h2></div>
-    <div class="kpi-grid">${kpiHtml}</div>${barsPerfHtml}
-  </div>
-  <div class="card">
-    <div class="section-title"><div class="badge">2</div><h2>Positionnement Narbonne — classement régional DTF Sud Est</h2></div>
-    <div class="rank-block" style="${rankStyle}">
-      <div class="rank-number" style="color:${rankNumColor}">${d.rang}</div>
-      <div class="rank-info"><strong style="color:${rankNumColor}">${d.rang_label}</strong><span>${d.rang_detail}</span></div>
-    </div>
-    <div class="bar ${d.bar_rang.type}">${d.bar_rang.html}</div>
-    <div class="spacer"></div>
-    <div class="table-label">Comparaison avec les magasins voisins :</div>
-    <table class="comp-table">
-      <thead><tr><th>Magasin</th><th>CA (K€)</th><th>Évol. CA</th><th>Débits</th><th>Évol. débits</th></tr></thead>
-      <tbody>${compRows}</tbody>
-    </table>
-    <div class="bar ${d.bar_comp.type}">${d.bar_comp.html}</div>
-  </div>
-  <div class="card">
-    <div class="section-title"><div class="badge amber">3</div><h2>Consignes du jour</h2></div>
-    <div class="progress-wrap"><span id="progress-label">0 / ${total} faits</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div></div>
-    <div class="sub-title navy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Tenue de rayon — excellence visuelle</div>
-    <ul class="check-list">${tenueHtml}</ul>
-    <div class="spacer"></div>
-    <div class="sub-title amber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Gestion des ruptures — commandes urgentes</div>
-    <ul class="check-list">${cmdHtml}</ul>
-  </div>
-  <div class="positive-card"><div class="eyebrow">🌟 Bonne journée à toute l'équipe !</div><p>${d.positif}</p></div>`;
-
-  document.getElementById('brief-output').classList.add('visible');
-  document.getElementById('footer-src').style.display = 'block';
-  document.getElementById('btn-print').classList.add('visible');
-  updateProgress();
-  document.getElementById('brief-output').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-function showLoader(msg)   { document.getElementById('loader').classList.add('visible'); setLoaderMsg(msg); }
-function hideLoader()      { document.getElementById('loader').classList.remove('visible'); }
-function setLoaderMsg(msg) { document.getElementById('loader-msg').textContent = msg; }
-
-function toggleCheck(li) { li.classList.toggle('done'); updateProgress(); }
-function updateProgress() {
-  const all  = document.querySelectorAll('.check-list li');
-  const done = document.querySelectorAll('.check-list li.done');
-  if (!all.length) return;
-  const fill = document.getElementById('progress-fill');
-  const lbl  = document.getElementById('progress-label');
-  if (fill) fill.style.width = (done.length / all.length * 100) + '%';
-  if (lbl)  lbl.textContent  = done.length + ' / ' + all.length + ' fait' + (done.length > 1 ? 's' : '');
-}
+setupFileInput('file-perf', 'lbl-perf', 'fname-perf');
+setupFileInput('file-rayons', 'lbl-rayons', 'fname-rayons');
+setupFileInput('file-compar', 'lbl-compar', 'fname-compar');
 </script>
 </body>
 </html>
