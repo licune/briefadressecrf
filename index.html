@@ -116,6 +116,20 @@
     white-space: nowrap;
   }
   .btn-generate:hover { background: var(--light-blue); }
+  .btn-print {
+    padding: 10px 16px;
+    background: #fff;
+    color: var(--blue);
+    border: 1.5px solid var(--blue);
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-print:hover { background: var(--blue); color: #fff; }
   .btn-region {
     padding: 10px 16px;
     background: #fff;
@@ -401,6 +415,7 @@
     </div>
 
     <button class="btn-generate" onclick="generateBrief()">▶ Générer le brief</button>
+    <button class="btn-print" onclick="lancerImpression()">🖨️ Imprimer</button>
     <button class="btn-region" id="btn-region" onclick="showRegion()" disabled>🌍 Classement Région</button>
 
   </div>
@@ -811,6 +826,14 @@ function setupFileInput(inputId, labelId, fnameId) {
 setupFileInput('file-perf', 'lbl-perf', 'fname-perf');
 setupFileInput('file-rayons', 'lbl-rayons', 'fname-rayons');
 setupFileInput('file-compar', 'lbl-compar', 'fname-compar');
+
+function lancerImpression() {
+  try { top.print(); } catch(e) {
+    try { window.print(); } catch(e2) {
+      alert("Pour imprimer, utilisez le menu de votre navigateur (Ctrl+P / Cmd+P).");
+    }
+  }
+}
 </script>
 </body>
 </html>
