@@ -116,6 +116,21 @@
     white-space: nowrap;
   }
   .btn-generate:hover { background: var(--light-blue); }
+  .btn-consignes {
+    padding: 10px 16px;
+    background: #fff;
+    color: #7c3aed;
+    border: 1.5px solid #7c3aed;
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-consignes:hover { background: #7c3aed; color: #fff; }
+  .btn-consignes.has-content { background: #f3e8ff; }
   .btn-print {
     padding: 10px 16px;
     background: #fff;
@@ -223,7 +238,20 @@
     background: #f9fafb;
     border-left: 3px solid transparent;
   }
-  .consigne.op { border-left-color: var(--blue); }
+  .consigne.manual { border-left-color: #7c3aed; background: #faf5ff; }
+  .consigne.manual .consigne-num { color: #7c3aed; }
+  .consigne-manual-badge {
+    display: inline-block;
+    background: #ede9fe;
+    color: #6d28d9;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: .3px;
+  }
   .consigne.clean { border-left-color: var(--green); }
   .consigne-num {
     font-family: 'Barlow Condensed', sans-serif;
@@ -331,7 +359,7 @@
     </div>
   </div>
   <div class="header-date">
-    Journée du<br><strong>Mardi 05/05/2026</strong>
+    Journée du<br><strong id="header-date-display">—</strong>
   </div>
 </div>
 
@@ -415,9 +443,39 @@
     </div>
 
     <button class="btn-generate" onclick="generateBrief()">▶ Générer le brief</button>
+    <button class="btn-consignes" onclick="ouvrirConsignes()">✏️ Consignes manuelles</button>
     <button class="btn-print" onclick="lancerImpression()">🖨️ Imprimer</button>
     <button class="btn-region" id="btn-region" onclick="showRegion()" disabled>🌍 Classement Région</button>
 
+  </div>
+
+  <!-- MODAL CONSIGNES -->
+  <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="background:var(--blue);color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700">✏️ Consignes manuelles du jour</span>
+        <button onclick="fermerConsignes()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1">×</button>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+        <p style="font-size:13px;color:var(--muted)">Ces consignes s'ajouteront automatiquement aux consignes générées lors du prochain brief. Elles sont conservées jusqu'à ce que vous les effaciez.</p>
+        <div>
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:6px">➕ Consigne opérationnelle supplémentaire</label>
+          <textarea id="input-op-1" placeholder="Ex : Vérifier la mise en place de l'opération promo semaine 20…" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13.5px;resize:vertical"></textarea>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:6px">➕ Consigne opérationnelle supplémentaire 2 (optionnel)</label>
+          <textarea id="input-op-2" placeholder="Ex : Préparer le retour fournisseur prévu cet après-midi…" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13.5px;resize:vertical"></textarea>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:6px">🧹 Consigne propreté supplémentaire (optionnel)</label>
+          <textarea id="input-clean-1" placeholder="Ex : Nettoyer le sol suite à la réception de ce matin…" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13.5px;resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+          <button onclick="effacerConsignes()" style="padding:9px 16px;border:1.5px solid #e5e7eb;border-radius:6px;background:#fff;font-family:'Barlow Condensed',sans-serif;font-size:15px;cursor:pointer;color:var(--muted)">🗑 Effacer tout</button>
+          <button onclick="sauvegarderConsignes()" style="padding:9px 20px;border:none;border-radius:6px;background:var(--blue);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer">✓ Enregistrer</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- BRIEF OUTPUT -->
@@ -673,7 +731,6 @@ function generateBrief() {
 
   const { op, clean } = getConsignes(rayon);
 
-  // KPIs header
   const evolSign = rayon.evolCA >= 0 ? "up" : "down";
   const margeSign = rayon.diffMarge >= 0 ? "up" : "down";
   const budgSign = rayon.budget >= 0 ? "up" : "down";
@@ -681,84 +738,84 @@ function generateBrief() {
 
   // Alertes
   const alertes = [];
-  if (rayon.stkNeg > 20) alertes.push({type:"bad", label:`⚠ ${rayon.stkNeg} stocks négatifs`});
-  else if (rayon.stkNeg > 0) alertes.push({type:"warn", label:`${rayon.stkNeg} stocks négatifs`});
-  if (rayon.ruptAssort > 50) alertes.push({type:"bad", label:`⚠ ${rayon.ruptAssort} ruptures assortiment`});
-  else if (rayon.ruptAssort > 0) alertes.push({type:"warn", label:`${rayon.ruptAssort} ruptures assortiment`});
-  if (rayon.evolCA < -15) alertes.push({type:"bad", label:`CA en forte baisse ${rayon.evolCA}%`});
-  if (rayon.diffMarge < -3) alertes.push({type:"bad", label:`Marge en recul de ${rayon.diffMarge.toFixed(1)} pts`});
-  if (rayon.diffMarge > 2) alertes.push({type:"good", label:`✓ Marge en progression +${rayon.diffMarge.toFixed(1)} pts`});
-  if (rayon.evolRang > 10) alertes.push({type:"good", label:`✓ Progression nationale +${rayon.evolRang} places`});
-  if (rayon.budget < -2) alertes.push({type:"warn", label:`Écart budget ${rayon.budget.toFixed(1)} K€`});
+  if (rayon.stkNeg > 20) alertes.push({type:"bad", label:"⚠ " + rayon.stkNeg + " stocks négatifs"});
+  else if (rayon.stkNeg > 0) alertes.push({type:"warn", label:rayon.stkNeg + " stocks négatifs"});
+  if (rayon.ruptAssort > 50) alertes.push({type:"bad", label:"⚠ " + rayon.ruptAssort + " ruptures assortiment"});
+  else if (rayon.ruptAssort > 0) alertes.push({type:"warn", label:rayon.ruptAssort + " ruptures assortiment"});
+  if (rayon.evolCA < -15) alertes.push({type:"bad", label:"CA en forte baisse " + rayon.evolCA + "%"});
+  if (rayon.diffMarge < -3) alertes.push({type:"bad", label:"Marge en recul de " + rayon.diffMarge.toFixed(1) + " pts"});
+  if (rayon.diffMarge > 2) alertes.push({type:"good", label:"✓ Marge en progression +" + rayon.diffMarge.toFixed(1) + " pts"});
+  if (rayon.evolRang > 10) alertes.push({type:"good", label:"✓ Progression nationale +" + rayon.evolRang + " places"});
+  if (rayon.budget < -2) alertes.push({type:"warn", label:"Écart budget " + rayon.budget.toFixed(1) + " K€"});
   if (alertes.length === 0) alertes.push({type:"good", label:"✓ Situation globale correcte"});
 
-  // Region button
   const hasRegion = !!REGION_DATA[key];
   document.getElementById("btn-region").disabled = !hasRegion;
 
-  const html = `
-  <div class="brief-header">
-    <div>
-      <div class="brief-rayon-id">Rayon ${rayon.num} · ${rayon.parent} · ${STORE.magasin}</div>
-      <div class="brief-rayon-name">${rayon.nom}</div>
-      <div style="font-size:12px;opacity:.65;margin-top:4px">${STORE.date} — Source Darwin</div>
-    </div>
-    <div class="kpi-row">
-      <div class="kpi">
-        <div class="kpi-val ${evolSign}">${rayon.ca.toFixed(1)} K€</div>
-        <div class="kpi-label">CA Jour</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-val ${evolSign}">${rayon.evolCA > 0 ? '+' : ''}${rayon.evolCA.toFixed(1)}%</div>
-        <div class="kpi-label">Évol vs N-1</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-val ${margeSign}">${rayon.taux.toFixed(1)}%</div>
-        <div class="kpi-label">Taux Marge</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-val ${margeSign}">${rayon.diffMarge > 0 ? '+' : ''}${rayon.diffMarge.toFixed(2)} pts</div>
-        <div class="kpi-label">Diff Marge N-1</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-val ${budgSign}">${rayon.budget > 0 ? '+' : ''}${rayon.budget.toFixed(1)} K€</div>
-        <div class="kpi-label">Écart Budget</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-val ${rangSign}">Rang ${rayon.rang}</div>
-        <div class="kpi-label">Classement National (${rayon.evolRang > 0 ? '+' : ''}${rayon.evolRang} place${Math.abs(rayon.evolRang) > 1 ? 's' : ''})</div>
-      </div>
-    </div>
-  </div>
+  // Consignes manuelles
+  const manOp1 = (localStorage.getItem('consigne_op_1') || '').trim();
+  const manOp2 = (localStorage.getItem('consigne_op_2') || '').trim();
+  const manClean = (localStorage.getItem('consigne_clean_1') || '').trim();
 
-  <div class="section-card full" style="margin-bottom:14px">
-    <div class="section-head alerte">⚡ Points d'attention du jour</div>
-    <div class="alert-row">
-      ${alertes.map(a => `<span class="alert-chip ${a.type}">${a.label}</span>`).join('')}
-    </div>
-  </div>
+  // Construire les blocs HTML sans backticks imbriqués
+  const alertesHtml = alertes.map(function(a) {
+    return '<span class="alert-chip ' + a.type + '">' + a.label + '</span>';
+  }).join('');
 
-  <div class="sections-grid">
-    <div class="section-card">
-      <div class="section-head op">⚙️ Consignes Opérationnelles (3 priorités)</div>
-      <div class="consignes-list">
-        ${op.map((c,i) => `<div class="consigne op"><div class="consigne-num">${i+1}</div><div class="consigne-text">${c}</div></div>`).join('')}
-      </div>
-    </div>
-    <div class="section-card">
-      <div class="section-head clean">🧹 Propreté & Tenue du Rayon</div>
-      <div class="consignes-list">
-        ${clean.map((c,i) => `<div class="consigne clean"><div class="consigne-num">${i+1}</div><div class="consigne-text">${c}</div></div>`).join('')}
-      </div>
-    </div>
-  </div>
+  const opHtml = op.map(function(c, i) {
+    return '<div class="consigne op"><div class="consigne-num">' + (i+1) + '</div><div class="consigne-text">' + c + '</div></div>';
+  }).join('');
 
-  <div id="region-section" style="display:none"></div>
+  const cleanHtml = clean.map(function(c, i) {
+    return '<div class="consigne clean"><div class="consigne-num">' + (i+1) + '</div><div class="consigne-text">' + c + '</div></div>';
+  }).join('');
 
-  <div class="brief-footer">
-    Brief généré le ${STORE.date} — Carrefour ${STORE.magasin} — Confidentiel Carrefour
-  </div>
-  `;
+  const extraOpHtml = [manOp1, manOp2].filter(Boolean).map(function(c) {
+    return '<div class="consigne manual"><div class="consigne-num">+</div><div class="consigne-text">' + c + ' <span class="consigne-manual-badge">MANUEL</span></div></div>';
+  }).join('');
+
+  const extraCleanHtml = manClean
+    ? '<div class="consigne manual"><div class="consigne-num">+</div><div class="consigne-text">' + manClean + ' <span class="consigne-manual-badge">MANUEL</span></div></div>'
+    : '';
+
+  const evolRangLabel = (rayon.evolRang > 0 ? '+' : '') + rayon.evolRang + ' place' + (Math.abs(rayon.evolRang) > 1 ? 's' : '');
+
+  const html =
+    '<div class="brief-header">' +
+      '<div>' +
+        '<div class="brief-rayon-id">Rayon ' + rayon.num + ' · ' + rayon.parent + ' · ' + STORE.magasin + '</div>' +
+        '<div class="brief-rayon-name">' + rayon.nom + '</div>' +
+        '<div style="font-size:12px;opacity:.65;margin-top:4px">' + STORE.date + ' — Source Darwin</div>' +
+      '</div>' +
+      '<div class="kpi-row">' +
+        '<div class="kpi"><div class="kpi-val ' + evolSign + '">' + rayon.ca.toFixed(1) + ' K€</div><div class="kpi-label">CA Jour</div></div>' +
+        '<div class="kpi"><div class="kpi-val ' + evolSign + '">' + (rayon.evolCA > 0 ? '+' : '') + rayon.evolCA.toFixed(1) + '%</div><div class="kpi-label">Évol vs N-1</div></div>' +
+        '<div class="kpi"><div class="kpi-val ' + margeSign + '">' + rayon.taux.toFixed(1) + '%</div><div class="kpi-label">Taux Marge</div></div>' +
+        '<div class="kpi"><div class="kpi-val ' + margeSign + '">' + (rayon.diffMarge > 0 ? '+' : '') + rayon.diffMarge.toFixed(2) + ' pts</div><div class="kpi-label">Diff Marge N-1</div></div>' +
+        '<div class="kpi"><div class="kpi-val ' + budgSign + '">' + (rayon.budget > 0 ? '+' : '') + rayon.budget.toFixed(1) + ' K€</div><div class="kpi-label">Écart Budget</div></div>' +
+        '<div class="kpi"><div class="kpi-val ' + rangSign + '">Rang ' + rayon.rang + '</div><div class="kpi-label">Classement National (' + evolRangLabel + ')</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="section-card full" style="margin-bottom:14px">' +
+      '<div class="section-head alerte">⚡ Points d\'attention du jour</div>' +
+      '<div class="alert-row">' + alertesHtml + '</div>' +
+    '</div>' +
+
+    '<div class="sections-grid">' +
+      '<div class="section-card">' +
+        '<div class="section-head op">⚙️ Consignes Opérationnelles</div>' +
+        '<div class="consignes-list">' + opHtml + extraOpHtml + '</div>' +
+      '</div>' +
+      '<div class="section-card">' +
+        '<div class="section-head clean">🧹 Propreté & Tenue du Rayon</div>' +
+        '<div class="consignes-list">' + cleanHtml + extraCleanHtml + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="region-section" style="display:none"></div>' +
+
+    '<div class="brief-footer">Brief généré le ' + STORE.date + ' — Carrefour ' + STORE.magasin + ' — Confidentiel Carrefour</div>';
 
   document.getElementById("brief-content").innerHTML = html;
   document.getElementById("brief-output").style.display = "block";
@@ -771,42 +828,37 @@ function showRegion() {
   const rayon = RAYONS[key];
   const data = REGION_DATA[key];
 
-  const rows = data.magasins.map(m => `
-    <tr class="${m.isNarbonne ? 'highlight' : ''}">
-      <td><span class="rank-badge ${m.rang <= 3 ? 'top3' : ''} ${m.isNarbonne ? 'narbonne' : ''}">${m.rang}</span></td>
-      <td><strong>${m.nom}${m.isNarbonne ? " ← Vous" : ""}</strong></td>
-      <td>${m.ca.toFixed(1)} K€</td>
-      <td style="color:${m.evolCA >= 0 ? 'var(--green)' : 'var(--red)'}">${m.evolCA > 0 ? '+' : ''}${m.evolCA.toFixed(1)}%</td>
-      <td>${m.debits.toLocaleString('fr')}</td>
-      <td>${m.panier.toFixed(1)} €</td>
-    </tr>
-  `).join('');
+  const rowsHtml = data.magasins.map(function(m) {
+    const trClass = m.isNarbonne ? 'highlight' : '';
+    const badgeClass = 'rank-badge' + (m.rang <= 3 ? ' top3' : '') + (m.isNarbonne ? ' narbonne' : '');
+    const nomLabel = m.nom + (m.isNarbonne ? ' ← Vous' : '');
+    const evolColor = m.evolCA >= 0 ? 'var(--green)' : 'var(--red)';
+    const evolLabel = (m.evolCA > 0 ? '+' : '') + m.evolCA.toFixed(1) + '%';
+    return '<tr class="' + trClass + '">' +
+      '<td><span class="' + badgeClass + '">' + m.rang + '</span></td>' +
+      '<td><strong>' + nomLabel + '</strong></td>' +
+      '<td>' + m.ca.toFixed(1) + ' K€</td>' +
+      '<td style="color:' + evolColor + '">' + evolLabel + '</td>' +
+      '<td>' + m.debits.toLocaleString('fr') + '</td>' +
+      '<td>' + m.panier.toFixed(1) + ' €</td>' +
+    '</tr>';
+  }).join('');
 
-  const html = `
-    <div class="section-card full" style="margin-bottom:14px">
-      <div class="section-head region">🌍 Classement Régional — Rayon ${rayon.num} ${rayon.nom} · DTF SUD EST · ${STORE.date}</div>
-      <div style="padding:10px 14px 4px;font-size:12px;color:var(--muted)">
-        DTF SUD EST total : <strong>${data.dtfCA} M€</strong> (${data.dtfEvol}% vs N-1) · 
-        Débits : <strong>${data.dtfDebits.toLocaleString('fr')}</strong> · 
-        Panier moyen : <strong>${data.dtfPanier} €</strong>
-      </div>
-      <div style="overflow-x:auto;padding:0 8px 12px">
-        <table class="region-table">
-          <thead>
-            <tr>
-              <th>Rang</th>
-              <th>Magasin</th>
-              <th>CA (K€)</th>
-              <th>Évol %</th>
-              <th>Débits</th>
-              <th>Panier</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>
-  `;
+  const html =
+    '<div class="section-card full" style="margin-bottom:14px">' +
+      '<div class="section-head region">🌍 Classement Régional — Rayon ' + rayon.num + ' ' + rayon.nom + ' · DTF SUD EST · ' + STORE.date + '</div>' +
+      '<div style="padding:10px 14px 4px;font-size:12px;color:var(--muted)">' +
+        'DTF SUD EST total : <strong>' + data.dtfCA + ' K€</strong> (' + data.dtfEvol + '% vs N-1) · ' +
+        'Débits : <strong>' + data.dtfDebits.toLocaleString('fr') + '</strong> · ' +
+        'Panier moyen : <strong>' + data.dtfPanier + ' €</strong>' +
+      '</div>' +
+      '<div style="overflow-x:auto;padding:0 8px 12px">' +
+        '<table class="region-table">' +
+          '<thead><tr><th>Rang</th><th>Magasin</th><th>CA (K€)</th><th>Évol %</th><th>Débits</th><th>Panier</th></tr></thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table>' +
+      '</div>' +
+    '</div>';
 
   const section = document.getElementById("region-section");
   section.style.display = "block";
@@ -826,6 +878,92 @@ function setupFileInput(inputId, labelId, fnameId) {
 setupFileInput('file-perf', 'lbl-perf', 'fname-perf');
 setupFileInput('file-rayons', 'lbl-rayons', 'fname-rayons');
 setupFileInput('file-compar', 'lbl-compar', 'fname-compar');
+
+// ── Extraction date depuis nom du PDF ──
+// Le PDF Performances Globales contient la date dans son contenu : "05/05/2026"
+// On tente de lire le nom du fichier et/ou d'extraire via FileReader + regex
+document.getElementById('file-perf').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  // Essai 1 : date dans le nom du fichier (ex: "...2026-05-05..." ou "...05_05_2026...")
+  const nomMatch = file.name.match(/(\d{2})[._\-\/](\d{2})[._\-\/](\d{4})/);
+  if (nomMatch) {
+    const [, j, m, a] = nomMatch;
+    afficherDate(j, m, a);
+    return;
+  }
+  // Essai 2 : lire le texte du PDF via FileReader (fonctionne pour les PDF texte)
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result || '';
+    const match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if (match) {
+      const [, j, m, a] = match;
+      afficherDate(j, m, a);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+function afficherDate(j, m, a) {
+  const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const d = new Date(`${a}-${m}-${j}`);
+  const nomJour = isNaN(d) ? '' : jours[d.getDay()] + ' ';
+  const dateStr = `${nomJour}${j}/${m}/${a}`;
+  document.getElementById('header-date-display').textContent = dateStr;
+  STORE.date = dateStr;
+}
+
+// ── Modal consignes manuelles ──
+function ouvrirConsignes() {
+  document.getElementById('input-op-1').value = localStorage.getItem('consigne_op_1') || '';
+  document.getElementById('input-op-2').value = localStorage.getItem('consigne_op_2') || '';
+  document.getElementById('input-clean-1').value = localStorage.getItem('consigne_clean_1') || '';
+  const overlay = document.getElementById('modal-overlay');
+  overlay.style.display = 'flex';
+}
+
+function fermerConsignes() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+function sauvegarderConsignes() {
+  localStorage.setItem('consigne_op_1', document.getElementById('input-op-1').value);
+  localStorage.setItem('consigne_op_2', document.getElementById('input-op-2').value);
+  localStorage.setItem('consigne_clean_1', document.getElementById('input-clean-1').value);
+  majBoutonConsignes();
+  fermerConsignes();
+}
+
+function effacerConsignes() {
+  document.getElementById('input-op-1').value = '';
+  document.getElementById('input-op-2').value = '';
+  document.getElementById('input-clean-1').value = '';
+  localStorage.removeItem('consigne_op_1');
+  localStorage.removeItem('consigne_op_2');
+  localStorage.removeItem('consigne_clean_1');
+  majBoutonConsignes();
+}
+
+function majBoutonConsignes() {
+  const hasContent = !!(
+    (localStorage.getItem('consigne_op_1') || '').trim() ||
+    (localStorage.getItem('consigne_op_2') || '').trim() ||
+    (localStorage.getItem('consigne_clean_1') || '').trim()
+  );
+  const btn = document.querySelector('.btn-consignes');
+  btn.classList.toggle('has-content', hasContent);
+  btn.textContent = hasContent ? '✏️ Consignes manuelles ●' : '✏️ Consignes manuelles';
+}
+
+// Fermer le modal en cliquant en dehors
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) fermerConsignes();
+});
+
+// Init au chargement
+majBoutonConsignes();
+document.getElementById('header-date-display').textContent = STORE.date;
 
 function lancerImpression() {
   try { top.print(); } catch(e) {
