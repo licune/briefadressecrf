@@ -131,6 +131,22 @@
   }
   .btn-consignes:hover { background: #7c3aed; color: #fff; }
   .btn-consignes.has-content { background: #f3e8ff; }
+  .btn-edit {
+    padding: 10px 16px;
+    background: #fff;
+    color: #0369a1;
+    border: 1.5px solid #0369a1;
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-edit:hover { background: #0369a1; color: #fff; }
+  .btn-edit.modified { background: #e0f2fe; }
+  .btn-edit:disabled { opacity: .35; cursor: not-allowed; background: #fff; color: #0369a1; }
   .btn-print {
     padding: 10px 16px;
     background: #fff;
@@ -397,7 +413,7 @@
 
     <div class="control-group">
       <label>Choisir le rayon</label>
-      <select id="select-rayon">
+      <select id="select-rayon" onchange="onRayonChange()">
         <option value="">— Sélectionner un rayon —</option>
         <optgroup label="Alimentaire PGC">
           <option value="10">10 — Boissons</option>
@@ -444,6 +460,7 @@
 
     <button class="btn-generate" onclick="generateBrief()">▶ Générer le brief</button>
     <button class="btn-consignes" onclick="ouvrirConsignes()">✏️ Consignes manuelles</button>
+    <button class="btn-edit" id="btn-edit" onclick="ouvrirEditScript()" disabled>⚙️ Modifier les consignes</button>
     <button class="btn-print" onclick="lancerImpression()">🖨️ Imprimer</button>
     <button class="btn-region" id="btn-region" onclick="showRegion()" disabled>🌍 Classement Région</button>
 
@@ -473,6 +490,23 @@
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
           <button onclick="effacerConsignes()" style="padding:9px 16px;border:1.5px solid #e5e7eb;border-radius:6px;background:#fff;font-family:'Barlow Condensed',sans-serif;font-size:15px;cursor:pointer;color:var(--muted)">🗑 Effacer tout</button>
           <button onclick="sauvegarderConsignes()" style="padding:9px 20px;border:none;border-radius:6px;background:var(--blue);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer">✓ Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITION CONSIGNES SCRIPT -->
+  <div id="modal-edit" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
+    <div style="background:#fff;border-radius:12px;width:100%;max-width:700px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="background:#0369a1;color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700">⚙️ Modifier les consignes automatiques</span>
+        <button onclick="fermerEditScript()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1">×</button>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:4px">
+        <p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Modifiez les consignes ci-dessous. Elles seront appliquées <strong>une seule fois</strong> au prochain brief généré, puis les textes originaux seront automatiquement restaurés.</p>
+        <div id="edit-sections"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+          <button onclick="sauvegarderScript()" style="padding:9px 20px;border:none;border-radius:6px;background:#0369a1;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer">✓ Appliquer au prochain brief</button>
         </div>
       </div>
     </div>
@@ -640,83 +674,6 @@ const REGION_DATA = {
 };
 
 // ═══════════════════════════════════════════════════════════
-// CONSIGNES PAR TYPE DE RAYON
-// ═══════════════════════════════════════════════════════════
-function getConsignes(rayon) {
-  const op = [];
-  const clean = [];
-  const type = rayon.type;
-  const stkNeg = rayon.stkNeg;
-  const rupt = rayon.ruptAssort;
-
-  // ─────────────────────────────────────────────
-  // PGC (hors PLS)
-  // ─────────────────────────────────────────────
-  if (type === "alim_pgc") {
-    op.push(`<strong>Contrôle DLC / DDM obligatoire :</strong> Effectuer un tour complet du rayon et retirer tout produit dont la date est dépassée ou à moins de 3 jours. Vérifier en priorité les zones de bas-de-rayon et les têtes de gondole.`);
-    op.push(`<strong>Chasse aux ruptures & commande :</strong> Identifier chaque référence absente du linéaire. Pour chaque rupture confirmée : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
-    op.push(`<strong>Mise à jour des SMP :</strong> Sur les références en rupture traitées, vérifier que le Stock Mini Permanent est cohérent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster pour éviter les ruptures futures.`);
-
-    // Propreté PGC : rangement réserve + vérification linéaire
-    clean.push(`<strong>Rangement de la réserve :</strong> Ranger la réserve, évacuer les cartons vides et les emballages, vérifier que les allées de sécurité sont dégagées.`);
-    clean.push(`<strong>Vérification du linéaire — étagères & rayonnages :</strong> Contrôler l'état de chaque étagère, redresser les articles tombés ou mal positionnés, vérifier que les tablettes sont propres et stables.`);
-    clean.push(`<strong>Facing & tenue générale du rayon :</strong> Remettre chaque produit face-client sur l'ensemble des emplacements, combler les trous de présentation, vérifier l'affichage des prix et retirer les étiquettes obsolètes.`);
-  }
-
-  // ─────────────────────────────────────────────
-  // PLS
-  // ─────────────────────────────────────────────
-  else if (type === "alim_pls") {
-    op.push(`<strong>Contrôle DLC produits frais LS :</strong> Effectuer un tour complet des meubles réfrigérés et retirer tout produit dont la DLC est dépassée ou à moins de 3 jours. Vérifier les étiquettes de traçabilité et l'intégrité des emballages.`);
-    op.push(`<strong>Chasse aux ruptures & commande :</strong> Identifier chaque référence absente. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
-    op.push(`<strong>Mise à jour des SMP :</strong> Sur les références en rupture traitées, vérifier la cohérence du Stock Mini Permanent avec la rotation journalière. Ajuster si le SMP est à 0 ou sous-dimensionné.`);
-
-    // Propreté PLS : réserve + meubles froids (températures)
-    clean.push(`<strong>Rangement de la réserve :</strong> Ranger la chambre froide et la réserve PLS, évacuer les cartons vides, vérifier que les allées sont dégagées et que les produits sont bien identifiés.`);
-    clean.push(`<strong>Vérification & nettoyage des meubles froids :</strong> Contrôler les températures de chaque meuble réfrigéré (maxi +4 °C pour les frais, -18 °C pour les surgelés). Nettoyer les vitrines, joints et étagères des meubles. Signaler toute anomalie thermique.`);
-    clean.push(`<strong>Tenue du linéaire — étagères & rayonnages :</strong> Vérifier l'état et la propreté des étagères, redresser les articles mal positionnés, contrôler l'affichage des prix et retirer les étiquettes de références absentes.`);
-  }
-
-  // ─────────────────────────────────────────────
-  // PFT
-  // ─────────────────────────────────────────────
-  else if (type === "alim_pft") {
-    if (rayon.num === "20" || rayon.num === "21" || rayon.num === "24") {
-      op.push(`<strong>Traçabilité & origine obligatoires :</strong> Vérifier que chaque produit en vitrine dispose de sa fiche traçabilité complète (numéro de lot, date de réception, origine géographique). Contrôler l'affichage réglementaire de l'origine sur les étiquettes.`);
-    } else if (rayon.num === "22") {
-      op.push(`<strong>Traçabilité & fiches origine :</strong> Vérifier que les étiquettes affichent l'origine de chaque produit (pays + exploitation si bio). Retirer tout produit sans fiche traçabilité conforme. Contrôler la fraîcheur visuelle de l'ensemble de l'étalage.`);
-    } else if (rayon.num === "23") {
-      op.push(`<strong>Étiquetage allergènes & DLC :</strong> Contrôler que l'affichage des 14 allergènes réglementaires est présent et lisible pour chaque produit fabriqué sur place. Vérifier les DLC des produits et retirer ceux arrivés à date.`);
-    } else {
-      op.push(`<strong>Contrôle DLC & qualité produits frais :</strong> Vérifier les DLC de tous les produits en vitrine et en réserve. Retirer tout produit arrivé à date ou présentant des défauts d'aspect. Contrôler l'intégrité des conditionnements.`);
-    }
-    op.push(`<strong>Chasse aux ruptures & stock :</strong> Identifier chaque emplacement vide. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
-    op.push(`<strong>Mise à jour des SMP :</strong> Sur les références traitées en rupture, vérifier la cohérence du Stock Mini Permanent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster. Contrôler le coût d'achat des dernières réceptions pour veiller à la tenue de marge.`);
-
-    // Propreté PFT : réserve + meubles froids + plan HACCP
-    clean.push(`<strong>Nettoyage & désinfection des meubles froids :</strong> Contrôler les températures de chaque meuble ou vitrine réfrigérée. Nettoyer les vitrines, joints, bacs et étagères selon le plan HACCP. Signaler toute anomalie thermique dans le cahier d'hygiène.`);
-    clean.push(`<strong>Rangement de la réserve & chambre froide :</strong> Ranger la réserve et la chambre froide, évacuer les déchets et emballages de découpe, vérifier que les allées et sorties de secours sont dégagées.`);
-    clean.push(`<strong>Nettoyage plans de travail & zone de production :</strong> Désinfecter les plans de travail, planches et ustensiles après chaque utilisation. Nettoyer le sol de la zone PFT et consigner les opérations dans le cahier d'hygiène.`);
-  }
-
-  // ─────────────────────────────────────────────
-  // NON ALIMENTAIRE
-  // ─────────────────────────────────────────────
-  else if (type === "non_alim") {
-    op.push(`<strong>Facing & rangement complet du rayon :</strong> Remettre chaque article à sa place selon le plan de masse, effectuer un facing soigné face-client sur toutes les étagères. Vérifier le balisage prix de chaque référence et corriger les erreurs d'affichage.`);
-    op.push(`<strong>Chasse aux ruptures — commander 1 carton :</strong> Identifier toutes les références manquantes en rayon. Pour chaque rupture : 1) vérifier le stock informatique, 2) si stock négatif ou nul par erreur corriger le stock, 3) <em>commander 1 carton en commande client</em> pour relancer la commande automatique.`);
-    op.push(`<strong>Mise à jour des SMP :</strong> Pour chaque référence traitée en rupture, vérifier que le SMP est cohérent avec la vitesse de vente. Si SMP = 0 ou sous-évalué, le corriger pour sécuriser le réapprovisionnement automatique.`);
-
-    // Propreté Non Alim : rangement réserve + vérification linéaire
-    clean.push(`<strong>Rangement de la réserve :</strong> Ranger la réserve, évacuer les cartons vides et emballages, vérifier que les allées et sorties de secours sont libres. Contrôler l'état du mobilier de stockage.`);
-    clean.push(`<strong>Vérification du linéaire — étagères & rayonnages :</strong> Contrôler l'état de chaque étagère et rayonnage, redresser les articles tombés ou mal positionnés, vérifier la stabilité des tablettes et signaler toute dégradation du mobilier.`);
-    clean.push(`<strong>Tenue visuelle du rayon :</strong> Dépoussiérer les étagères et les articles en exposition, soigner la présentation des têtes de gondole, vérifier que l'allée centrale et les allées secondaires sont propres et dégagées.`);
-  }
-
-  return { op, clean };
-}
-
-// ═══════════════════════════════════════════════════════════
 // GÉNÉRATION DU BRIEF
 // ═══════════════════════════════════════════════════════════
 let currentRayonKey = null;
@@ -820,6 +777,10 @@ function generateBrief() {
   document.getElementById("brief-content").innerHTML = html;
   document.getElementById("brief-output").style.display = "block";
   document.getElementById("brief-output").scrollIntoView({behavior:"smooth", block:"start"});
+
+  // Réinitialiser les consignes modifiées après usage unique
+  consignesUniqueShot = null;
+  majBoutonEdit();
 }
 
 function showRegion() {
@@ -960,10 +921,219 @@ function majBoutonConsignes() {
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) fermerConsignes();
 });
+document.getElementById('modal-edit').addEventListener('click', function(e) {
+  if (e.target === this) fermerEditScript();
+});
 
-// Init au chargement
+// ═══════════════════════════════════════════════════════════
+// ÉDITION DES CONSIGNES AUTOMATIQUES
+// ═══════════════════════════════════════════════════════════
+
+var CONSIGNES_ORIGINALES = {
+  pgc_op_1: "Contrôle DLC / DDM obligatoire : Effectuer un tour complet du rayon et retirer tout produit dont la date est dépassée ou à moins de 3 jours. Vérifier en priorité les zones de bas-de-rayon et les têtes de gondole.",
+  pgc_op_2: "Chasse aux ruptures & commande : Identifier chaque référence absente du linéaire. Pour chaque rupture confirmée : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
+  pgc_op_3: "Mise à jour des SMP : Sur les références en rupture traitées, vérifier que le Stock Mini Permanent est cohérent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster pour éviter les ruptures futures.",
+  pgc_cl_1: "Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et les emballages, vérifier que les allées de sécurité sont dégagées.",
+  pgc_cl_2: "Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère, redresser les articles tombés ou mal positionnés, vérifier que les tablettes sont propres et stables.",
+  pgc_cl_3: "Facing & tenue générale du rayon : Remettre chaque produit face-client sur l'ensemble des emplacements, combler les trous de présentation, vérifier l'affichage des prix et retirer les étiquettes obsolètes.",
+  pls_op_1: "Contrôle DLC produits frais LS : Effectuer un tour complet des meubles réfrigérés et retirer tout produit dont la DLC est dépassée ou à moins de 3 jours. Vérifier les étiquettes de traçabilité et l'intégrité des emballages.",
+  pls_op_2: "Chasse aux ruptures & commande : Identifier chaque référence absente. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
+  pls_op_3: "Mise à jour des SMP : Sur les références en rupture traitées, vérifier la cohérence du Stock Mini Permanent avec la rotation journalière. Ajuster si le SMP est à 0 ou sous-dimensionné.",
+  pls_cl_1: "Rangement de la réserve : Ranger la chambre froide et la réserve PLS, évacuer les cartons vides, vérifier que les allées sont dégagées et que les produits sont bien identifiés.",
+  pls_cl_2: "Vérification & nettoyage des meubles froids : Contrôler les températures de chaque meuble réfrigéré (maxi +4 °C pour les frais, -18 °C pour les surgelés). Nettoyer les vitrines, joints et étagères des meubles. Signaler toute anomalie thermique.",
+  pls_cl_3: "Tenue du linéaire — étagères & rayonnages : Vérifier l'état et la propreté des étagères, redresser les articles mal positionnés, contrôler l'affichage des prix et retirer les étiquettes de références absentes.",
+  pft_op_1_tracab: "Traçabilité & origine obligatoires : Vérifier que chaque produit en vitrine dispose de sa fiche traçabilité complète (numéro de lot, date de réception, origine géographique). Contrôler l'affichage réglementaire de l'origine sur les étiquettes.",
+  pft_op_1_fl: "Traçabilité & fiches origine : Vérifier que les étiquettes affichent l'origine de chaque produit (pays + exploitation si bio). Retirer tout produit sans fiche traçabilité conforme. Contrôler la fraîcheur visuelle de l'ensemble de l'étalage.",
+  pft_op_1_boul: "Étiquetage allergènes & DLC : Contrôler que l'affichage des 14 allergènes réglementaires est présent et lisible pour chaque produit fabriqué sur place. Vérifier les DLC des produits et retirer ceux arrivés à date.",
+  pft_op_1_autres: "Contrôle DLC & qualité produits frais : Vérifier les DLC de tous les produits en vitrine et en réserve. Retirer tout produit arrivé à date ou présentant des défauts d'aspect. Contrôler l'intégrité des conditionnements.",
+  pft_op_2: "Chasse aux ruptures & stock : Identifier chaque emplacement vide. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
+  pft_op_3: "Mise à jour des SMP : Sur les références traitées en rupture, vérifier la cohérence du Stock Mini Permanent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster. Contrôler le coût d'achat des dernières réceptions pour veiller à la tenue de marge.",
+  pft_cl_1: "Nettoyage & désinfection des meubles froids : Contrôler les températures de chaque meuble ou vitrine réfrigérée. Nettoyer les vitrines, joints, bacs et étagères. Signaler toute anomalie thermique dans le cahier d'hygiène.",
+  pft_cl_2: "Rangement de la réserve & chambre froide : Ranger la réserve et la chambre froide, évacuer les déchets et emballages de découpe, vérifier que les allées et sorties de secours sont dégagées.",
+  pft_cl_3: "Nettoyage plans de travail & zone de production : Désinfecter les plans de travail, planches et ustensiles après chaque utilisation. Nettoyer le sol de la zone PFT et consigner les opérations dans le cahier d'hygiène.",
+  na_op_1: "Facing & rangement complet du rayon : Remettre chaque article à sa place selon le plan de masse, effectuer un facing soigné face-client sur toutes les étagères. Vérifier le balisage prix de chaque référence et corriger les erreurs d'affichage.",
+  na_op_2: "Chasse aux ruptures — commander 1 carton : Identifier toutes les références manquantes en rayon. Pour chaque rupture : 1) vérifier le stock informatique, 2) si stock négatif ou nul par erreur corriger le stock, 3) commander 1 carton en commande client pour relancer la commande automatique.",
+  na_op_3: "Mise à jour des SMP : Pour chaque référence traitée en rupture, vérifier que le SMP est cohérent avec la vitesse de vente. Si SMP = 0 ou sous-évalué, le corriger pour sécuriser le réapprovisionnement automatique.",
+  na_cl_1: "Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et emballages, vérifier que les allées et sorties de secours sont libres. Contrôler l'état du mobilier de stockage.",
+  na_cl_2: "Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère et rayonnage, redresser les articles tombés ou mal positionnés, vérifier la stabilité des tablettes et signaler toute dégradation du mobilier.",
+  na_cl_3: "Tenue visuelle du rayon : Dépoussiérer les étagères et les articles en exposition, soigner la présentation des têtes de gondole, vérifier que l'allée centrale et les allées secondaires sont propres et dégagées."
+};
+
+// Consignes modifiées pour un seul brief (usage unique)
+var consignesUniqueShot = null;
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function lireConsigne(key) {
+  if (consignesUniqueShot && consignesUniqueShot[key]) return consignesUniqueShot[key];
+  return CONSIGNES_ORIGINALES[key] || '';
+}
+
+function buildTagHtml(text) {
+  var colonIdx = text.indexOf(':');
+  if (colonIdx > 0 && colonIdx < 80) {
+    return '<strong>' + text.substring(0, colonIdx) + ' :</strong>' + text.substring(colonIdx + 1);
+  }
+  return text;
+}
+
+function getConsignes(rayon) {
+  var op = [];
+  var clean = [];
+  var type = rayon.type;
+  function C(key) { return buildTagHtml(lireConsigne(key)); }
+  if (type === "alim_pgc") {
+    op.push(C('pgc_op_1')); op.push(C('pgc_op_2')); op.push(C('pgc_op_3'));
+    clean.push(C('pgc_cl_1')); clean.push(C('pgc_cl_2')); clean.push(C('pgc_cl_3'));
+  } else if (type === "alim_pls") {
+    op.push(C('pls_op_1')); op.push(C('pls_op_2')); op.push(C('pls_op_3'));
+    clean.push(C('pls_cl_1')); clean.push(C('pls_cl_2')); clean.push(C('pls_cl_3'));
+  } else if (type === "alim_pft") {
+    if (rayon.num === "20" || rayon.num === "21" || rayon.num === "24") op.push(C('pft_op_1_tracab'));
+    else if (rayon.num === "22") op.push(C('pft_op_1_fl'));
+    else if (rayon.num === "23") op.push(C('pft_op_1_boul'));
+    else op.push(C('pft_op_1_autres'));
+    op.push(C('pft_op_2')); op.push(C('pft_op_3'));
+    clean.push(C('pft_cl_1')); clean.push(C('pft_cl_2')); clean.push(C('pft_cl_3'));
+  } else if (type === "non_alim") {
+    op.push(C('na_op_1')); op.push(C('na_op_2')); op.push(C('na_op_3'));
+    clean.push(C('na_cl_1')); clean.push(C('na_cl_2')); clean.push(C('na_cl_3'));
+  }
+  return { op: op, clean: clean };
+}
+
+var EDIT_GROUPS = [
+  { label: "🛒 PGC — Opérationnel", color: "#003d8f", keys: ["pgc_op_1","pgc_op_2","pgc_op_3"], noms: ["Consigne 1","Consigne 2","Consigne 3"] },
+  { label: "🛒 PGC — Propreté", color: "#16a34a", keys: ["pgc_cl_1","pgc_cl_2","pgc_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] },
+  { label: "❄️ PLS — Opérationnel", color: "#003d8f", keys: ["pls_op_1","pls_op_2","pls_op_3"], noms: ["Consigne 1","Consigne 2","Consigne 3"] },
+  { label: "❄️ PLS — Propreté", color: "#16a34a", keys: ["pls_cl_1","pls_cl_2","pls_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] },
+  { label: "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)", color: "#003d8f", keys: ["pft_op_1_tracab","pft_op_2","pft_op_3"], noms: ["Consigne traçabilité","Consigne 2","Consigne 3"] },
+  { label: "🥬 PFT — Opérationnel (Fruits & Légumes)", color: "#003d8f", keys: ["pft_op_1_fl","pft_op_2","pft_op_3"], noms: ["Consigne origine","Consigne 2","Consigne 3"] },
+  { label: "🥐 PFT — Opérationnel (Boulangerie)", color: "#003d8f", keys: ["pft_op_1_boul","pft_op_2","pft_op_3"], noms: ["Consigne allergènes","Consigne 2","Consigne 3"] },
+  { label: "🐟 PFT — Opérationnel (Autres PFT)", color: "#003d8f", keys: ["pft_op_1_autres","pft_op_2","pft_op_3"], noms: ["Consigne DLC","Consigne 2","Consigne 3"] },
+  { label: "🥩 PFT — Propreté", color: "#16a34a", keys: ["pft_cl_1","pft_cl_2","pft_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] },
+  { label: "📦 Non Alimentaire — Opérationnel", color: "#003d8f", keys: ["na_op_1","na_op_2","na_op_3"], noms: ["Consigne 1","Consigne 2","Consigne 3"] },
+  { label: "📦 Non Alimentaire — Propreté", color: "#16a34a", keys: ["na_cl_1","na_cl_2","na_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] }
+];
+
+function onRayonChange() {
+  var key = document.getElementById('select-rayon').value;
+  var btn = document.getElementById('btn-edit');
+  if (!btn) return;
+  btn.disabled = !key;
+  majBoutonEdit();
+}
+
+// Mapping type -> groupes concernés
+var TYPE_GROUPS = {
+  alim_pgc:  ["🛒 PGC — Opérationnel", "🛒 PGC — Propreté"],
+  alim_pls:  ["❄️ PLS — Opérationnel", "❄️ PLS — Propreté"],
+  alim_pft:  [
+    "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
+    "🥬 PFT — Opérationnel (Fruits & Légumes)",
+    "🥐 PFT — Opérationnel (Boulangerie)",
+    "🐟 PFT — Opérationnel (Autres PFT)",
+    "🥩 PFT — Propreté"
+  ],
+  non_alim:  ["📦 Non Alimentaire — Opérationnel", "📦 Non Alimentaire — Propreté"]
+};
+
+// Pour les PFT, afficher uniquement le groupe de consigne 1 correspondant au rayon
+var PFT_GROUP_BY_NUM = {
+  "20": "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
+  "21": "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
+  "24": "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
+  "22": "🥬 PFT — Opérationnel (Fruits & Légumes)",
+  "23": "🥐 PFT — Opérationnel (Boulangerie)",
+  "25": "🐟 PFT — Opérationnel (Autres PFT)"
+};
+
+function ouvrirEditScript() {
+  var key = document.getElementById('select-rayon').value;
+  if (!key) return;
+  var rayon = RAYONS[key];
+  if (!rayon) return;
+
+  // Déterminer les groupes à afficher
+  var allowedLabels = TYPE_GROUPS[rayon.type] ? TYPE_GROUPS[rayon.type].slice() : [];
+
+  // Pour PFT : garder uniquement le groupe op_1 du rayon concerné + commun op_2/op_3 + propreté
+  if (rayon.type === "alim_pft") {
+    var specificGroup = PFT_GROUP_BY_NUM[rayon.num] || "🐟 PFT — Opérationnel (Autres PFT)";
+    // Retirer les autres groupes op_1 PFT
+    var pftOp1Labels = [
+      "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
+      "🥬 PFT — Opérationnel (Fruits & Légumes)",
+      "🥐 PFT — Opérationnel (Boulangerie)",
+      "🐟 PFT — Opérationnel (Autres PFT)"
+    ];
+    allowedLabels = allowedLabels.filter(function(l) {
+      return pftOp1Labels.indexOf(l) === -1 || l === specificGroup;
+    });
+  }
+
+  var container = document.getElementById('edit-sections');
+  var html = '<div style="background:#f0f6ff;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#1e40af">' +
+    '📌 Vous modifiez les consignes du rayon <strong>' + rayon.num + ' — ' + rayon.nom + '</strong>' +
+    '</div>';
+
+  EDIT_GROUPS.forEach(function(group) {
+    if (allowedLabels.indexOf(group.label) === -1) return;
+    html += '<div style="margin-bottom:14px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">';
+    html += '<div style="background:' + group.color + '18;border-bottom:1px solid #e5e7eb;padding:8px 12px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:' + group.color + '">' + group.label + '</div>';
+    html += '<div style="padding:12px;display:flex;flex-direction:column;gap:10px">';
+    group.keys.forEach(function(key, i) {
+      var val = lireConsigne(key);
+      var isModified = !!localStorage.getItem('script_' + key);
+      html += '<div><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.4px;display:flex;gap:6px;align-items:center;margin-bottom:4px">' + group.noms[i];
+      if (isModified) html += ' <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;padding:1px 5px;border-radius:3px">MODIFIÉ</span>';
+      html += '</label><textarea data-key="' + key + '" rows="3" style="width:100%;padding:8px 10px;border:1.5px solid ' + (isModified ? '#3b82f6' : '#d1d9e6') + ';border-radius:6px;font-family:\'Barlow\',sans-serif;font-size:13px;resize:vertical;line-height:1.5">' + escHtml(val) + '</textarea></div>';
+    });
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+  document.getElementById('modal-edit').style.display = 'flex';
+}
+
+function fermerEditScript() {
+  document.getElementById('modal-edit').style.display = 'none';
+}
+
+function sauvegarderScript() {
+  // Stocker les consignes modifiées en mémoire (pas localStorage) — usage unique
+  var textareas = document.querySelectorAll('#edit-sections textarea');
+  consignesUniqueShot = {};
+  var auMoinsUne = false;
+  textareas.forEach(function(ta) {
+    var key = ta.getAttribute('data-key');
+    var val = ta.value.trim();
+    if (val && val !== CONSIGNES_ORIGINALES[key]) {
+      consignesUniqueShot[key] = val;
+      auMoinsUne = true;
+    }
+  });
+  if (!auMoinsUne) consignesUniqueShot = null;
+  majBoutonEdit();
+  fermerEditScript();
+}
+
+function majBoutonEdit() {
+  var btn = document.getElementById('btn-edit');
+  if (!btn) return;
+  var hasModif = consignesUniqueShot && Object.keys(consignesUniqueShot).length > 0;
+  btn.classList.toggle('modified', hasModif);
+  var key = document.getElementById('select-rayon').value;
+  btn.disabled = !key;
+  btn.textContent = hasModif ? '⚙️ Consignes à appliquer ●' : '⚙️ Modifier les consignes';
+}
+
+// ── Init au chargement
 majBoutonConsignes();
 document.getElementById('header-date-display').textContent = STORE.date;
+majBoutonEdit();
 
 function lancerImpression() {
   try { top.print(); } catch(e) {
