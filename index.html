@@ -1136,11 +1136,41 @@ document.getElementById('header-date-display').textContent = STORE.date;
 majBoutonEdit();
 
 function lancerImpression() {
-  try { top.print(); } catch(e) {
-    try { window.print(); } catch(e2) {
-      alert("Pour imprimer, utilisez le menu de votre navigateur (Ctrl+P / Cmd+P).");
-    }
+  var brief = document.getElementById('brief-content');
+  if (!brief || !brief.innerHTML.trim()) {
+    alert('Veuillez d\'abord générer un brief.');
+    return;
   }
+
+  // Récupérer tous les styles de la page
+  var styles = '';
+  var styleSheets = document.querySelectorAll('style');
+  styleSheets.forEach(function(s) { styles += s.outerHTML; });
+
+  var contenu = brief.innerHTML;
+
+  var win = window.open('', '_blank', 'width=900,height=700');
+  if (!win) {
+    alert('Veuillez autoriser les pop-ups pour ce fichier, puis réessayez.');
+    return;
+  }
+
+  win.document.open();
+  win.document.write(
+    '<!DOCTYPE html><html lang="fr"><head>' +
+    '<meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Brief Journalier</title>' +
+    styles +
+    '<style>body{background:#fff;padding:12px}@media print{body{padding:0}}</style>' +
+    '</head><body>' +
+    '<div class="container" style="max-width:960px;margin:0 auto">' +
+    contenu +
+    '</div>' +
+    '<script>window.onload=function(){window.focus();window.print();}<\/script>' +
+    '</body></html>'
+  );
+  win.document.close();
 }
 </script>
 </body>
