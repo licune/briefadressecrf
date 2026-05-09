@@ -4,1174 +4,862 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brief Journalier — Carrefour Narbonne HF7152</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+:root{--blue:#003d8f;--red:#e20e17;--lblue:#0066cc;--bg:#f0f3f8;--card:#fff;--text:#1a1a2e;--muted:#6b7280;--green:#16a34a;--orange:#ea580c;--border:#d1d9e6;--purple:#7c3aed;--cyan:#0369a1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hdr{background:var(--blue);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-badge{width:42px;height:42px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;flex-shrink:0}
+.hdr-title{font-size:20px;font-weight:700;line-height:1.2}
+.hdr-sub{font-size:11px;opacity:.7}
+.hdr-date{font-size:12px;opacity:.8;text-align:right;line-height:1.6}
+.wrap{max-width:980px;margin:0 auto;padding:14px}
+.ctrl{background:var(--card);border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid var(--border)}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.ctrl-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+.ctrl-group label.lbl{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.4px}
+.file-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:#fff;font-size:13px;transition:all .15s;user-select:none;min-height:38px}
+.file-btn:hover{border-color:var(--lblue);background:#f0f6ff}
+.file-btn.ok{border-color:var(--green);background:#f0fdf4}
+.file-btn input{display:none}
+.fname{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+.file-btn.ok .fname{color:#166534}
+select{padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#fff;cursor:pointer;min-height:38px;width:100%}
+select:focus{outline:none;border-color:var(--lblue)}
+.btn{padding:9px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--lblue)}
+.btn-outline{background:#fff;border:1.5px solid var(--blue);color:var(--blue)}.btn-outline:hover{background:var(--blue);color:#fff}
+.btn-purple{background:#fff;border:1.5px solid var(--purple);color:var(--purple)}.btn-purple:hover{background:var(--purple);color:#fff}
+.btn-purple.on{background:#f3e8ff}
+.btn-cyan{background:#fff;border:1.5px solid var(--cyan);color:var(--cyan)}.btn-cyan:hover{background:var(--cyan);color:#fff}
+.btn-cyan.on{background:#e0f2fe}
+.btn-orange{background:#fff;border:1.5px solid var(--orange);color:var(--orange)}.btn-orange:hover{background:var(--orange);color:#fff}
+.btn:disabled{opacity:.35;cursor:not-allowed!important;pointer-events:none}
+.statut{font-size:12px;color:var(--muted);margin-top:6px;width:100%}
+.statut.ok{color:var(--green)}.statut.err{color:var(--red)}
 
-  :root {
-    --blue: #003d8f;
-    --red: #e20e17;
-    --light-blue: #0066cc;
-    --bg: #f0f3f8;
-    --card: #ffffff;
-    --text: #1a1a2e;
-    --muted: #6b7280;
-    --green: #16a34a;
-    --orange: #ea580c;
-    --border: #d1d9e6;
-    --alert: #fff7ed;
-  }
+/* BRIEF */
+#brief{display:none}
+.b-hdr{background:linear-gradient(135deg,var(--blue) 55%,#0055b3);color:#fff;border-radius:10px;padding:18px 20px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+.b-title{font-size:26px;font-weight:800;line-height:1.1}
+.b-meta{font-size:11px;opacity:.65;margin-top:3px}
+.kpis{display:flex;flex-wrap:wrap;gap:7px}
+.kpi{background:rgba(255,255,255,.13);border-radius:7px;padding:8px 11px;min-width:88px;text-align:center}
+.kv{font-size:18px;font-weight:700}.kl{font-size:10px;opacity:.75;margin-top:1px}
+.up{color:#86efac}.dn{color:#fca5a5}.nt{color:#fde68a}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:580px){.g2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:10px;border:1px solid var(--border);overflow:hidden}
+.card.full{grid-column:1/-1}
+.ch{padding:9px 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ch.op{background:#eff6ff;color:var(--blue);border-bottom:1px solid #dbeafe}
+.ch.cl{background:#f0fdf4;color:#166534;border-bottom:1px solid #bbf7d0}
+.ch.al{background:#fff7ed;color:#9a3412;border-bottom:1px solid #fed7aa}
+.ch.rg{background:#fdf4ff;color:#6b21a8;border-bottom:1px solid #e9d5ff}
+.clist{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.ci{display:flex;gap:8px;align-items:flex-start;padding:9px 10px;border-radius:7px;background:#f9fafb;border-left:3px solid var(--blue)}
+.ci.cl{border-left-color:var(--green)}
+.ci.man{border-left-color:var(--purple);background:#faf5ff}
+.cn{font-size:16px;font-weight:800;color:var(--blue);min-width:20px;line-height:1.35;flex-shrink:0}
+.ci.cl .cn{color:var(--green)}.ci.man .cn{color:var(--purple)}
+.ct{font-size:13px;line-height:1.55}
+.mb{display:inline-block;background:#ede9fe;color:#6d28d9;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle}
+.alerts{padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.chip.bad{background:#fee2e2;color:#991b1b}
+.chip.warn{background:#fff3cd;color:#92400e}
+.chip.good{background:#dcfce7;color:#166534}
+.closing{background:linear-gradient(135deg,var(--blue),var(--lblue));color:#fff;border-radius:10px;padding:15px 20px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
+.cl-ico{font-size:30px;flex-shrink:0}
+.cl-t{font-size:15px;font-weight:700;margin-bottom:3px}
+.cl-s{font-size:13px;opacity:.85}
+.bfoot{text-align:center;font-size:11px;color:var(--muted);padding:6px 0 16px}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* REGION TABLE */
+.rtbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.rtbl th{padding:6px 10px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.rtbl td{padding:7px 10px;border-bottom:1px solid #f0f3f8}
+.rtbl tr.me td{font-weight:700;background:#fffbeb}
+.rbg{display:inline-block;min-width:24px;text-align:center;padding:2px 5px;border-radius:4px;font-size:12px;font-weight:700;background:#e0e7ff;color:var(--blue)}
+.rbg.top{background:#fef9c3;color:#854d0e}
+.rbg.me{background:var(--blue);color:#fff}
 
-  body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ─── HEADER ─── */
-  .header {
-    background: var(--blue);
-    color: #fff;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .header-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .logo-badge {
-    width: 44px; height: 44px;
-    background: var(--red);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 20px;
-    color: #fff;
-    letter-spacing: -1px;
-    flex-shrink: 0;
-  }
-  .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1; }
-  .header-sub { font-size: 12px; opacity: 0.75; }
-  .header-date { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; opacity: 0.85; text-align: right; }
-
-  /* ─── MAIN CONTENT ─── */
-  .container { max-width: 960px; margin: 0 auto; padding: 16px; }
-
-  /* ─── CONTROLS ─── */
-  .controls-card {
-    background: var(--card);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-end;
-  }
-  .control-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
-  .control-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: .5px; }
-  select, .btn-file {
-    padding: 9px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    font-family: 'Barlow', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: #fff;
-    cursor: pointer;
-    transition: border-color .2s;
-  }
-  select:focus { outline: none; border-color: var(--light-blue); }
-  .btn-file input[type=file] { display: none; }
-  .btn-file {
-    display: flex; align-items: center; gap: 6px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .btn-file:hover { border-color: var(--light-blue); background: #f0f6ff; }
-  .btn-file .icon { font-size: 16px; }
-  .btn-file .fname { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-  .file-loaded { border-color: var(--green) !important; background: #f0fdf4 !important; }
-
-  .btn-generate {
-    padding: 10px 20px;
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background .2s;
-    white-space: nowrap;
-  }
-  .btn-generate:hover { background: var(--light-blue); }
-  .btn-consignes {
-    padding: 10px 16px;
-    background: #fff;
-    color: #7c3aed;
-    border: 1.5px solid #7c3aed;
-    border-radius: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .btn-consignes:hover { background: #7c3aed; color: #fff; }
-  .btn-consignes.has-content { background: #f3e8ff; }
-  .btn-edit {
-    padding: 10px 16px;
-    background: #fff;
-    color: #0369a1;
-    border: 1.5px solid #0369a1;
-    border-radius: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .btn-edit:hover { background: #0369a1; color: #fff; }
-  .btn-edit.modified { background: #e0f2fe; }
-  .btn-edit:disabled { opacity: .35; cursor: not-allowed; background: #fff; color: #0369a1; }
-  .btn-print {
-    padding: 10px 16px;
-    background: #fff;
-    color: var(--blue);
-    border: 1.5px solid var(--blue);
-    border-radius: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .btn-print:hover { background: var(--blue); color: #fff; }
-  .btn-region {
-    padding: 10px 16px;
-    background: #fff;
-    color: var(--orange);
-    border: 1.5px solid var(--orange);
-    border-radius: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .btn-region:hover { background: var(--orange); color: #fff; }
-  .btn-region:disabled { opacity: .4; cursor: default; }
-
-  /* ─── BRIEF CONTENT ─── */
-  #brief-output { display: none; }
-
-  .brief-header {
-    background: linear-gradient(135deg, var(--blue) 60%, #0055b3);
-    color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .brief-rayon-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    line-height: 1.1;
-  }
-  .brief-rayon-id { font-size: 13px; opacity: .7; }
-  .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; }
-  .kpi {
-    background: rgba(255,255,255,.12);
-    border-radius: 8px;
-    padding: 10px 14px;
-    min-width: 110px;
-    text-align: center;
-  }
-  .kpi-val {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-  }
-  .kpi-label { font-size: 11px; opacity: .75; margin-top: 2px; }
-  .up { color: #86efac; }
-  .down { color: #fca5a5; }
-  .neutral { color: #fde68a; }
-
-  /* ─── SECTIONS ─── */
-  .sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-  @media (max-width: 600px) { .sections-grid { grid-template-columns: 1fr; } }
-
-  .section-card {
-    background: var(--card);
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .section-card.full { grid-column: 1 / -1; }
-
-  .section-head {
-    padding: 10px 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: .3px;
-  }
-  .section-head.op { background: #eff6ff; color: var(--blue); border-bottom: 1px solid #dbeafe; }
-  .section-head.clean { background: #f0fdf4; color: #166534; border-bottom: 1px solid #bbf7d0; }
-  .section-head.alerte { background: #fff7ed; color: #9a3412; border-bottom: 1px solid #fed7aa; }
-  .section-head.region { background: #fdf4ff; color: #6b21a8; border-bottom: 1px solid #e9d5ff; }
-
-  .consignes-list { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
-  .consigne {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: #f9fafb;
-    border-left: 3px solid transparent;
-  }
-  .consigne.manual { border-left-color: #7c3aed; background: #faf5ff; }
-  .consigne.manual .consigne-num { color: #7c3aed; }
-  .consigne-manual-badge {
-    display: inline-block;
-    background: #ede9fe;
-    color: #6d28d9;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 4px;
-    margin-left: 6px;
-    vertical-align: middle;
-    letter-spacing: .3px;
-  }
-  .consigne.clean { border-left-color: var(--green); }
-  .consigne-num {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--blue);
-    min-width: 22px;
-    line-height: 1.3;
-  }
-  .consigne.clean .consigne-num { color: var(--green); }
-  .consigne-text { font-size: 13.5px; line-height: 1.5; }
-  .consigne-text strong { color: var(--text); }
-  .consigne-text .tag {
-    display: inline-block;
-    background: #e0e7ff;
-    color: var(--blue);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 1px 6px;
-    border-radius: 4px;
-    margin-left: 4px;
-  }
-  .consigne-text .tag.warn { background: #fff3cd; color: #92400e; }
-  .consigne-text .tag.ok { background: #dcfce7; color: #166534; }
-  .consigne-text .tag.err { background: #fee2e2; color: #991b1b; }
-
-  /* ─── ALERTES ─── */
-  .alert-row {
-    padding: 10px 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .alert-chip {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  }
-  .alert-chip.warn { background: #fff3cd; color: #92400e; }
-  .alert-chip.bad { background: #fee2e2; color: #991b1b; }
-  .alert-chip.good { background: #dcfce7; color: #166534; }
-
-  /* ─── CLASSEMENT REGION ─── */
-  .region-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  .region-table th {
-    padding: 7px 10px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-  }
-  .region-table td { padding: 7px 10px; border-bottom: 1px solid #f0f3f8; }
-  .region-table tr.highlight { background: #fffbeb; }
-  .region-table tr.highlight td { font-weight: 600; }
-  .rank-badge {
-    display: inline-block;
-    min-width: 26px;
-    text-align: center;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    background: #e0e7ff;
-    color: var(--blue);
-  }
-  .rank-badge.top3 { background: #fef9c3; color: #854d0e; }
-  .rank-badge.narbonne { background: var(--blue); color: #fff; }
-
-  /* ─── SIGNATURE ─── */
-  .brief-footer {
-    text-align: center;
-    font-size: 11px;
-    color: var(--muted);
-    padding: 10px 0 20px;
-  }
-
-  /* ─── PRINT ─── */
-  @media print {
-    body { background: #fff; }
-    .controls-card, .no-print { display: none !important; }
-    #brief-output { display: block !important; }
-    .header { background: #003d8f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .brief-header { background: #003d8f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .section-head.op, .section-head.clean, .section-head.alerte, .section-head.region { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .sections-grid { grid-template-columns: 1fr 1fr; }
-    .container { padding: 0 10px; }
-  }
+/* MODALS */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:flex-start;justify-content:center;padding:14px;overflow-y:auto}
+.ov.open{display:flex}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:560px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal.wide{max-width:700px}
+.mh{padding:13px 18px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+.mh.purple{background:var(--purple);color:#fff}
+.mh.cyan{background:var(--cyan);color:#fff}
+.mh span{font-size:16px;font-weight:700}
+.mc{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:0 2px}
+.mb2{padding:14px;display:flex;flex-direction:column;gap:11px}
+.mnote{font-size:12.5px;color:var(--muted)}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.4px;display:flex;gap:6px;align-items:center;margin-bottom:4px}
+textarea{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;resize:vertical;line-height:1.5}
+textarea:focus{outline:none;border-color:var(--lblue)}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+.eg{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:10px}
+.egh{padding:7px 12px;font-size:13px;font-weight:700}
+.egb{padding:12px;display:flex;flex-direction:column;gap:10px}
+.modb{background:#dbeafe;color:#1d4ed8;font-size:10px;padding:1px 5px;border-radius:3px}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-logo">
-    <div class="logo-badge">C</div>
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-badge">C</div>
     <div>
-      <div class="header-title">Brief Journalier — Carrefour Narbonne</div>
-      <div class="header-sub">Magasin HF7152 · DTF SUD EST · Source Darwin</div>
+      <div class="hdr-title">Brief Journalier — Carrefour Narbonne</div>
+      <div class="hdr-sub">Magasin HF7152 · DTF SUD EST · Source Darwin</div>
     </div>
   </div>
-  <div class="header-date">
-    Journée du<br><strong id="header-date-display">—</strong>
+  <div class="hdr-date" id="hdr-date">Chargez les PDFs</div>
+</div>
+
+<div class="wrap">
+  <div class="ctrl">
+    <div class="ctrl-row">
+
+      <div class="ctrl-group">
+        <label class="lbl">📄 Performances Globales</label>
+        <label class="file-btn" id="lb-perf">
+          <input type="file" id="fp" accept=".pdf">
+          <span>📥</span><span class="fname" id="fn-perf">Charger PDF…</span>
+        </label>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="lbl">📊 Classement Rayons</label>
+        <label class="file-btn" id="lb-ray">
+          <input type="file" id="fr" accept=".pdf">
+          <span>📥</span><span class="fname" id="fn-ray">Charger PDF…</span>
+        </label>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="lbl">🌍 Comparaison <small style="font-size:10px;font-weight:400">(optionnel)</small></label>
+        <label class="file-btn" id="lb-cmp">
+          <input type="file" id="fc" accept=".pdf">
+          <span>📥</span><span class="fname" id="fn-cmp">Charger PDF…</span>
+        </label>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="lbl">Rayon</label>
+        <select id="sel" onchange="onSel()">
+          <option value="">— Choisir un rayon —</option>
+          <optgroup label="PGC">
+            <option value="10">10 — Boissons</option>
+            <option value="11">11 — Droguerie</option>
+            <option value="12">12 — Parfumerie Hygiène</option>
+            <option value="14">14 — Épicerie</option>
+            <option value="19">19 — Parapharmacie</option>
+          </optgroup>
+          <optgroup label="PFT">
+            <option value="20">20 — Charcuterie / Traiteur</option>
+            <option value="21">21 — Poissonnerie</option>
+            <option value="22">22 — Fruits et Légumes</option>
+            <option value="23">23 — Boulangerie / Pâtisserie</option>
+            <option value="24">24 — Boucherie Volaille</option>
+            <option value="25">25 — PLS (Libre Service)</option>
+          </optgroup>
+          <optgroup label="Bazar">
+            <option value="30">30 — Bricolage</option>
+            <option value="31">31 — Confort de la Maison</option>
+            <option value="32">32 — Papeterie</option>
+            <option value="33">33 — Jouet Sport</option>
+            <option value="34">34 — Jardin et Animalerie</option>
+            <option value="35">35 — Auto</option>
+            <option value="8X">8X — Culture</option>
+          </optgroup>
+          <optgroup label="EPCS">
+            <option value="40">40 — GEM</option>
+            <option value="41">41 — PEM</option>
+            <option value="43">43 — Image et Son</option>
+            <option value="44">44 — Micro Informatique</option>
+            <option value="45">45 — Radiotéléphonie</option>
+          </optgroup>
+          <optgroup label="Textile">
+            <option value="60">60 — Chaussure</option>
+            <option value="61">61 — Bébé</option>
+            <option value="62">62 — Enfant</option>
+            <option value="63">63 — Femme</option>
+            <option value="64">64 — Homme</option>
+            <option value="65">65 — Linge de Maison</option>
+            <option value="66">66 — Accessoires</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <button class="btn btn-blue" onclick="genBrief()">▶ Générer</button>
+      <button class="btn btn-purple" id="btn-man" onclick="ouvMan()">✏️ Consignes manuelles</button>
+      <button class="btn btn-cyan"   id="btn-edt" onclick="ouvEdit()" disabled>⚙️ Modifier consignes</button>
+      <button class="btn btn-outline" onclick="imprimer()">🖨️ Imprimer</button>
+      <button class="btn btn-orange" id="btn-reg" onclick="affReg()" disabled>🌍 Classement Région</button>
+
+      <div class="statut" id="statut">Chargez les PDFs Darwin pour alimenter les données.</div>
+    </div>
+  </div>
+
+  <div id="brief"><div id="brief-c"></div></div>
+</div>
+
+<!-- MODAL MANUELLES -->
+<div class="ov" id="ov-man">
+  <div class="modal">
+    <div class="mh purple"><span>✏️ Consignes manuelles du jour</span><button class="mc" onclick="fov('ov-man')">×</button></div>
+    <div class="mb2">
+      <p class="mnote">Ces consignes s'ajoutent aux consignes automatiques à chaque génération. Elles sont conservées jusqu'à effacement.</p>
+      <div><div class="flbl">➕ Consigne opérationnelle 1</div><textarea id="m1" rows="2" placeholder="Ex : Vérifier la mise en place de l'opération promo…"></textarea></div>
+      <div><div class="flbl">➕ Consigne opérationnelle 2 (optionnel)</div><textarea id="m2" rows="2" placeholder="Ex : Préparer le retour fournisseur prévu…"></textarea></div>
+      <div><div class="flbl">🧹 Consigne propreté (optionnel)</div><textarea id="m3" rows="2" placeholder="Ex : Nettoyer suite à la réception de ce matin…"></textarea></div>
+      <div class="mfoot">
+        <button class="btn" style="border:1.5px solid #e5e7eb;background:#fff;color:var(--muted)" onclick="effMan()">🗑 Effacer</button>
+        <button class="btn btn-blue" onclick="savMan()">✓ Enregistrer</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="container">
-
-  <!-- CONTROLS -->
-  <div class="controls-card no-print">
-
-    <div class="control-group">
-      <label>📄 PDF Performances Globales</label>
-      <label class="btn-file" id="lbl-perf">
-        <input type="file" id="file-perf" accept=".pdf">
-        <span class="icon">📥</span>
-        <span id="fname-perf" class="fname">Charger le PDF…</span>
-      </label>
-    </div>
-
-    <div class="control-group">
-      <label>📊 PDF Classement Rayons</label>
-      <label class="btn-file" id="lbl-rayons">
-        <input type="file" id="file-rayons" accept=".pdf">
-        <span class="icon">📥</span>
-        <span id="fname-rayons" class="fname">Charger le PDF…</span>
-      </label>
-    </div>
-
-    <div class="control-group">
-      <label>🗂️ PDF Comparaison Magasins (optionnel)</label>
-      <label class="btn-file" id="lbl-compar">
-        <input type="file" id="file-compar" accept=".pdf">
-        <span class="icon">📥</span>
-        <span id="fname-compar" class="fname">Charger le PDF…</span>
-      </label>
-    </div>
-
-    <div class="control-group">
-      <label>Choisir le rayon</label>
-      <select id="select-rayon" onchange="onRayonChange()">
-        <option value="">— Sélectionner un rayon —</option>
-        <optgroup label="Alimentaire PGC">
-          <option value="10">10 — Boissons</option>
-          <option value="11">11 — Droguerie</option>
-          <option value="12">12 — Parfumerie Hygiène</option>
-          <option value="14">14 — Épicerie</option>
-          <option value="19">19 — Parapharmacie</option>
-        </optgroup>
-        <optgroup label="Alimentaire PFT">
-          <option value="20">20 — Charcuterie / Traiteur</option>
-          <option value="21">21 — Poissonnerie</option>
-          <option value="22">22 — Fruits et Légumes</option>
-          <option value="23">23 — Boulangerie / Pâtisserie</option>
-          <option value="24">24 — Boucherie Volaille</option>
-          <option value="25">25 — PLS (Produits Libres Service)</option>
-        </optgroup>
-        <optgroup label="Non Alimentaire — Bazar">
-          <option value="30">30 — Bricolage</option>
-          <option value="31">31 — Confort de la Maison</option>
-          <option value="32">32 — Papeterie</option>
-          <option value="33">33 — Jouet Sport</option>
-          <option value="34">34 — Jardin et Animalerie</option>
-          <option value="35">35 — Auto</option>
-          <option value="8X">8X — Culture</option>
-        </optgroup>
-        <optgroup label="Non Alimentaire — EPCS">
-          <option value="40">40 — GEM</option>
-          <option value="41">41 — PEM</option>
-          <option value="43">43 — Image et Son</option>
-          <option value="44">44 — Micro Informatique</option>
-          <option value="45">45 — Radiotéléphonie</option>
-        </optgroup>
-        <optgroup label="Textile">
-          <option value="60">60 — Chaussure</option>
-          <option value="61">61 — Bébé</option>
-          <option value="62">62 — Enfant</option>
-          <option value="63">63 — Femme</option>
-          <option value="64">64 — Homme</option>
-          <option value="65">65 — Linge de Maison</option>
-          <option value="66">66 — Accessoires</option>
-        </optgroup>
-      </select>
-    </div>
-
-    <button class="btn-generate" onclick="generateBrief()">▶ Générer le brief</button>
-    <button class="btn-consignes" onclick="ouvrirConsignes()">✏️ Consignes manuelles</button>
-    <button class="btn-edit" id="btn-edit" onclick="ouvrirEditScript()" disabled>⚙️ Modifier les consignes</button>
-    <button class="btn-print" onclick="lancerImpression()">🖨️ Imprimer</button>
-    <button class="btn-region" id="btn-region" onclick="showRegion()" disabled>🌍 Classement Région</button>
-
-  </div>
-
-  <!-- MODAL CONSIGNES -->
-  <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:16px">
-    <div style="background:#fff;border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="background:var(--blue);color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700">✏️ Consignes manuelles du jour</span>
-        <button onclick="fermerConsignes()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1">×</button>
-      </div>
-      <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
-        <p style="font-size:13px;color:var(--muted)">Ces consignes s'ajouteront automatiquement aux consignes générées lors du prochain brief. Elles sont conservées jusqu'à ce que vous les effaciez.</p>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:6px">➕ Consigne opérationnelle supplémentaire</label>
-          <textarea id="input-op-1" placeholder="Ex : Vérifier la mise en place de l'opération promo semaine 20…" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13.5px;resize:vertical"></textarea>
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:6px">➕ Consigne opérationnelle supplémentaire 2 (optionnel)</label>
-          <textarea id="input-op-2" placeholder="Ex : Préparer le retour fournisseur prévu cet après-midi…" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13.5px;resize:vertical"></textarea>
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:6px">🧹 Consigne propreté supplémentaire (optionnel)</label>
-          <textarea id="input-clean-1" placeholder="Ex : Nettoyer le sol suite à la réception de ce matin…" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13.5px;resize:vertical"></textarea>
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
-          <button onclick="effacerConsignes()" style="padding:9px 16px;border:1.5px solid #e5e7eb;border-radius:6px;background:#fff;font-family:'Barlow Condensed',sans-serif;font-size:15px;cursor:pointer;color:var(--muted)">🗑 Effacer tout</button>
-          <button onclick="sauvegarderConsignes()" style="padding:9px 20px;border:none;border-radius:6px;background:var(--blue);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer">✓ Enregistrer</button>
-        </div>
+<!-- MODAL EDIT -->
+<div class="ov" id="ov-edt">
+  <div class="modal wide">
+    <div class="mh cyan"><span>⚙️ Modifier les consignes automatiques</span><button class="mc" onclick="fov('ov-edt')">×</button></div>
+    <div class="mb2">
+      <p class="mnote">Modifications appliquées <strong>une seule fois</strong> au prochain brief, puis textes originaux restaurés automatiquement.</p>
+      <div id="edit-c"></div>
+      <div class="mfoot">
+        <button class="btn btn-blue" onclick="appEdit()">✓ Appliquer au prochain brief</button>
       </div>
     </div>
   </div>
-
-  <!-- MODAL EDITION CONSIGNES SCRIPT -->
-  <div id="modal-edit" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
-    <div style="background:#fff;border-radius:12px;width:100%;max-width:700px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="background:#0369a1;color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700">⚙️ Modifier les consignes automatiques</span>
-        <button onclick="fermerEditScript()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1">×</button>
-      </div>
-      <div style="padding:16px;display:flex;flex-direction:column;gap:4px">
-        <p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Modifiez les consignes ci-dessous. Elles seront appliquées <strong>une seule fois</strong> au prochain brief généré, puis les textes originaux seront automatiquement restaurés.</p>
-        <div id="edit-sections"></div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
-          <button onclick="sauvegarderScript()" style="padding:9px 20px;border:none;border-radius:6px;background:#0369a1;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer">✓ Appliquer au prochain brief</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- BRIEF OUTPUT -->
-  <div id="brief-output">
-    <div id="brief-content"></div>
-  </div>
-
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-// DATA — Extraite des PDFs Darwin HF7152 Narbonne 05/05/2026
-// ═══════════════════════════════════════════════════════════
-const STORE = {
-  magasin: "HF7152 - Narbonne",
-  date: "Mardi 05/05/2026",
-  caJour: 317.4,
-  caJourEvol: -3.2,
-  caJourBudget: -19.4,
-  panierMoyen: 56.6,
-  panierEvol: -0.5,
-  debits: 5609,
-  debitsEvol: -2.7,
-  dispoLineaire: 91.5,
-  vabTop3000: 92.6,
-  mbgcTaux: 28.43,
-  prevJour: 335.3,
+// ═══════════════════════════════
+// PDF.js worker
+// ═══════════════════════════════
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+// ═══════════════════════════════
+// MÉTADONNÉES RAYONS
+// ═══════════════════════════════
+var M = {
+  "10":{n:"10",nom:"Boissons",par:"PGC",t:"pgc"},
+  "11":{n:"11",nom:"Droguerie",par:"PGC",t:"pgc"},
+  "12":{n:"12",nom:"Parfumerie Hygiène",par:"PGC",t:"pgc"},
+  "14":{n:"14",nom:"Épicerie",par:"PGC",t:"pgc"},
+  "19":{n:"19",nom:"Parapharmacie",par:"PGC",t:"pgc"},
+  "20":{n:"20",nom:"Charcuterie / Traiteur",par:"PFT",t:"pft"},
+  "21":{n:"21",nom:"Poissonnerie",par:"PFT",t:"pft"},
+  "22":{n:"22",nom:"Fruits et Légumes",par:"PFT",t:"pft"},
+  "23":{n:"23",nom:"Boulangerie / Pâtisserie",par:"PFT",t:"pft"},
+  "24":{n:"24",nom:"Boucherie Volaille",par:"PFT",t:"pft"},
+  "25":{n:"25",nom:"PLS (Libre Service)",par:"PFT",t:"pls"},
+  "30":{n:"30",nom:"Bricolage",par:"Bazar",t:"na"},
+  "31":{n:"31",nom:"Confort de la Maison",par:"Bazar",t:"na"},
+  "32":{n:"32",nom:"Papeterie",par:"Bazar",t:"na"},
+  "33":{n:"33",nom:"Jouet Sport",par:"Bazar",t:"na"},
+  "34":{n:"34",nom:"Jardin et Animalerie",par:"Bazar",t:"na"},
+  "35":{n:"35",nom:"Auto",par:"Bazar",t:"na"},
+  "8X":{n:"8X",nom:"Culture",par:"Bazar",t:"na"},
+  "40":{n:"40",nom:"GEM",par:"EPCS",t:"na"},
+  "41":{n:"41",nom:"PEM",par:"EPCS",t:"na"},
+  "43":{n:"43",nom:"Image et Son",par:"EPCS",t:"na"},
+  "44":{n:"44",nom:"Micro Informatique",par:"EPCS",t:"na"},
+  "45":{n:"45",nom:"Radiotéléphonie",par:"EPCS",t:"na"},
+  "60":{n:"60",nom:"Chaussure",par:"Textile",t:"na"},
+  "61":{n:"61",nom:"Bébé",par:"Textile",t:"na"},
+  "62":{n:"62",nom:"Enfant",par:"Textile",t:"na"},
+  "63":{n:"63",nom:"Femme",par:"Textile",t:"na"},
+  "64":{n:"64",nom:"Homme",par:"Textile",t:"na"},
+  "65":{n:"65",nom:"Linge de Maison",par:"Textile",t:"na"},
+  "66":{n:"66",nom:"Accessoires",par:"Textile",t:"na"}
 };
 
-// Données par rayon : [num, nom, CA(K€), evolCA%, ecartBudget, taux_marge%, diff_marge_N1, rang_CA, evol_rang, evol_region%, rupt_assort, vab_top3000, stk_negatif]
-const RAYONS = {
-  "10": { num:"10", nom:"Boissons", parent:"PGC", type:"alim_pgc",
-    ca:30.4, evolCA:-11.8, budget:-7.8, taux:20.05, diffMarge:-0.31, rang:71, evolRang:-17, evolRegion:2.4,
-    ruptAssort:60, vab:37, stkNeg:100, notes:"CA e-com: 2,0 K€ (-25,2%)" },
-  "11": { num:"11", nom:"Droguerie", parent:"PGC", type:"alim_pgc",
-    ca:10.8, evolCA:4.4, budget:0.2, taux:24.49, diffMarge:-4.56, rang:58, evolRang:-1, evolRegion:10.4,
-    ruptAssort:28, vab:1, stkNeg:18, notes:"CA e-com: 0,8 K€ (+22,4%)" },
-  "12": { num:"12", nom:"Parfumerie Hygiène", parent:"PGC", type:"alim_pgc",
-    ca:19.9, evolCA:-3.9, budget:-1.7, taux:28.13, diffMarge:0.83, rang:42, evolRang:-4, evolRegion:8.9,
-    ruptAssort:60, vab:4, stkNeg:76, notes:"CA e-com: 1,1 K€ (+24,6%)" },
-  "14": { num:"14", nom:"Épicerie", parent:"PGC", type:"alim_pgc",
-    ca:64.5, evolCA:2.6, budget:0.4, taux:24.26, diffMarge:-1.14, rang:49, evolRang:1, evolRegion:9.3,
-    ruptAssort:25, vab:75, stkNeg:113, notes:"CA e-com: 5,8 K€ (+18,2%)" },
-  "19": { num:"19", nom:"Parapharmacie", parent:"PGC", type:"alim_pgc",
-    ca:6.0, evolCA:-20.9, budget:-1.6, taux:35.40, diffMarge:1.24, rang:7, evolRang:-5, evolRegion:-8.9,
-    ruptAssort:0, vab:0, stkNeg:41, notes:"CA e-com: 0,1 K€ (+92,6%)" },
-  "20": { num:"20", nom:"Charcuterie / Traiteur", parent:"PFT", type:"alim_pft",
-    ca:11.3, evolCA:-16.9, budget:-2.5, taux:39.53, diffMarge:1.04, rang:34, evolRang:-12, evolRegion:-0.1,
-    ruptAssort:0, vab:0, stkNeg:22, notes:"Traçabilité & origine obligatoires" },
-  "21": { num:"21", nom:"Poissonnerie", parent:"PFT", type:"alim_pft",
-    ca:9.2, evolCA:-6.9, budget:-0.7, taux:25.28, diffMarge:-0.15, rang:32, evolRang:-7, evolRegion:7.7,
-    ruptAssort:0, vab:0, stkNeg:4, notes:"DLC courtes — contrôle J" },
-  "22": { num:"22", nom:"Fruits et Légumes", parent:"PFT", type:"alim_pft",
-    ca:21.1, evolCA:-6.0, budget:-1.8, taux:31.30, diffMarge:2.58, rang:49, evolRang:-6, evolRegion:2.6,
-    ruptAssort:0, vab:0, stkNeg:26, notes:"Origine & traçabilité — fiches produits" },
-  "23": { num:"23", nom:"Boulangerie / Pâtisserie", parent:"PFT", type:"alim_pft",
-    ca:5.5, evolCA:-10.1, budget:-1.4, taux:64.74, diffMarge:1.77, rang:41, evolRang:-8, evolRegion:-0.6,
-    ruptAssort:0, vab:0, stkNeg:0, notes:"Étiquetage allergènes obligatoire" },
-  "24": { num:"24", nom:"Boucherie Volaille", parent:"PFT", type:"alim_pft",
-    ca:16.2, evolCA:-7.8, budget:-1.9, taux:27.78, diffMarge:0.86, rang:29, evolRang:-7, evolRegion:4.2,
-    ruptAssort:0, vab:0, stkNeg:0, notes:"Traçabilité obligatoire + affichage origine" },
-  "25": { num:"25", nom:"PLS (Libre Service)", parent:"PFT", type:"alim_pls",
-    ca:63.8, evolCA:-0.1, budget:-1.9, taux:25.24, diffMarge:-0.84, rang:66, evolRang:-12, evolRegion:9.7,
-    ruptAssort:154, vab:89, stkNeg:117, notes:"CA e-com: 7,0 K€ (+12,2%)" },
-  "30": { num:"30", nom:"Bricolage", parent:"Bazar", type:"non_alim",
-    ca:2.7, evolCA:15.8, budget:0.4, taux:46.64, diffMarge:4.33, rang:16, evolRang:25, evolRegion:-11.2,
-    ruptAssort:28, vab:0, stkNeg:26, notes:"Bon évolution +15,8%" },
-  "31": { num:"31", nom:"Confort de la Maison", parent:"Bazar", type:"non_alim",
-    ca:8.4, evolCA:7.2, budget:-0.4, taux:46.02, diffMarge:-0.16, rang:16, evolRang:19, evolRegion:-5.0,
-    ruptAssort:24, vab:0, stkNeg:49, notes:"Rang 16/31 DTF — progression +19 rangs" },
-  "32": { num:"32", nom:"Papeterie", parent:"Bazar", type:"non_alim",
-    ca:1.3, evolCA:-8.9, budget:-0.2, taux:41.84, diffMarge:-0.60, rang:33, evolRang:-11, evolRegion:7.5,
-    ruptAssort:44, vab:0, stkNeg:34, notes:"" },
-  "33": { num:"33", nom:"Jouet Sport", parent:"Bazar", type:"non_alim",
-    ca:2.9, evolCA:-1.7, budget:0.1, taux:34.82, diffMarge:1.20, rang:25, evolRang:5, evolRegion:-6.1,
-    ruptAssort:152, vab:0, stkNeg:49, notes:"152 ruptures assortiment à traiter" },
-  "34": { num:"34", nom:"Jardin et Animalerie", parent:"Bazar", type:"non_alim",
-    ca:4.5, evolCA:-30.4, budget:-3.5, taux:34.40, diffMarge:5.08, rang:53, evolRang:-16, evolRegion:-14.1,
-    ruptAssort:8, vab:1, stkNeg:99, notes:"Forte baisse CA -30,4% — 99 stocks négatifs" },
-  "35": { num:"35", nom:"Auto", parent:"Bazar", type:"non_alim",
-    ca:1.3, evolCA:-0.2, budget:0.0, taux:47.21, diffMarge:-0.95, rang:47, evolRang:-1, evolRegion:-5.5,
-    ruptAssort:0, vab:0, stkNeg:19, notes:"" },
-  "8X": { num:"8X", nom:"Culture", parent:"Bazar", type:"non_alim",
-    ca:2.7, evolCA:5.8, budget:0.1, taux:21.07, diffMarge:-7.29, rang:66, evolRang:-1, evolRegion:8.4,
-    ruptAssort:0, vab:0, stkNeg:106, notes:"Marge en recul -7,29 pts" },
-  "40": { num:"40", nom:"GEM (Gros Électro Ménager)", parent:"EPCS", type:"non_alim",
-    ca:0.8, evolCA:94.8, budget:0.4, taux:32.35, diffMarge:0.11, rang:19, evolRang:34, evolRegion:20.9,
-    ruptAssort:1, vab:0, stkNeg:0, notes:"Très forte progression +94,8%" },
-  "41": { num:"41", nom:"PEM (Petit Électro Ménager)", parent:"EPCS", type:"non_alim",
-    ca:6.6, evolCA:-2.7, budget:-0.2, taux:21.61, diffMarge:-2.22, rang:24, evolRang:-13, evolRegion:3.5,
-    ruptAssort:13, vab:0, stkNeg:4, notes:"CA e-com: 0 (-94,7%)" },
-  "43": { num:"43", nom:"Image et Son", parent:"EPCS", type:"non_alim",
-    ca:4.7, evolCA:44.6, budget:2.0, taux:17.34, diffMarge:-0.26, rang:7, evolRang:14, evolRegion:9.9,
-    ruptAssort:34, vab:0, stkNeg:2, notes:"Bonne dynamique CA +44,6%" },
-  "44": { num:"44", nom:"Micro Informatique", parent:"EPCS", type:"non_alim",
-    ca:4.3, evolCA:-6.9, budget:0.4, taux:23.84, diffMarge:-1.26, rang:14, evolRang:-5, evolRegion:-2.5,
-    ruptAssort:56, vab:0, stkNeg:3, notes:"" },
-  "45": { num:"45", nom:"Radiotéléphonie", parent:"EPCS", type:"non_alim",
-    ca:3.2, evolCA:-6.3, budget:0.0, taux:16.28, diffMarge:-6.29, rang:59, evolRang:-27, evolRegion:25.8,
-    ruptAssort:0, vab:0, stkNeg:12, notes:"Marge en forte baisse -6,29 pts" },
-  "60": { num:"60", nom:"Chaussure", parent:"Textile", type:"non_alim",
-    ca:1.9, evolCA:25.5, budget:0.4, taux:45.27, diffMarge:-1.59, rang:2, evolRang:6, evolRegion:8.8,
-    ruptAssort:417, vab:0, stkNeg:53, notes:"Rang 2 DTF — 417 ruptures assortiment" },
-  "61": { num:"61", nom:"Bébé", parent:"Textile", type:"non_alim",
-    ca:1.0, evolCA:-33.4, budget:-0.1, taux:47.77, diffMarge:1.25, rang:61, evolRang:-35, evolRegion:-9.1,
-    ruptAssort:97, vab:0, stkNeg:25, notes:"Forte baisse -33,4%" },
-  "62": { num:"62", nom:"Enfant", parent:"Textile", type:"non_alim",
-    ca:1.2, evolCA:0.4, budget:0.2, taux:54.66, diffMarge:1.80, rang:14, evolRang:12, evolRegion:-12.6,
-    ruptAssort:77, vab:0, stkNeg:59, notes:"" },
-  "63": { num:"63", nom:"Femme", parent:"Textile", type:"non_alim",
-    ca:4.0, evolCA:-3.3, budget:0.0, taux:45.04, diffMarge:-0.06, rang:11, evolRang:5, evolRegion:-9.5,
-    ruptAssort:359, vab:0, stkNeg:105, notes:"" },
-  "64": { num:"64", nom:"Homme", parent:"Textile", type:"non_alim",
-    ca:2.8, evolCA:0.6, budget:0.3, taux:48.45, diffMarge:3.35, rang:12, evolRang:7, evolRegion:-0.9,
-    ruptAssort:312, vab:0, stkNeg:65, notes:"" },
-  "65": { num:"65", nom:"Linge de Maison", parent:"Textile", type:"non_alim",
-    ca:3.4, evolCA:25.2, budget:0.7, taux:53.16, diffMarge:2.31, rang:7, evolRang:3, evolRegion:14.4,
-    ruptAssort:122, vab:0, stkNeg:36, notes:"" },
-  "66": { num:"66", nom:"Accessoires", parent:"Textile", type:"non_alim",
-    ca:0.6, evolCA:15.9, budget:0.1, taux:44.29, diffMarge:7.47, rang:25, evolRang:-11, evolRegion:45.5,
-    ruptAssort:31, vab:0, stkNeg:3, notes:"Meilleur taux marge diff: +7,47 pts" },
-};
+// ═══════════════════════════════
+// ÉTAT
+// ═══════════════════════════════
+var DATE_STR = '';
+var D = {}; // données par rayon
+var REG = {}; // classement région
+var SHOT = null; // consignes one-shot
+var mOp1='', mOp2='', mCl=''; // manuelles
+var rayonK = null;
 
-// Données comparaison région — Rayon 31 Confort de la Maison
-const REGION_DATA = {
-  "31": {
-    dtfCA: 130.2, dtfEvol: -5.0, dtfDebits: 26116, dtfPanier: 5.0,
-    magasins: [
-      {rang:1, nom:"Nice Tnl", ca:10.2, evolCA:-12.2, debits:2200, panier:4.6, isNarbonne:false},
-      {rang:2, nom:"Narbonne", ca:8.4, evolCA:7.2, debits:1273, panier:6.6, isNarbonne:true},
-      {rang:3, nom:"Montélimar", ca:3.5, evolCA:-0.7, debits:504, panier:6.9, isNarbonne:false},
-      {rang:4, nom:"Sainte Maxime", ca:4.6, evolCA:-1.8, debits:587, panier:7.8, isNarbonne:false},
-      {rang:5, nom:"Marseille Grand Littoral", ca:7.0, evolCA:-14.6, debits:1513, panier:4.6, isNarbonne:false},
-      {rang:6, nom:"Portet-sur-Garonne", ca:4.6, evolCA:-18.2, debits:728, panier:6.3, isNarbonne:false},
-      {rang:7, nom:"Toulon Mayol", ca:5.6, evolCA:-17.1, debits:1807, panier:3.1, isNarbonne:false},
-      {rang:8, nom:"Avignon", ca:1.2, evolCA:-28.6, debits:444, panier:2.8, isNarbonne:false},
-      {rang:9, nom:"Ajaccio 2", ca:5.5, evolCA:-10.6, debits:1233, panier:4.4, isNarbonne:false},
-      {rang:10, nom:"Vaulx En Velin", ca:5.5, evolCA:-5.3, debits:1108, panier:4.9, isNarbonne:false},
-      {rang:11, nom:"Perpignan", ca:5.0, evolCA:10.2, debits:807, panier:6.2, isNarbonne:false},
-      {rang:12, nom:"Saint Jean De Védas", ca:4.6, evolCA:8.4, debits:898, panier:5.2, isNarbonne:false},
-      {rang:13, nom:"Sainte Maxime", ca:4.6, evolCA:-1.8, debits:587, panier:7.8, isNarbonne:false},
-      {rang:14, nom:"Vitrolles", ca:7.6, evolCA:-10.6, debits:1224, panier:6.2, isNarbonne:false},
-      {rang:15, nom:"Nîmes Ouest", ca:4.4, evolCA:-15.5, debits:1117, panier:3.9, isNarbonne:false},
-      {rang:16, nom:"Orange", ca:3.7, evolCA:-18.2, debits:759, panier:4.9, isNarbonne:false},
-      {rang:17, nom:"L\'Isle D\'abeau", ca:3.5, evolCA:-26.1, debits:814, panier:4.3, isNarbonne:false},
-      {rang:18, nom:"Montélimar", ca:3.5, evolCA:-0.7, debits:504, panier:6.9, isNarbonne:false},
-      {rang:19, nom:"Sérignan", ca:3.2, evolCA:-1.6, debits:619, panier:5.2, isNarbonne:false},
-      {rang:20, nom:"Port De Bouc", ca:2.3, evolCA:13.0, debits:725, panier:3.2, isNarbonne:false},
-      {rang:21, nom:"Salaise Sur Sanne", ca:3.1, evolCA:-12.8, debits:617, panier:5.1, isNarbonne:false},
-      {rang:22, nom:"Le Crès", ca:3.0, evolCA:-21.4, debits:609, panier:4.8, isNarbonne:false},
-      {rang:23, nom:"Trans En Provence", ca:2.8, evolCA:-1.2, debits:577, panier:4.9, isNarbonne:false},
-      {rang:24, nom:"Aussi", ca:1.3, evolCA:14.9, debits:340, panier:3.8, isNarbonne:false},
-      {rang:25, nom:"Cahors", ca:1.6, evolCA:-4.1, debits:256, panier:6.1, isNarbonne:false},
-      {rang:26, nom:"Aurillac", ca:2.1, evolCA:-10.9, debits:376, panier:5.6, isNarbonne:false},
-      {rang:27, nom:"Montauban", ca:1.5, evolCA:-12.2, debits:287, panier:5.1, isNarbonne:false},
-      {rang:28, nom:"Villefranche De Rouergue", ca:1.4, evolCA:-14.9, debits:291, panier:4.8, isNarbonne:false},
-      {rang:29, nom:"Issoire", ca:3.1, evolCA:-12.2, debits:525, panier:6.0, isNarbonne:false},
-      {rang:30, nom:"Boe", ca:1.6, evolCA:-17.1, debits:202, panier:5.0, isNarbonne:false},
-      {rang:31, nom:"Marseille Le Merlan", ca:5.7, evolCA:-5.1, debits:1329, panier:4.3, isNarbonne:false},
-    ]
-  }
-};
+Object.keys(M).forEach(function(k){
+  D[k]={ca:0,ev:0,bud:0,taux:0,dm:0,rang:0,er:0,stk:0,rupt:0};
+});
 
-// ═══════════════════════════════════════════════════════════
-// GÉNÉRATION DU BRIEF
-// ═══════════════════════════════════════════════════════════
-let currentRayonKey = null;
-
-function generateBrief() {
-  const key = document.getElementById("select-rayon").value;
-  if (!key) { alert("Veuillez choisir un rayon."); return; }
-  currentRayonKey = key;
-
-  const rayon = RAYONS[key];
-  if (!rayon) { alert("Données non disponibles pour ce rayon."); return; }
-
-  const { op, clean } = getConsignes(rayon);
-
-  const evolSign = rayon.evolCA >= 0 ? "up" : "down";
-  const margeSign = rayon.diffMarge >= 0 ? "up" : "down";
-  const budgSign = rayon.budget >= 0 ? "up" : "down";
-  const rangSign = rayon.evolRang > 0 ? "up" : rayon.evolRang < 0 ? "down" : "neutral";
-
-  // Alertes
-  const alertes = [];
-  if (rayon.stkNeg > 20) alertes.push({type:"bad", label:"⚠ " + rayon.stkNeg + " stocks négatifs"});
-  else if (rayon.stkNeg > 0) alertes.push({type:"warn", label:rayon.stkNeg + " stocks négatifs"});
-  if (rayon.ruptAssort > 50) alertes.push({type:"bad", label:"⚠ " + rayon.ruptAssort + " ruptures assortiment"});
-  else if (rayon.ruptAssort > 0) alertes.push({type:"warn", label:rayon.ruptAssort + " ruptures assortiment"});
-  if (rayon.evolCA < -15) alertes.push({type:"bad", label:"CA en forte baisse " + rayon.evolCA + "%"});
-  if (rayon.diffMarge < -3) alertes.push({type:"bad", label:"Marge en recul de " + rayon.diffMarge.toFixed(1) + " pts"});
-  if (rayon.diffMarge > 2) alertes.push({type:"good", label:"✓ Marge en progression +" + rayon.diffMarge.toFixed(1) + " pts"});
-  if (rayon.evolRang > 10) alertes.push({type:"good", label:"✓ Progression nationale +" + rayon.evolRang + " places"});
-  if (rayon.budget < -2) alertes.push({type:"warn", label:"Écart budget " + rayon.budget.toFixed(1) + " K€"});
-  if (alertes.length === 0) alertes.push({type:"good", label:"✓ Situation globale correcte"});
-
-  const hasRegion = !!REGION_DATA[key];
-  document.getElementById("btn-region").disabled = !hasRegion;
-
-  // Consignes manuelles
-  const manOp1 = (localStorage.getItem('consigne_op_1') || '').trim();
-  const manOp2 = (localStorage.getItem('consigne_op_2') || '').trim();
-  const manClean = (localStorage.getItem('consigne_clean_1') || '').trim();
-
-  // Construire les blocs HTML sans backticks imbriqués
-  const alertesHtml = alertes.map(function(a) {
-    return '<span class="alert-chip ' + a.type + '">' + a.label + '</span>';
-  }).join('');
-
-  const opHtml = op.map(function(c, i) {
-    return '<div class="consigne op"><div class="consigne-num">' + (i+1) + '</div><div class="consigne-text">' + c + '</div></div>';
-  }).join('');
-
-  const cleanHtml = clean.map(function(c, i) {
-    return '<div class="consigne clean"><div class="consigne-num">' + (i+1) + '</div><div class="consigne-text">' + c + '</div></div>';
-  }).join('');
-
-  const extraOpHtml = [manOp1, manOp2].filter(Boolean).map(function(c) {
-    return '<div class="consigne manual"><div class="consigne-num">+</div><div class="consigne-text">' + c + ' <span class="consigne-manual-badge">MANUEL</span></div></div>';
-  }).join('');
-
-  const extraCleanHtml = manClean
-    ? '<div class="consigne manual"><div class="consigne-num">+</div><div class="consigne-text">' + manClean + ' <span class="consigne-manual-badge">MANUEL</span></div></div>'
-    : '';
-
-  const evolRangLabel = (rayon.evolRang > 0 ? '+' : '') + rayon.evolRang + ' place' + (Math.abs(rayon.evolRang) > 1 ? 's' : '');
-
-  const html =
-    '<div class="brief-header">' +
-      '<div>' +
-        '<div class="brief-rayon-id">Rayon ' + rayon.num + ' · ' + rayon.parent + ' · ' + STORE.magasin + '</div>' +
-        '<div class="brief-rayon-name">' + rayon.nom + '</div>' +
-        '<div style="font-size:12px;opacity:.65;margin-top:4px">' + STORE.date + ' — Source Darwin</div>' +
-      '</div>' +
-      '<div class="kpi-row">' +
-        '<div class="kpi"><div class="kpi-val ' + evolSign + '">' + rayon.ca.toFixed(1) + ' K€</div><div class="kpi-label">CA Jour</div></div>' +
-        '<div class="kpi"><div class="kpi-val ' + evolSign + '">' + (rayon.evolCA > 0 ? '+' : '') + rayon.evolCA.toFixed(1) + '%</div><div class="kpi-label">Évol vs N-1</div></div>' +
-        '<div class="kpi"><div class="kpi-val ' + margeSign + '">' + rayon.taux.toFixed(1) + '%</div><div class="kpi-label">Taux Marge</div></div>' +
-        '<div class="kpi"><div class="kpi-val ' + margeSign + '">' + (rayon.diffMarge > 0 ? '+' : '') + rayon.diffMarge.toFixed(2) + ' pts</div><div class="kpi-label">Diff Marge N-1</div></div>' +
-        '<div class="kpi"><div class="kpi-val ' + budgSign + '">' + (rayon.budget > 0 ? '+' : '') + rayon.budget.toFixed(1) + ' K€</div><div class="kpi-label">Écart Budget</div></div>' +
-        '<div class="kpi"><div class="kpi-val ' + rangSign + '">Rang ' + rayon.rang + '</div><div class="kpi-label">Classement National (' + evolRangLabel + ')</div></div>' +
-      '</div>' +
-    '</div>' +
-
-    '<div class="section-card full" style="margin-bottom:14px">' +
-      '<div class="section-head alerte">⚡ Points d\'attention du jour</div>' +
-      '<div class="alert-row">' + alertesHtml + '</div>' +
-    '</div>' +
-
-    '<div class="sections-grid">' +
-      '<div class="section-card">' +
-        '<div class="section-head op">⚙️ Consignes Opérationnelles</div>' +
-        '<div class="consignes-list">' + opHtml + extraOpHtml + '</div>' +
-      '</div>' +
-      '<div class="section-card">' +
-        '<div class="section-head clean">🧹 Propreté & Tenue du Rayon</div>' +
-        '<div class="consignes-list">' + cleanHtml + extraCleanHtml + '</div>' +
-      '</div>' +
-    '</div>' +
-
-    '<div id="region-section" style="display:none"></div>' +
-
-    '<div class="brief-footer">Brief généré le ' + STORE.date + ' — Carrefour ' + STORE.magasin + ' — Confidentiel Carrefour</div>';
-
-  document.getElementById("brief-content").innerHTML = html;
-  document.getElementById("brief-output").style.display = "block";
-  document.getElementById("brief-output").scrollIntoView({behavior:"smooth", block:"start"});
-
-  // Réinitialiser les consignes modifiées après usage unique
-  consignesUniqueShot = null;
-  majBoutonEdit();
+// ═══════════════════════════════
+// LECTURE PDF
+// ═══════════════════════════════
+function lirePDF(file){
+  return new Promise(function(res,rej){
+    var rd = new FileReader();
+    rd.onerror = rej;
+    rd.onload = function(e){
+      pdfjsLib.getDocument({data:new Uint8Array(e.target.result)}).promise
+        .then(function(pdf){
+          var pp = [];
+          for(var i=1;i<=pdf.numPages;i++) pp.push(
+            pdf.getPage(i).then(function(pg){
+              return pg.getTextContent().then(function(tc){
+                return tc.items.map(function(it){return it.str;}).join(' ');
+              });
+            })
+          );
+          Promise.all(pp).then(function(ts){res(ts.join('\n'));}).catch(rej);
+        }).catch(rej);
+    };
+    rd.readAsArrayBuffer(file);
+  });
 }
 
-function showRegion() {
-  const key = currentRayonKey;
-  if (!key || !REGION_DATA[key]) return;
-  const rayon = RAYONS[key];
-  const data = REGION_DATA[key];
+// ═══════════════════════════════
+// UTILS PARSING
+// ═══════════════════════════════
+function pN(s){return parseFloat(String(s).replace(',','.'))||0;}
 
-  const rowsHtml = data.magasins.map(function(m) {
-    const trClass = m.isNarbonne ? 'highlight' : '';
-    const badgeClass = 'rank-badge' + (m.rang <= 3 ? ' top3' : '') + (m.isNarbonne ? ' narbonne' : '');
-    const nomLabel = m.nom + (m.isNarbonne ? ' ← Vous' : '');
-    const evolColor = m.evolCA >= 0 ? 'var(--green)' : 'var(--red)';
-    const evolLabel = (m.evolCA > 0 ? '+' : '') + m.evolCA.toFixed(1) + '%';
-    return '<tr class="' + trClass + '">' +
-      '<td><span class="' + badgeClass + '">' + m.rang + '</span></td>' +
-      '<td><strong>' + nomLabel + '</strong></td>' +
-      '<td>' + m.ca.toFixed(1) + ' K€</td>' +
-      '<td style="color:' + evolColor + '">' + evolLabel + '</td>' +
-      '<td>' + m.debits.toLocaleString('fr') + '</td>' +
-      '<td>' + m.panier.toFixed(1) + ' €</td>' +
+function nums(txt){
+  var r=[],m,re=/(-?\d+[,.]?\d*)/g;
+  while((m=re.exec(txt))!==null) r.push(pN(m[1]));
+  return r;
+}
+
+function trouverDate(txt){
+  var m=txt.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return '';
+  var j=m[1],mo=m[2],a=m[3];
+  var jj=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  var dt=new Date(a+'-'+mo+'-'+j);
+  return 'Journée du '+(isNaN(dt.getTime())?'':jj[dt.getDay()]+' ')+j+'/'+mo+'/'+a;
+}
+
+// Patterns de recherche par rayon : [regex identifiant le rayon, clé]
+var PAT = [
+  [/10\s+BOISSONS/i,"10"],[/11\s+DROGUERIE/i,"11"],[/12\s+PARFUMERIE/i,"12"],
+  [/14\s+.PICERIE/i,"14"],[/19\s+PARAPHARMACIE/i,"19"],[/20\s+CHARCUT/i,"20"],
+  [/21\s+POISSONNERIE/i,"21"],[/22\s+FRUITS/i,"22"],[/23\s+BOULANGERIE/i,"23"],
+  [/24\s+BOUCHERIE/i,"24"],[/25\s+P\.?L\.?S/i,"25"],[/30\s+BRICOLAGE/i,"30"],
+  [/31\s+CONFORT/i,"31"],[/32\s+PAPETERIE/i,"32"],[/33\s+JOUET/i,"33"],
+  [/34\s+JARDIN/i,"34"],[/35\s+AUTO/i,"35"],[/8X\s+CULTURE/i,"8X"],
+  [/40\s+GEM/i,"40"],[/41\s+PEM/i,"41"],[/43\s+IMAGE/i,"43"],
+  [/44\s+MICRO/i,"44"],[/45\s+RADIO/i,"45"],[/60\s+CHAUSSURE/i,"60"],
+  [/61\s+B.B./i,"61"],[/62\s+ENFANT/i,"62"],[/63\s+FEMME/i,"63"],
+  [/64\s+HOMME/i,"64"],[/65\s+LINGE/i,"65"],[/66\s+ACCESSOIRES/i,"66"]
+];
+
+// ═══════════════════════════════
+// PARSER PERFORMANCES GLOBALES
+// Colonnes Darwin : CA | EVOL% | BUDGET | POIDS% | POIDS_CAT% |
+//                  TAUX_MARGE% | DIFF_MARGE | ... | STK_NEG | RUPT | VAB
+// ═══════════════════════════════
+function parserPerf(txt){
+  var date = trouverDate(txt);
+  if(date){DATE_STR=date;document.getElementById('hdr-date').textContent=date;}
+
+  PAT.forEach(function(p){
+    var m = txt.match(p[0]);
+    if(!m) return;
+    var pos = txt.indexOf(m[0]);
+    var fen = txt.substring(pos, pos+500);
+    var ns = nums(fen);
+    if(ns.length<4) return;
+    var d = D[p[1]];
+
+    // CA : premier nombre positif < 500
+    var i=0;
+    while(i<ns.length && (ns[i]<=0||ns[i]>=500)) i++;
+    if(i<ns.length){d.ca=ns[i];i++;}
+
+    // EVOL CA%
+    if(i<ns.length){d.ev=ns[i];i++;}
+
+    // ECART BUDGET
+    if(i<ns.length){d.bud=ns[i];i++;}
+
+    // TAUX MARGE : chercher entre 5 et 90
+    var j=i;
+    while(j<ns.length&&!(ns[j]>=5&&ns[j]<=90)){j++;}
+    if(j<ns.length){d.taux=ns[j];j++;}
+
+    // DIFF MARGE N-1 : petit, abs < 20
+    if(j<ns.length&&Math.abs(ns[j])<20){d.dm=ns[j];j++;}
+
+    // STK_NEG et RUPT : entiers en fin de fenêtre
+    var ent=[];
+    for(var e=0;e<ns.length;e++){
+      if(Number.isInteger(ns[e])&&ns[e]>=0&&ns[e]<5000) ent.push(ns[e]);
+    }
+    if(ent.length>=2){
+      d.stk  = ent[ent.length-2];
+      d.rupt = ent[ent.length-1];
+    }
+  });
+}
+
+// ═══════════════════════════════
+// PARSER CLASSEMENT RAYONS
+// Colonnes : CA | EVOL% | BUDGET | [e-com] | RANG_CA | EVOL_RANG | EVOL_REG%
+// ═══════════════════════════════
+function parserRayons(txt){
+  PAT.forEach(function(p){
+    var m = txt.match(p[0]);
+    if(!m) return;
+    var pos = txt.indexOf(m[0]);
+    var fen = txt.substring(pos, pos+400);
+    var ns = nums(fen);
+    if(ns.length<3) return;
+    var d = D[p[1]];
+
+    // Le rang national est un entier 1-250
+    // On cherche en partant de la position ~3 pour éviter CA et evol
+    for(var i=2;i<ns.length;i++){
+      var v=ns[i];
+      if(Number.isInteger(v)&&v>=1&&v<=250){
+        d.rang=v;
+        // evolution rang : entier suivant, peut être négatif
+        if(i+1<ns.length){d.er=Math.round(ns[i+1]);}
+        break;
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════
+// PARSER COMPARAISON MAGASINS
+// ═══════════════════════════════
+function parserCompar(txt){
+  // Identifier le rayon
+  var MAP_R = [
+    [/CONFORT\s+DE\s+LA\s+MAISON/i,"31"],[/BOISSONS/i,"10"],[/DROGUERIE/i,"11"],
+    [/PARFUMERIE/i,"12"],[/EPICERIE/i,"14"],[/BRICOLAGE/i,"30"],
+    [/PAPETERIE/i,"32"],[/JOUET/i,"33"],[/JARDIN/i,"34"],
+    [/CHAUSSURE/i,"60"],[/LINGE\s+DE\s+MAISON/i,"65"],[/FEMME/i,"63"],
+    [/HOMME/i,"64"],[/PLS/i,"25"]
+  ];
+  var kk=null;
+  for(var ci=0;ci<MAP_R.length;ci++){
+    if(MAP_R[ci][0].test(txt)){kk=MAP_R[ci][1];break;}
+  }
+  if(!kk) return;
+
+  REG[kk]={dtf:{ca:0,ev:0,deb:0,pan:0},mags:[]};
+  var reg=REG[kk];
+
+  // DTF SUD EST
+  var dm=txt.match(/DTF\s+SUD\s+EST\s+([\d,\.]+)\s+(-?[\d,\.]+)\s*%\s*([\d\s]+)\s+([\d,\.]+)/i);
+  if(dm){
+    reg.dtf.ca  = pN(dm[1]);
+    reg.dtf.ev  = pN(dm[2]);
+    reg.dtf.deb = parseInt(dm[3].replace(/\s/g,''))||0;
+    reg.dtf.pan = pN(dm[4]);
+  }
+
+  // Lignes magasins
+  var EXCL=['DTF','CLASSEMENT','CHIFFRE','MAGASIN','PERIODE','SOURCE','DARWIN',
+            'NAVIGATION','COMPARAISON','ACCUEIL','PERFORMANCES','CAJ','EXCELLENCE',
+            'DEMARQUES','GLOSSAIRE','CONTACTEZ','RAYON','PANIER','VALEUR','DEBITS'];
+  var lignes = txt.split(/\n/);
+  var rang=0;
+  lignes.forEach(function(l){
+    l=l.trim();
+    if(!l||l.length<3) return;
+    var lu=l.toUpperCase();
+    if(EXCL.some(function(ex){return lu.indexOf(ex)!==-1;})) return;
+    if(!/^[A-Za-zÀ-ÿ]/.test(l)) return;
+    var nm=l.match(/^([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9\s\-'\.]+?)(?=\s+[-\d]|\s+\d)/);
+    if(!nm) return;
+    var nom=nm[1].trim();
+    if(nom.length<3) return;
+    var ns=nums(l.substring(nm[0].length));
+    if(ns.length<2) return;
+    rang++;
+    reg.mags.push({
+      rang:rang,nom:nom,
+      ca:ns[0]||0,ev:ns[1]||0,
+      deb:ns[2]?Math.round(ns[2]):0,
+      pan:ns[3]||0,
+      isMe:/NARBONNE/i.test(nom)
+    });
+  });
+
+  // Activer bouton région
+  var k=document.getElementById('sel').value;
+  if(k&&REG[k]) document.getElementById('btn-reg').disabled=false;
+}
+
+// ═══════════════════════════════
+// SETUP FILE INPUTS
+// ═══════════════════════════════
+function setupF(id,lbId,fnId,parser){
+  document.getElementById(id).addEventListener('change',function(){
+    var f=this.files[0];
+    if(!f) return;
+    document.getElementById(fnId).textContent=f.name;
+    document.getElementById(lbId).classList.add('ok');
+    setStatut('⏳ Lecture de '+f.name+'…','');
+    lirePDF(f).then(function(txt){
+      parser(txt);
+      setStatut('✓ '+f.name+' chargé'+(DATE_STR?' — '+DATE_STR:''),'ok');
+    }).catch(function(e){
+      console.error(e);
+      document.getElementById(lbId).classList.remove('ok');
+      setStatut('⚠ Erreur lecture '+f.name,'err');
+    });
+  });
+}
+setupF('fp','lb-perf','fn-perf',parserPerf);
+setupF('fr','lb-ray', 'fn-ray', parserRayons);
+setupF('fc','lb-cmp', 'fn-cmp', parserCompar);
+
+function setStatut(msg,cls){
+  var el=document.getElementById('statut');
+  el.textContent=msg; el.className='statut '+(cls||'');
+}
+
+// ═══════════════════════════════
+// CONSIGNES TEXTES ORIGINAUX
+// ═══════════════════════════════
+var CO={
+  pgc_o1:"Contrôle DLC / DDM obligatoire : Effectuer un tour complet du rayon et retirer tout produit dont la date est dépassée ou à moins de 3 jours. Vérifier en priorité les zones de bas-de-rayon et les têtes de gondole.",
+  pgc_o2:"Chasse aux ruptures & commande : Identifier chaque référence absente du linéaire. Pour chaque rupture confirmée : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique. En cas de rupture : vérifier le stock, corriger si erreur, puis ajuster le SMP si besoin.",
+  pgc_o3:"Mise à jour des SMP : Sur les références en rupture traitées, vérifier que le Stock Mini Permanent est cohérent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster pour éviter les ruptures futures.",
+  pgc_c1:"Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et les emballages, vérifier que les allées de sécurité sont dégagées.",
+  pgc_c2:"Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère, redresser les articles tombés ou mal positionnés, vérifier que les tablettes sont propres et stables.",
+  pgc_c3:"Facing & tenue générale du rayon : Remettre chaque produit face-client sur l'ensemble des emplacements, combler les trous de présentation, vérifier l'affichage des prix.",
+
+  pls_o1:"Contrôle DLC produits frais libre-service : Effectuer un tour complet des meubles réfrigérés et retirer tout produit dont la DLC est dépassée ou à moins de 3 jours. Vérifier les étiquettes de traçabilité et l'intégrité des emballages.",
+  pls_o2:"Chasse aux ruptures & commande : Identifier chaque référence absente. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique. En cas de rupture : vérifier le stock, corriger si erreur, puis ajuster le SMP si besoin.",
+  pls_o3:"Mise à jour des SMP : Sur les références en rupture traitées, vérifier la cohérence du Stock Mini Permanent avec la rotation journalière. Ajuster si le SMP est à 0 ou sous-dimensionné.",
+  pls_c1:"Rangement de la réserve : Ranger la chambre froide et la réserve PLS, évacuer les cartons vides, vérifier que les allées sont dégagées et que les produits sont bien identifiés.",
+  pls_c2:"Vérification & nettoyage des meubles froids : Contrôler les températures de chaque meuble réfrigéré (maxi +4°C pour les frais, -18°C pour les surgelés). Nettoyer les vitrines, joints et étagères des meubles. Signaler toute anomalie thermique.",
+  pls_c3:"Tenue du linéaire — étagères & rayonnages : Vérifier l'état et la propreté des étagères, redresser les articles mal positionnés, contrôler l'affichage des prix.",
+
+  pft_tb:"Traçabilité & origine obligatoires : Vérifier que chaque produit en vitrine dispose de sa fiche traçabilité complète (numéro de lot, date de réception, origine géographique). Contrôler l'affichage réglementaire de l'origine sur les étiquettes.",
+  pft_fl:"Traçabilité & fiches origine : Vérifier que les étiquettes affichent l'origine de chaque produit (pays + exploitation si bio). Retirer tout produit sans fiche traçabilité conforme. Contrôler la fraîcheur visuelle de l'étalage.",
+  pft_bo:"Étiquetage allergènes & DLC : Contrôler que l'affichage des 14 allergènes réglementaires est présent et lisible pour chaque produit fabriqué sur place. Vérifier les DLC des produits et retirer ceux arrivés à date.",
+  pft_dl:"Contrôle DLC & qualité produits frais : Vérifier les DLC de tous les produits en vitrine et en réserve. Retirer tout produit arrivé à date ou présentant des défauts d'aspect. Contrôler l'intégrité des conditionnements.",
+  pft_o2:"Chasse aux ruptures & stock : Identifier chaque emplacement vide. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
+  pft_o3:"Mise à jour des SMP : Sur les références traitées en rupture, vérifier la cohérence du Stock Mini Permanent. Si le SMP est à 0 ou sous-évalué, l'ajuster. Contrôler le coût d'achat des dernières réceptions pour veiller à la tenue de marge.",
+  pft_c1:"Nettoyage & contrôle des meubles froids : Contrôler les températures de chaque meuble ou vitrine réfrigérée. Nettoyer les vitrines, joints, bacs et étagères. Signaler toute anomalie thermique dans le cahier d'hygiène.",
+  pft_c2:"Rangement de la réserve & chambre froide : Ranger la réserve et la chambre froide, évacuer les déchets et emballages de découpe, vérifier que les allées et sorties de secours sont dégagées.",
+  pft_c3:"Nettoyage des plans de travail & zone de production : Désinfecter les plans de travail, planches et ustensiles après chaque utilisation. Nettoyer le sol de la zone PFT et consigner les opérations dans le cahier d'hygiène.",
+
+  na_o1:"Facing & rangement complet du rayon : Remettre chaque article à sa place selon le plan de masse, effectuer un facing soigné face-client sur toutes les étagères. Vérifier le balisage prix de chaque référence.",
+  na_o2:"Chasse aux ruptures — commander 1 carton : Identifier toutes les références manquantes en rayon. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou nul par erreur, 3) commander 1 carton en commande client pour relancer la commande automatique. En cas de rupture : vérifier le stock, corriger si erreur, puis ajuster le SMP si besoin.",
+  na_o3:"Mise à jour des SMP : Pour chaque référence traitée en rupture, vérifier que le SMP est cohérent avec la vitesse de vente. Si SMP = 0 ou sous-évalué, le corriger pour sécuriser le réapprovisionnement automatique.",
+  na_c1:"Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et emballages, vérifier que les allées et sorties de secours sont libres. Contrôler l'état du mobilier de stockage.",
+  na_c2:"Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère et rayonnage, redresser les articles tombés ou mal positionnés, vérifier la stabilité des tablettes.",
+  na_c3:"Tenue visuelle du rayon : Dépoussiérer les étagères et les articles en exposition, soigner la présentation des têtes de gondole, vérifier que les allées sont propres et dégagées."
+};
+
+function lireC(k){return (SHOT&&SHOT[k])||CO[k]||'';}
+
+function fmtC(s){
+  var i=s.indexOf(':');
+  if(i>0&&i<80) return '<strong>'+s.substring(0,i)+' :</strong>'+s.substring(i+1);
+  return s;
+}
+
+function getCons(k){
+  var t=M[k]?M[k].t:'na';
+  var op=[],cl=[];
+  if(t==='pgc'){
+    op=[lireC('pgc_o1'),lireC('pgc_o2'),lireC('pgc_o3')];
+    cl=[lireC('pgc_c1'),lireC('pgc_c2'),lireC('pgc_c3')];
+  } else if(t==='pls'){
+    op=[lireC('pls_o1'),lireC('pls_o2'),lireC('pls_o3')];
+    cl=[lireC('pls_c1'),lireC('pls_c2'),lireC('pls_c3')];
+  } else if(t==='pft'){
+    var c1= k==='20'||k==='21'||k==='24' ? lireC('pft_tb') :
+            k==='22' ? lireC('pft_fl') :
+            k==='23' ? lireC('pft_bo') : lireC('pft_dl');
+    op=[c1,lireC('pft_o2'),lireC('pft_o3')];
+    cl=[lireC('pft_c1'),lireC('pft_c2'),lireC('pft_c3')];
+  } else {
+    op=[lireC('na_o1'),lireC('na_o2'),lireC('na_o3')];
+    cl=[lireC('na_c1'),lireC('na_c2'),lireC('na_c3')];
+  }
+  return {op:op,cl:cl};
+}
+
+// ═══════════════════════════════
+// GENERER BRIEF
+// ═══════════════════════════════
+function onSel(){
+  var k=document.getElementById('sel').value;
+  rayonK=k||null;
+  document.getElementById('btn-edt').disabled=!k;
+  document.getElementById('btn-reg').disabled=!(k&&REG[k]);
+  var rs=document.getElementById('region-s');
+  if(rs) rs.style.display='none';
+}
+
+function sg(v){return v>=0?'up':'dn';}
+function sp(v,d){return (v>=0?'+':'')+v.toFixed(d||1);}
+
+function genBrief(){
+  var k=document.getElementById('sel').value;
+  if(!k){alert('Veuillez choisir un rayon.');return;}
+  rayonK=k;
+  var m=M[k]; var d=D[k]||{}; var c=getCons(k);
+  SHOT=null; majBtnEdit();
+
+  // Alertes
+  var al=[];
+  if(d.stk>20)    al.push({t:'bad', l:'⚠ '+d.stk+' stocks négatifs'});
+  else if(d.stk>0) al.push({t:'warn',l:d.stk+' stocks négatifs'});
+  if(d.rupt>50)    al.push({t:'bad', l:'⚠ '+d.rupt+' ruptures assortiment'});
+  else if(d.rupt>0) al.push({t:'warn',l:d.rupt+' ruptures assortiment'});
+  if(d.ev<-15)  al.push({t:'bad', l:'CA en forte baisse ('+sp(d.ev,1)+'%)'});
+  if(d.dm<-3)   al.push({t:'bad', l:'Marge en recul ('+sp(d.dm,2)+' pts)'});
+  if(d.dm>2)    al.push({t:'good',l:'✓ Marge en progression ('+sp(d.dm,2)+' pts)'});
+  if(d.er>10)   al.push({t:'good',l:'✓ Progression nationale (+'+d.er+' places)'});
+  if(d.bud<-2)  al.push({t:'warn',l:'Écart budget '+d.bud.toFixed(1)+' K€'});
+  if(!al.length) al.push({t:'good',l:'✓ Situation globale correcte'});
+
+  // HTML consignes
+  function opRow(txt,num){
+    return '<div class="ci"><div class="cn">'+num+'</div><div class="ct">'+fmtC(txt)+'</div></div>';
+  }
+  function clRow(txt,num){
+    return '<div class="ci cl"><div class="cn">'+num+'</div><div class="ct">'+fmtC(txt)+'</div></div>';
+  }
+  function manRow(txt,isCl){
+    return '<div class="ci man'+(isCl?' cl':'')+'"><div class="cn">+</div><div class="ct">'+esc(txt)+'<span class="mb">MANUEL</span></div></div>';
+  }
+
+  var opH = c.op.map(function(t,i){return opRow(t,i+1);}).join('');
+  if(mOp1) opH+=manRow(mOp1,false);
+  if(mOp2) opH+=manRow(mOp2,false);
+  var clH = c.cl.map(function(t,i){return clRow(t,i+1);}).join('');
+  if(mCl)  clH+=manRow(mCl,true);
+
+  var erl=(d.er>0?'+':'')+d.er+' place'+(Math.abs(d.er)>1?'s':'');
+
+  var h=
+    '<div class="b-hdr">'+
+      '<div>'+
+        '<div style="font-size:11px;opacity:.65">Rayon '+m.n+' · '+m.par+' · HF7152 — Narbonne</div>'+
+        '<div class="b-title">'+m.nom+'</div>'+
+        '<div class="b-meta">'+(DATE_STR||'—')+' — Source Darwin</div>'+
+      '</div>'+
+      '<div class="kpis">'+
+        '<div class="kpi"><div class="kv '+sg(d.ev)+'">'+d.ca.toFixed(1)+' K€</div><div class="kl">CA Jour</div></div>'+
+        '<div class="kpi"><div class="kv '+sg(d.ev)+'">'+(d.ev>=0?'+':'')+d.ev.toFixed(1)+'%</div><div class="kl">Évol N-1</div></div>'+
+        '<div class="kpi"><div class="kv '+sg(d.taux)+'">'+d.taux.toFixed(1)+'%</div><div class="kl">Taux Marge</div></div>'+
+        '<div class="kpi"><div class="kv '+sg(d.dm)+'">'+(d.dm>=0?'+':'')+d.dm.toFixed(2)+' pts</div><div class="kl">Diff Marge N-1</div></div>'+
+        '<div class="kpi"><div class="kv '+sg(d.bud)+'">'+(d.bud>=0?'+':'')+d.bud.toFixed(1)+' K€</div><div class="kl">Écart Budget</div></div>'+
+        '<div class="kpi"><div class="kv '+(d.er>0?'up':d.er<0?'dn':'nt')+'">Rang '+d.rang+'</div><div class="kl">National ('+erl+')</div></div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="card full" style="margin-bottom:12px">'+
+      '<div class="ch al">⚡ Points d\'attention du jour</div>'+
+      '<div class="alerts">'+al.map(function(a){return '<span class="chip '+a.t+'">'+a.l+'</span>';}).join('')+'</div>'+
+    '</div>'+
+
+    '<div class="g2">'+
+      '<div class="card"><div class="ch op">⚙️ Consignes Opérationnelles</div><div class="clist">'+opH+'</div></div>'+
+      '<div class="card"><div class="ch cl">🧹 Propreté & Tenue du Rayon</div><div class="clist">'+clH+'</div></div>'+
+    '</div>'+
+
+    '<div id="region-s" style="display:none"></div>'+
+
+    '<div class="closing">'+
+      '<div class="cl-ico">💪</div>'+
+      '<div>'+
+        '<div class="cl-t">Bonne journée à toute l\'équipe !</div>'+
+        '<div class="cl-s">Chaque action compte — un rayon bien tenu, c\'est un client qui revient. Merci pour votre engagement au quotidien.</div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="bfoot">Brief généré — HF7152 Narbonne — '+(DATE_STR||new Date().toLocaleDateString('fr-FR'))+' — Confidentiel Carrefour</div>';
+
+  document.getElementById('brief-c').innerHTML=h;
+  document.getElementById('brief').style.display='block';
+  document.getElementById('brief').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('btn-reg').disabled=!(k&&REG[k]);
+}
+
+// ═══════════════════════════════
+// RÉGION
+// ═══════════════════════════════
+function affReg(){
+  var k=rayonK;
+  if(!k||!REG[k]) return;
+  var reg=REG[k]; var mm=M[k];
+
+  var rows=reg.mags.map(function(mg){
+    var tc=mg.isMe?' me':'';
+    var bc='rbg'+(mg.rang<=3?' top':'')+(mg.isMe?' me':'');
+    var ec=mg.ev>=0?'var(--green)':'var(--red)';
+    return '<tr class="'+tc+'">'+
+      '<td><span class="'+bc+'">'+mg.rang+'</span></td>'+
+      '<td>'+(mg.isMe?'<strong>'+mg.nom+' ← Vous</strong>':mg.nom)+'</td>'+
+      '<td>'+mg.ca.toFixed(1)+' K€</td>'+
+      '<td style="color:'+ec+'">'+(mg.ev>=0?'+':'')+mg.ev.toFixed(1)+'%</td>'+
+      '<td>'+mg.deb.toLocaleString('fr-FR')+'</td>'+
+      '<td>'+mg.pan.toFixed(1)+' €</td>'+
     '</tr>';
   }).join('');
 
-  const html =
-    '<div class="section-card full" style="margin-bottom:14px">' +
-      '<div class="section-head region">🌍 Classement Régional — Rayon ' + rayon.num + ' ' + rayon.nom + ' · DTF SUD EST · ' + STORE.date + '</div>' +
-      '<div style="padding:10px 14px 4px;font-size:12px;color:var(--muted)">' +
-        'DTF SUD EST total : <strong>' + data.dtfCA + ' K€</strong> (' + data.dtfEvol + '% vs N-1) · ' +
-        'Débits : <strong>' + data.dtfDebits.toLocaleString('fr') + '</strong> · ' +
-        'Panier moyen : <strong>' + data.dtfPanier + ' €</strong>' +
-      '</div>' +
-      '<div style="overflow-x:auto;padding:0 8px 12px">' +
-        '<table class="region-table">' +
-          '<thead><tr><th>Rang</th><th>Magasin</th><th>CA (K€)</th><th>Évol %</th><th>Débits</th><th>Panier</th></tr></thead>' +
-          '<tbody>' + rowsHtml + '</tbody>' +
-        '</table>' +
-      '</div>' +
-    '</div>';
+  var h='<div class="card full" style="margin-bottom:12px">'+
+    '<div class="ch rg">🌍 Classement Régional DTF SUD EST — Rayon '+mm.n+' '+mm.nom+'</div>'+
+    '<div style="padding:8px 12px 4px;font-size:12px;color:var(--muted)">'+
+      'DTF total : <strong>'+reg.dtf.ca.toFixed(1)+' K€</strong> ('+
+      (reg.dtf.ev>=0?'+':'')+reg.dtf.ev.toFixed(1)+'% vs N-1) · '+
+      'Débits : <strong>'+reg.dtf.deb.toLocaleString('fr-FR')+'</strong> · '+
+      'Panier : <strong>'+reg.dtf.pan.toFixed(1)+' €</strong>'+
+    '</div>'+
+    '<div style="overflow-x:auto;padding:0 8px 12px">'+
+      '<table class="rtbl">'+
+        '<thead><tr><th>Rang</th><th>Magasin</th><th>CA</th><th>Évol</th><th>Débits</th><th>Panier</th></tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
 
-  const section = document.getElementById("region-section");
-  section.style.display = "block";
-  section.innerHTML = html;
-  section.scrollIntoView({behavior:"smooth"});
+  var s=document.getElementById('region-s');
+  s.innerHTML=h; s.style.display='block';
+  s.scrollIntoView({behavior:'smooth'});
 }
 
-// ── File upload handlers ──
-function setupFileInput(inputId, labelId, fnameId) {
-  document.getElementById(inputId).addEventListener('change', function() {
-    if (this.files[0]) {
-      document.getElementById(fnameId).textContent = this.files[0].name;
-      document.getElementById(labelId).classList.add('file-loaded');
-    }
-  });
+// ═══════════════════════════════
+// CONSIGNES MANUELLES
+// ═══════════════════════════════
+function ouvMan(){
+  document.getElementById('m1').value=mOp1;
+  document.getElementById('m2').value=mOp2;
+  document.getElementById('m3').value=mCl;
+  document.getElementById('ov-man').classList.add('open');
 }
-setupFileInput('file-perf', 'lbl-perf', 'fname-perf');
-setupFileInput('file-rayons', 'lbl-rayons', 'fname-rayons');
-setupFileInput('file-compar', 'lbl-compar', 'fname-compar');
-
-// ── Extraction date depuis nom du PDF ──
-// Le PDF Performances Globales contient la date dans son contenu : "05/05/2026"
-// On tente de lire le nom du fichier et/ou d'extraire via FileReader + regex
-document.getElementById('file-perf').addEventListener('change', function() {
-  const file = this.files[0];
-  if (!file) return;
-  // Essai 1 : date dans le nom du fichier (ex: "...2026-05-05..." ou "...05_05_2026...")
-  const nomMatch = file.name.match(/(\d{2})[._\-\/](\d{2})[._\-\/](\d{4})/);
-  if (nomMatch) {
-    const [, j, m, a] = nomMatch;
-    afficherDate(j, m, a);
-    return;
-  }
-  // Essai 2 : lire le texte du PDF via FileReader (fonctionne pour les PDF texte)
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result || '';
-    const match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-    if (match) {
-      const [, j, m, a] = match;
-      afficherDate(j, m, a);
-    }
-  };
-  reader.readAsText(file, 'utf-8');
-});
-
-function afficherDate(j, m, a) {
-  const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-  const d = new Date(`${a}-${m}-${j}`);
-  const nomJour = isNaN(d) ? '' : jours[d.getDay()] + ' ';
-  const dateStr = `${nomJour}${j}/${m}/${a}`;
-  document.getElementById('header-date-display').textContent = dateStr;
-  STORE.date = dateStr;
+function savMan(){
+  mOp1=document.getElementById('m1').value.trim();
+  mOp2=document.getElementById('m2').value.trim();
+  mCl =document.getElementById('m3').value.trim();
+  majBtnMan(); fov('ov-man');
+}
+function effMan(){
+  document.getElementById('m1').value='';
+  document.getElementById('m2').value='';
+  document.getElementById('m3').value='';
+  mOp1=mOp2=mCl=''; majBtnMan(); fov('ov-man');
+}
+function majBtnMan(){
+  var b=document.getElementById('btn-man');
+  var has=mOp1||mOp2||mCl;
+  b.classList.toggle('on',!!has);
+  b.textContent=has?'✏️ Consignes manuelles ●':'✏️ Consignes manuelles';
 }
 
-// ── Modal consignes manuelles ──
-function ouvrirConsignes() {
-  document.getElementById('input-op-1').value = localStorage.getItem('consigne_op_1') || '';
-  document.getElementById('input-op-2').value = localStorage.getItem('consigne_op_2') || '';
-  document.getElementById('input-clean-1').value = localStorage.getItem('consigne_clean_1') || '';
-  const overlay = document.getElementById('modal-overlay');
-  overlay.style.display = 'flex';
-}
-
-function fermerConsignes() {
-  document.getElementById('modal-overlay').style.display = 'none';
-}
-
-function sauvegarderConsignes() {
-  localStorage.setItem('consigne_op_1', document.getElementById('input-op-1').value);
-  localStorage.setItem('consigne_op_2', document.getElementById('input-op-2').value);
-  localStorage.setItem('consigne_clean_1', document.getElementById('input-clean-1').value);
-  majBoutonConsignes();
-  fermerConsignes();
-}
-
-function effacerConsignes() {
-  document.getElementById('input-op-1').value = '';
-  document.getElementById('input-op-2').value = '';
-  document.getElementById('input-clean-1').value = '';
-  localStorage.removeItem('consigne_op_1');
-  localStorage.removeItem('consigne_op_2');
-  localStorage.removeItem('consigne_clean_1');
-  majBoutonConsignes();
-}
-
-function majBoutonConsignes() {
-  const hasContent = !!(
-    (localStorage.getItem('consigne_op_1') || '').trim() ||
-    (localStorage.getItem('consigne_op_2') || '').trim() ||
-    (localStorage.getItem('consigne_clean_1') || '').trim()
-  );
-  const btn = document.querySelector('.btn-consignes');
-  btn.classList.toggle('has-content', hasContent);
-  btn.textContent = hasContent ? '✏️ Consignes manuelles ●' : '✏️ Consignes manuelles';
-}
-
-// Fermer le modal en cliquant en dehors
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) fermerConsignes();
-});
-document.getElementById('modal-edit').addEventListener('click', function(e) {
-  if (e.target === this) fermerEditScript();
-});
-
-// ═══════════════════════════════════════════════════════════
-// ÉDITION DES CONSIGNES AUTOMATIQUES
-// ═══════════════════════════════════════════════════════════
-
-var CONSIGNES_ORIGINALES = {
-  pgc_op_1: "Contrôle DLC / DDM obligatoire : Effectuer un tour complet du rayon et retirer tout produit dont la date est dépassée ou à moins de 3 jours. Vérifier en priorité les zones de bas-de-rayon et les têtes de gondole.",
-  pgc_op_2: "Chasse aux ruptures & commande : Identifier chaque référence absente du linéaire. Pour chaque rupture confirmée : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
-  pgc_op_3: "Mise à jour des SMP : Sur les références en rupture traitées, vérifier que le Stock Mini Permanent est cohérent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster pour éviter les ruptures futures.",
-  pgc_cl_1: "Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et les emballages, vérifier que les allées de sécurité sont dégagées.",
-  pgc_cl_2: "Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère, redresser les articles tombés ou mal positionnés, vérifier que les tablettes sont propres et stables.",
-  pgc_cl_3: "Facing & tenue générale du rayon : Remettre chaque produit face-client sur l'ensemble des emplacements, combler les trous de présentation, vérifier l'affichage des prix et retirer les étiquettes obsolètes.",
-  pls_op_1: "Contrôle DLC produits frais LS : Effectuer un tour complet des meubles réfrigérés et retirer tout produit dont la DLC est dépassée ou à moins de 3 jours. Vérifier les étiquettes de traçabilité et l'intégrité des emballages.",
-  pls_op_2: "Chasse aux ruptures & commande : Identifier chaque référence absente. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
-  pls_op_3: "Mise à jour des SMP : Sur les références en rupture traitées, vérifier la cohérence du Stock Mini Permanent avec la rotation journalière. Ajuster si le SMP est à 0 ou sous-dimensionné.",
-  pls_cl_1: "Rangement de la réserve : Ranger la chambre froide et la réserve PLS, évacuer les cartons vides, vérifier que les allées sont dégagées et que les produits sont bien identifiés.",
-  pls_cl_2: "Vérification & nettoyage des meubles froids : Contrôler les températures de chaque meuble réfrigéré (maxi +4 °C pour les frais, -18 °C pour les surgelés). Nettoyer les vitrines, joints et étagères des meubles. Signaler toute anomalie thermique.",
-  pls_cl_3: "Tenue du linéaire — étagères & rayonnages : Vérifier l'état et la propreté des étagères, redresser les articles mal positionnés, contrôler l'affichage des prix et retirer les étiquettes de références absentes.",
-  pft_op_1_tracab: "Traçabilité & origine obligatoires : Vérifier que chaque produit en vitrine dispose de sa fiche traçabilité complète (numéro de lot, date de réception, origine géographique). Contrôler l'affichage réglementaire de l'origine sur les étiquettes.",
-  pft_op_1_fl: "Traçabilité & fiches origine : Vérifier que les étiquettes affichent l'origine de chaque produit (pays + exploitation si bio). Retirer tout produit sans fiche traçabilité conforme. Contrôler la fraîcheur visuelle de l'ensemble de l'étalage.",
-  pft_op_1_boul: "Étiquetage allergènes & DLC : Contrôler que l'affichage des 14 allergènes réglementaires est présent et lisible pour chaque produit fabriqué sur place. Vérifier les DLC des produits et retirer ceux arrivés à date.",
-  pft_op_1_autres: "Contrôle DLC & qualité produits frais : Vérifier les DLC de tous les produits en vitrine et en réserve. Retirer tout produit arrivé à date ou présentant des défauts d'aspect. Contrôler l'intégrité des conditionnements.",
-  pft_op_2: "Chasse aux ruptures & stock : Identifier chaque emplacement vide. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
-  pft_op_3: "Mise à jour des SMP : Sur les références traitées en rupture, vérifier la cohérence du Stock Mini Permanent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster. Contrôler le coût d'achat des dernières réceptions pour veiller à la tenue de marge.",
-  pft_cl_1: "Nettoyage & désinfection des meubles froids : Contrôler les températures de chaque meuble ou vitrine réfrigérée. Nettoyer les vitrines, joints, bacs et étagères. Signaler toute anomalie thermique dans le cahier d'hygiène.",
-  pft_cl_2: "Rangement de la réserve & chambre froide : Ranger la réserve et la chambre froide, évacuer les déchets et emballages de découpe, vérifier que les allées et sorties de secours sont dégagées.",
-  pft_cl_3: "Nettoyage plans de travail & zone de production : Désinfecter les plans de travail, planches et ustensiles après chaque utilisation. Nettoyer le sol de la zone PFT et consigner les opérations dans le cahier d'hygiène.",
-  na_op_1: "Facing & rangement complet du rayon : Remettre chaque article à sa place selon le plan de masse, effectuer un facing soigné face-client sur toutes les étagères. Vérifier le balisage prix de chaque référence et corriger les erreurs d'affichage.",
-  na_op_2: "Chasse aux ruptures — commander 1 carton : Identifier toutes les références manquantes en rayon. Pour chaque rupture : 1) vérifier le stock informatique, 2) si stock négatif ou nul par erreur corriger le stock, 3) commander 1 carton en commande client pour relancer la commande automatique.",
-  na_op_3: "Mise à jour des SMP : Pour chaque référence traitée en rupture, vérifier que le SMP est cohérent avec la vitesse de vente. Si SMP = 0 ou sous-évalué, le corriger pour sécuriser le réapprovisionnement automatique.",
-  na_cl_1: "Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et emballages, vérifier que les allées et sorties de secours sont libres. Contrôler l'état du mobilier de stockage.",
-  na_cl_2: "Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère et rayonnage, redresser les articles tombés ou mal positionnés, vérifier la stabilité des tablettes et signaler toute dégradation du mobilier.",
-  na_cl_3: "Tenue visuelle du rayon : Dépoussiérer les étagères et les articles en exposition, soigner la présentation des têtes de gondole, vérifier que l'allée centrale et les allées secondaires sont propres et dégagées."
+// ═══════════════════════════════
+// MODIFIER CONSIGNES (one-shot)
+// ═══════════════════════════════
+var GRP={
+  pgc:[[{lb:'🛒 PGC — Opérationnel',co:'#003d8f',ks:['pgc_o1','pgc_o2','pgc_o3'],ns:['Consigne 1','Consigne 2','Consigne 3']},
+        {lb:'🛒 PGC — Propreté',co:'#16a34a',ks:['pgc_c1','pgc_c2','pgc_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]],
+  pls:[[{lb:'❄️ PLS — Opérationnel',co:'#003d8f',ks:['pls_o1','pls_o2','pls_o3'],ns:['Consigne 1','Consigne 2','Consigne 3']},
+        {lb:'❄️ PLS — Propreté',co:'#16a34a',ks:['pls_c1','pls_c2','pls_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]],
+  pft_tb:[[{lb:'🥩 PFT Opérationnel (Boucherie/Poissonnerie/Charcuterie)',co:'#003d8f',ks:['pft_tb','pft_o2','pft_o3'],ns:['Traçabilité','Consigne 2','Consigne 3']},
+           {lb:'🥩 PFT — Propreté',co:'#16a34a',ks:['pft_c1','pft_c2','pft_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]],
+  pft_fl:[[{lb:'🥬 PFT Opérationnel (Fruits & Légumes)',co:'#003d8f',ks:['pft_fl','pft_o2','pft_o3'],ns:['Origine','Consigne 2','Consigne 3']},
+           {lb:'🥬 PFT — Propreté',co:'#16a34a',ks:['pft_c1','pft_c2','pft_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]],
+  pft_bo:[[{lb:'🥐 PFT Opérationnel (Boulangerie)',co:'#003d8f',ks:['pft_bo','pft_o2','pft_o3'],ns:['Allergènes','Consigne 2','Consigne 3']},
+           {lb:'🥐 PFT — Propreté',co:'#16a34a',ks:['pft_c1','pft_c2','pft_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]],
+  pft_dl:[[{lb:'🐟 PFT Opérationnel (Autres PFT)',co:'#003d8f',ks:['pft_dl','pft_o2','pft_o3'],ns:['DLC','Consigne 2','Consigne 3']},
+           {lb:'🐟 PFT — Propreté',co:'#16a34a',ks:['pft_c1','pft_c2','pft_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]],
+  na:    [[{lb:'📦 Non Alim — Opérationnel',co:'#003d8f',ks:['na_o1','na_o2','na_o3'],ns:['Consigne 1','Consigne 2','Consigne 3']},
+           {lb:'📦 Non Alim — Propreté',co:'#16a34a',ks:['na_c1','na_c2','na_c3'],ns:['Propreté 1','Propreté 2','Propreté 3']}]]
 };
 
-// Consignes modifiées pour un seul brief (usage unique)
-var consignesUniqueShot = null;
-
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function lireConsigne(key) {
-  if (consignesUniqueShot && consignesUniqueShot[key]) return consignesUniqueShot[key];
-  return CONSIGNES_ORIGINALES[key] || '';
-}
-
-function buildTagHtml(text) {
-  var colonIdx = text.indexOf(':');
-  if (colonIdx > 0 && colonIdx < 80) {
-    return '<strong>' + text.substring(0, colonIdx) + ' :</strong>' + text.substring(colonIdx + 1);
+function getGrp(k){
+  var t=M[k]?M[k].t:'na';
+  if(t==='pgc') return GRP.pgc[0];
+  if(t==='pls') return GRP.pls[0];
+  if(t==='pft'){
+    if(k==='20'||k==='21'||k==='24') return GRP.pft_tb[0];
+    if(k==='22') return GRP.pft_fl[0];
+    if(k==='23') return GRP.pft_bo[0];
+    return GRP.pft_dl[0];
   }
-  return text;
+  return GRP.na[0];
 }
 
-function getConsignes(rayon) {
-  var op = [];
-  var clean = [];
-  var type = rayon.type;
-  function C(key) { return buildTagHtml(lireConsigne(key)); }
-  if (type === "alim_pgc") {
-    op.push(C('pgc_op_1')); op.push(C('pgc_op_2')); op.push(C('pgc_op_3'));
-    clean.push(C('pgc_cl_1')); clean.push(C('pgc_cl_2')); clean.push(C('pgc_cl_3'));
-  } else if (type === "alim_pls") {
-    op.push(C('pls_op_1')); op.push(C('pls_op_2')); op.push(C('pls_op_3'));
-    clean.push(C('pls_cl_1')); clean.push(C('pls_cl_2')); clean.push(C('pls_cl_3'));
-  } else if (type === "alim_pft") {
-    if (rayon.num === "20" || rayon.num === "21" || rayon.num === "24") op.push(C('pft_op_1_tracab'));
-    else if (rayon.num === "22") op.push(C('pft_op_1_fl'));
-    else if (rayon.num === "23") op.push(C('pft_op_1_boul'));
-    else op.push(C('pft_op_1_autres'));
-    op.push(C('pft_op_2')); op.push(C('pft_op_3'));
-    clean.push(C('pft_cl_1')); clean.push(C('pft_cl_2')); clean.push(C('pft_cl_3'));
-  } else if (type === "non_alim") {
-    op.push(C('na_op_1')); op.push(C('na_op_2')); op.push(C('na_op_3'));
-    clean.push(C('na_cl_1')); clean.push(C('na_cl_2')); clean.push(C('na_cl_3'));
-  }
-  return { op: op, clean: clean };
-}
-
-var EDIT_GROUPS = [
-  { label: "🛒 PGC — Opérationnel", color: "#003d8f", keys: ["pgc_op_1","pgc_op_2","pgc_op_3"], noms: ["Consigne 1","Consigne 2","Consigne 3"] },
-  { label: "🛒 PGC — Propreté", color: "#16a34a", keys: ["pgc_cl_1","pgc_cl_2","pgc_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] },
-  { label: "❄️ PLS — Opérationnel", color: "#003d8f", keys: ["pls_op_1","pls_op_2","pls_op_3"], noms: ["Consigne 1","Consigne 2","Consigne 3"] },
-  { label: "❄️ PLS — Propreté", color: "#16a34a", keys: ["pls_cl_1","pls_cl_2","pls_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] },
-  { label: "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)", color: "#003d8f", keys: ["pft_op_1_tracab","pft_op_2","pft_op_3"], noms: ["Consigne traçabilité","Consigne 2","Consigne 3"] },
-  { label: "🥬 PFT — Opérationnel (Fruits & Légumes)", color: "#003d8f", keys: ["pft_op_1_fl","pft_op_2","pft_op_3"], noms: ["Consigne origine","Consigne 2","Consigne 3"] },
-  { label: "🥐 PFT — Opérationnel (Boulangerie)", color: "#003d8f", keys: ["pft_op_1_boul","pft_op_2","pft_op_3"], noms: ["Consigne allergènes","Consigne 2","Consigne 3"] },
-  { label: "🐟 PFT — Opérationnel (Autres PFT)", color: "#003d8f", keys: ["pft_op_1_autres","pft_op_2","pft_op_3"], noms: ["Consigne DLC","Consigne 2","Consigne 3"] },
-  { label: "🥩 PFT — Propreté", color: "#16a34a", keys: ["pft_cl_1","pft_cl_2","pft_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] },
-  { label: "📦 Non Alimentaire — Opérationnel", color: "#003d8f", keys: ["na_op_1","na_op_2","na_op_3"], noms: ["Consigne 1","Consigne 2","Consigne 3"] },
-  { label: "📦 Non Alimentaire — Propreté", color: "#16a34a", keys: ["na_cl_1","na_cl_2","na_cl_3"], noms: ["Propreté 1","Propreté 2","Propreté 3"] }
-];
-
-function onRayonChange() {
-  var key = document.getElementById('select-rayon').value;
-  var btn = document.getElementById('btn-edit');
-  if (!btn) return;
-  btn.disabled = !key;
-  majBoutonEdit();
-}
-
-// Mapping type -> groupes concernés
-var TYPE_GROUPS = {
-  alim_pgc:  ["🛒 PGC — Opérationnel", "🛒 PGC — Propreté"],
-  alim_pls:  ["❄️ PLS — Opérationnel", "❄️ PLS — Propreté"],
-  alim_pft:  [
-    "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
-    "🥬 PFT — Opérationnel (Fruits & Légumes)",
-    "🥐 PFT — Opérationnel (Boulangerie)",
-    "🐟 PFT — Opérationnel (Autres PFT)",
-    "🥩 PFT — Propreté"
-  ],
-  non_alim:  ["📦 Non Alimentaire — Opérationnel", "📦 Non Alimentaire — Propreté"]
-};
-
-// Pour les PFT, afficher uniquement le groupe de consigne 1 correspondant au rayon
-var PFT_GROUP_BY_NUM = {
-  "20": "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
-  "21": "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
-  "24": "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
-  "22": "🥬 PFT — Opérationnel (Fruits & Légumes)",
-  "23": "🥐 PFT — Opérationnel (Boulangerie)",
-  "25": "🐟 PFT — Opérationnel (Autres PFT)"
-};
-
-function ouvrirEditScript() {
-  var key = document.getElementById('select-rayon').value;
-  if (!key) return;
-  var rayon = RAYONS[key];
-  if (!rayon) return;
-
-  // Déterminer les groupes à afficher
-  var allowedLabels = TYPE_GROUPS[rayon.type] ? TYPE_GROUPS[rayon.type].slice() : [];
-
-  // Pour PFT : garder uniquement le groupe op_1 du rayon concerné + commun op_2/op_3 + propreté
-  if (rayon.type === "alim_pft") {
-    var specificGroup = PFT_GROUP_BY_NUM[rayon.num] || "🐟 PFT — Opérationnel (Autres PFT)";
-    // Retirer les autres groupes op_1 PFT
-    var pftOp1Labels = [
-      "🥩 PFT — Opérationnel (Boucherie / Poissonnerie / Charcuterie)",
-      "🥬 PFT — Opérationnel (Fruits & Légumes)",
-      "🥐 PFT — Opérationnel (Boulangerie)",
-      "🐟 PFT — Opérationnel (Autres PFT)"
-    ];
-    allowedLabels = allowedLabels.filter(function(l) {
-      return pftOp1Labels.indexOf(l) === -1 || l === specificGroup;
+function ouvEdit(){
+  var k=document.getElementById('sel').value;
+  if(!k) return;
+  var mm=M[k]; var grps=getGrp(k);
+  var h='<div style="background:#eff6ff;border-radius:7px;padding:9px 13px;margin-bottom:12px;font-size:13px;color:#1e40af">'+
+    '📌 Consignes pour <strong>Rayon '+mm.n+' — '+mm.nom+'</strong>. Appliquées au prochain brief uniquement.</div>';
+  grps.forEach(function(g){
+    h+='<div class="eg"><div class="egh" style="background:'+g.co+'18;color:'+g.co+'">'+g.lb+'</div><div class="egb">';
+    g.ks.forEach(function(key,i){
+      var val=lireC(key);
+      var mod=SHOT&&SHOT[key];
+      h+='<div><div class="flbl">'+g.ns[i]+(mod?'<span class="modb">MODIFIÉ</span>':'')+'</div>'+
+         '<textarea data-k="'+key+'" rows="3" style="border-color:'+(mod?'#3b82f6':'var(--border)')+'">'+esc(val)+'</textarea></div>';
     });
-  }
-
-  var container = document.getElementById('edit-sections');
-  var html = '<div style="background:#f0f6ff;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#1e40af">' +
-    '📌 Vous modifiez les consignes du rayon <strong>' + rayon.num + ' — ' + rayon.nom + '</strong>' +
-    '</div>';
-
-  EDIT_GROUPS.forEach(function(group) {
-    if (allowedLabels.indexOf(group.label) === -1) return;
-    html += '<div style="margin-bottom:14px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">';
-    html += '<div style="background:' + group.color + '18;border-bottom:1px solid #e5e7eb;padding:8px 12px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:' + group.color + '">' + group.label + '</div>';
-    html += '<div style="padding:12px;display:flex;flex-direction:column;gap:10px">';
-    group.keys.forEach(function(key, i) {
-      var val = lireConsigne(key);
-      var isModified = !!localStorage.getItem('script_' + key);
-      html += '<div><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.4px;display:flex;gap:6px;align-items:center;margin-bottom:4px">' + group.noms[i];
-      if (isModified) html += ' <span style="background:#dbeafe;color:#1d4ed8;font-size:10px;padding:1px 5px;border-radius:3px">MODIFIÉ</span>';
-      html += '</label><textarea data-key="' + key + '" rows="3" style="width:100%;padding:8px 10px;border:1.5px solid ' + (isModified ? '#3b82f6' : '#d1d9e6') + ';border-radius:6px;font-family:\'Barlow\',sans-serif;font-size:13px;resize:vertical;line-height:1.5">' + escHtml(val) + '</textarea></div>';
-    });
-    html += '</div></div>';
+    h+='</div></div>';
   });
-
-  container.innerHTML = html;
-  document.getElementById('modal-edit').style.display = 'flex';
+  document.getElementById('edit-c').innerHTML=h;
+  document.getElementById('ov-edt').classList.add('open');
 }
-
-function fermerEditScript() {
-  document.getElementById('modal-edit').style.display = 'none';
-}
-
-function sauvegarderScript() {
-  // Stocker les consignes modifiées en mémoire (pas localStorage) — usage unique
-  var textareas = document.querySelectorAll('#edit-sections textarea');
-  consignesUniqueShot = {};
-  var auMoinsUne = false;
-  textareas.forEach(function(ta) {
-    var key = ta.getAttribute('data-key');
-    var val = ta.value.trim();
-    if (val && val !== CONSIGNES_ORIGINALES[key]) {
-      consignesUniqueShot[key] = val;
-      auMoinsUne = true;
-    }
+function appEdit(){
+  var tas=document.querySelectorAll('#edit-c textarea');
+  var shot={},has=false;
+  tas.forEach(function(ta){
+    var k=ta.getAttribute('data-k');
+    var v=ta.value.trim();
+    if(v&&v!==CO[k]){shot[k]=v;has=true;}
   });
-  if (!auMoinsUne) consignesUniqueShot = null;
-  majBoutonEdit();
-  fermerEditScript();
+  SHOT=has?shot:null;
+  majBtnEdit(); fov('ov-edt');
+}
+function majBtnEdit(){
+  var b=document.getElementById('btn-edt');
+  if(!b) return;
+  var k=document.getElementById('sel').value;
+  b.disabled=!k;
+  var has=SHOT&&Object.keys(SHOT).length>0;
+  b.classList.toggle('on',has);
+  b.textContent=has?'⚙️ Consignes à appliquer ●':'⚙️ Modifier consignes';
 }
 
-function majBoutonEdit() {
-  var btn = document.getElementById('btn-edit');
-  if (!btn) return;
-  var hasModif = consignesUniqueShot && Object.keys(consignesUniqueShot).length > 0;
-  btn.classList.toggle('modified', hasModif);
-  var key = document.getElementById('select-rayon').value;
-  btn.disabled = !key;
-  btn.textContent = hasModif ? '⚙️ Consignes à appliquer ●' : '⚙️ Modifier les consignes';
+// ═══════════════════════════════
+// IMPRESSION
+// ═══════════════════════════════
+function imprimer(){
+  var c=document.getElementById('brief-c');
+  if(!c||!c.innerHTML.trim()){alert("Générez d'abord un brief.");return;}
+  var st='';
+  document.querySelectorAll('style').forEach(function(s){st+=s.outerHTML;});
+  var w=window.open('','_blank','width=960,height=700');
+  if(!w){alert("Autorisez les pop-ups pour ce fichier.");return;}
+  w.document.open();
+  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+st+
+    '<style>body{background:#fff;padding:10px}.ctrl,.ov{display:none!important}</style></head>'+
+    '<body><div style="max-width:960px;margin:0 auto">'+c.innerHTML+'</div>'+
+    '<'+'script>window.onload=function(){window.focus();window.print();}<'+'/script></body></html>');
+  w.document.close();
 }
 
-// ── Init au chargement
-majBoutonConsignes();
-document.getElementById('header-date-display').textContent = STORE.date;
-majBoutonEdit();
-
-function lancerImpression() {
-  var brief = document.getElementById('brief-content');
-  if (!brief || !brief.innerHTML.trim()) {
-    alert('Veuillez d\'abord générer un brief.');
-    return;
-  }
-
-  // Récupérer tous les styles de la page
-  var styles = '';
-  var styleSheets = document.querySelectorAll('style');
-  styleSheets.forEach(function(s) { styles += s.outerHTML; });
-
-  var contenu = brief.innerHTML;
-
-  var win = window.open('', '_blank', 'width=900,height=700');
-  if (!win) {
-    alert('Veuillez autoriser les pop-ups pour ce fichier, puis réessayez.');
-    return;
-  }
-
-  win.document.open();
-  win.document.write(
-    '<!DOCTYPE html><html lang="fr"><head>' +
-    '<meta charset="UTF-8">' +
-    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<title>Brief Journalier</title>' +
-    styles +
-    '<style>body{background:#fff;padding:12px}@media print{body{padding:0}}</style>' +
-    '</head><body>' +
-    '<div class="container" style="max-width:960px;margin:0 auto">' +
-    contenu +
-    '</div>' +
-    '<script>window.onload=function(){window.focus();window.print();}<\/script>' +
-    '</body></html>'
-  );
-  win.document.close();
-}
+// ═══════════════════════════════
+// UTILS
+// ═══════════════════════════════
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fov(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.ov').forEach(function(ov){
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('open');});
+});
 </script>
 </body>
 </html>
