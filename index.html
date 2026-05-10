@@ -542,39 +542,157 @@ setupF('f-c','lb-c','fn-c',parserCompar);
 function setStat(msg,cls){ var el=document.getElementById('stat'); el.textContent=msg; el.className='stat '+(cls||''); }
 
 // ═══════════════════════════════════════════════════
-// CONSIGNES — textes permanents (ne changent pas)
+// CONSIGNES — variantes rotatives (changent à chaque génération)
+// 3 variantes par consigne, tirées aléatoirement
 // ═══════════════════════════════════════════════════
-var CO = {
-  pgc_o1:"Contrôle DLC / DDM obligatoire : Effectuer un tour complet du rayon et retirer tout produit dont la date est dépassée ou à moins de 3 jours. Vérifier en priorité les zones de bas-de-rayon et les têtes de gondole.",
-  pgc_o2:"Chasse aux ruptures & commande : Identifier chaque référence absente du linéaire. Pour chaque rupture confirmée : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique. En cas de rupture : vérifier le stock, corriger si erreur, puis ajuster le SMP si besoin.",
-  pgc_o3:"Mise à jour des SMP : Sur les références en rupture traitées, vérifier que le Stock Mini Permanent est cohérent avec la rotation. Si le SMP est à 0 ou sous-évalué, l'ajuster pour éviter les ruptures futures.",
-  pgc_c1:"Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et les emballages, vérifier que les allées de sécurité sont dégagées.",
-  pgc_c2:"Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère, redresser les articles tombés ou mal positionnés, vérifier que les tablettes sont propres et stables.",
-  pgc_c3:"Facing & tenue générale du rayon : Remettre chaque produit face-client sur l'ensemble des emplacements, combler les trous de présentation, vérifier l'affichage des prix.",
-  pls_o1:"Contrôle DLC produits frais libre-service : Effectuer un tour complet des meubles réfrigérés et retirer tout produit dont la DLC est dépassée ou à moins de 3 jours. Vérifier les étiquettes de traçabilité et l'intégrité des emballages.",
-  pls_o2:"Chasse aux ruptures & commande : Identifier chaque référence absente. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique. En cas de rupture : vérifier le stock, corriger si erreur, puis ajuster le SMP si besoin.",
-  pls_o3:"Mise à jour des SMP : Sur les références en rupture traitées, vérifier la cohérence du Stock Mini Permanent avec la rotation journalière. Ajuster si le SMP est à 0 ou sous-dimensionné.",
-  pls_c1:"Rangement de la réserve : Ranger la chambre froide et la réserve PLS, évacuer les cartons vides, vérifier que les allées sont dégagées et que les produits sont bien identifiés.",
-  pls_c2:"Vérification & nettoyage des meubles froids : Contrôler les températures de chaque meuble réfrigéré (maxi +4°C pour les frais, -18°C pour les surgelés). Nettoyer les vitrines, joints et étagères des meubles. Signaler toute anomalie thermique.",
-  pls_c3:"Tenue du linéaire — étagères & rayonnages : Vérifier l'état et la propreté des étagères, redresser les articles mal positionnés, contrôler l'affichage des prix.",
-  pft_tb:"Traçabilité & origine obligatoires : Vérifier que chaque produit en vitrine dispose de sa fiche traçabilité complète (numéro de lot, date de réception, origine géographique). Contrôler l'affichage réglementaire de l'origine sur les étiquettes.",
-  pft_fl:"Traçabilité & fiches origine : Vérifier que les étiquettes affichent l'origine de chaque produit (pays + exploitation si bio). Retirer tout produit sans fiche traçabilité conforme. Contrôler la fraîcheur visuelle de l'étalage.",
-  pft_bo:"Étiquetage allergènes & DLC : Contrôler que l'affichage des 14 allergènes réglementaires est présent et lisible pour chaque produit fabriqué sur place. Vérifier les DLC des produits et retirer ceux arrivés à date.",
-  pft_dl:"Contrôle DLC & qualité produits frais : Vérifier les DLC de tous les produits en vitrine et en réserve. Retirer tout produit arrivé à date ou présentant des défauts d'aspect. Contrôler l'intégrité des conditionnements.",
-  pft_o2:"Chasse aux ruptures & stock : Identifier chaque emplacement vide. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou erroné, 3) commander 1 carton en commande client pour relancer la commande automatique.",
-  pft_o3:"Mise à jour des SMP : Sur les références traitées en rupture, vérifier la cohérence du Stock Mini Permanent. Si le SMP est à 0 ou sous-évalué, l'ajuster. Contrôler le coût d'achat des dernières réceptions pour veiller à la tenue de marge.",
-  pft_c1:"Nettoyage & contrôle des meubles froids : Contrôler les températures de chaque meuble ou vitrine réfrigérée. Nettoyer les vitrines, joints, bacs et étagères. Signaler toute anomalie thermique dans le cahier d'hygiène.",
-  pft_c2:"Rangement de la réserve & chambre froide : Ranger la réserve et la chambre froide, évacuer les déchets et emballages de découpe, vérifier que les allées et sorties de secours sont dégagées.",
-  pft_c3:"Nettoyage des plans de travail & zone de production : Désinfecter les plans de travail, planches et ustensiles après chaque utilisation. Nettoyer le sol de la zone PFT et consigner les opérations dans le cahier d'hygiène.",
-  na_o1:"Facing & rangement complet du rayon : Remettre chaque article à sa place selon le plan de masse, effectuer un facing soigné face-client sur toutes les étagères. Vérifier le balisage prix de chaque référence.",
-  na_o2:"Chasse aux ruptures — commander 1 carton : Identifier toutes les références manquantes en rayon. Pour chaque rupture : 1) vérifier le stock informatique, 2) corriger si stock négatif ou nul par erreur, 3) commander 1 carton en commande client pour relancer la commande automatique. En cas de rupture : vérifier le stock, corriger si erreur, puis ajuster le SMP si besoin.",
-  na_o3:"Mise à jour des SMP : Pour chaque référence traitée en rupture, vérifier que le SMP est cohérent avec la vitesse de vente. Si SMP = 0 ou sous-évalué, le corriger pour sécuriser le réapprovisionnement automatique.",
-  na_c1:"Rangement de la réserve : Ranger la réserve, évacuer les cartons vides et emballages, vérifier que les allées et sorties de secours sont libres. Contrôler l'état du mobilier de stockage.",
-  na_c2:"Vérification du linéaire — étagères & rayonnages : Contrôler l'état de chaque étagère et rayonnage, redresser les articles tombés ou mal positionnés, vérifier la stabilité des tablettes.",
-  na_c3:"Tenue visuelle du rayon : Dépoussiérer les étagères et les articles en exposition, soigner la présentation des têtes de gondole, vérifier que les allées sont propres et dégagées."
+function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+var CV = {
+  pgc_o1:[
+    "Contrôle DLC / DDM : Tour du rayon, retirer tout produit périmé ou à moins de 3 jours. Priorité aux bas-de-rayon et têtes de gondole.",
+    "Vérification des dates : Parcourir l'ensemble du linéaire et écarter les produits arrivés à date ou proches de l'échéance (J-3). Attention aux zones basses.",
+    "Tour DLC / DDM : Retirer sans exception tout article périmé ou dont la date tombe dans les 3 jours. Insister sur les emplacements difficiles d'accès."
+  ],
+  pgc_o2:[
+    "Ruptures : Pour chaque trou constaté — vérifier le stock, corriger si négatif ou erroné, passer 1 carton en commande client pour relancer l'automatique, ajuster le SMP si besoin.",
+    "Chasse aux ruptures : Repérer chaque référence manquante, contrôler le stock informatique, corriger les écarts, relancer via 1 carton commande client et revoir le SMP.",
+    "Tour des ruptures : Identifier les emplacements vides, vérifier et corriger le stock, commander 1 carton pour réamorcer la commande automatique, puis ajuster le SMP si nécessaire."
+  ],
+  pgc_o3:[
+    "SMP : Sur les références en rupture, s'assurer que le Stock Mini Permanent reflète la rotation réelle. Corriger les SMP à 0 ou sous-dimensionnés.",
+    "Mise à jour des SMP : Vérifier pour chaque rupture traitée que le SMP est adapté à la vitesse d'écoulement. Revaloriser si la valeur est insuffisante.",
+    "SMP à ajuster : Après traitement des ruptures, contrôler que les minima de stock correspondent à la réalité. Relever ceux qui sont à 0 ou trop bas."
+  ],
+  pgc_c1:[
+    "Réserve : Évacuer cartons et emballages vides, ranger proprement, s'assurer que les allées restent dégagées.",
+    "Rangement réserve : Désencombrer les allées, retirer les emballages inutiles, vérifier l'accès libre aux issues.",
+    "Réserve : Sortir les cartons vides, libérer les passages, ranger les produits de façon ordonnée."
+  ],
+  pgc_c2:[
+    "Linéaire : Contrôler chaque étagère, redresser les articles déplacés, vérifier la stabilité des tablettes.",
+    "Vérification étagères : Repositionner les articles tombés ou mal alignés, s'assurer que les rayonnages sont en bon état.",
+    "Tour des rayonnages : Redresser ce qui est renversé ou mal placé, contrôler l'état et la propreté des tablettes."
+  ],
+  pgc_c3:[
+    "Facing : Remettre tous les produits face-client, boucher les trous de présentation, vérifier les étiquettes de prix.",
+    "Tenue du rayon : Facing complet sur l'ensemble des emplacements, contrôle des prix, aucun trou apparent.",
+    "Facing & prix : Repositionner face-client, combler les vides, s'assurer que chaque référence est correctement étiquetée."
+  ],
+
+  pls_o1:[
+    "DLC frais : Tour des meubles réfrigérés, retirer tout produit périmé ou à moins de 3 jours. Vérifier l'intégrité des emballages et les étiquettes.",
+    "Contrôle DLC : Parcourir les frais libre-service, écarter les articles arrivés à date ou en J-3. Contrôler l'état des conditionnements.",
+    "Tour DLC frais LS : Inspecter chaque meuble, sortir les produits périmés ou proches de la limite, vérifier la traçabilité."
+  ],
+  pls_o2:[
+    "Ruptures : Repérer chaque trou, vérifier le stock, corriger si erroné, passer 1 carton commande client pour relancer l'automatique, ajuster le SMP.",
+    "Chasse aux ruptures : Identifier les références manquantes, corriger les stocks négatifs, relancer via 1 carton commande client, revoir les SMP.",
+    "Tour des ruptures : Pour chaque emplacement vide — corriger le stock, commander 1 carton pour réamorcer l'automatique, puis vérifier le SMP."
+  ],
+  pls_o3:[
+    "SMP : Vérifier que le Stock Mini Permanent est cohérent avec la rotation journalière. Relever les valeurs à 0 ou insuffisantes.",
+    "Mise à jour SMP : Après traitement des ruptures, s'assurer que les minima reflètent la réalité de vente. Corriger si nécessaire.",
+    "SMP à contrôler : Sur les ruptures traitées, vérifier l'adéquation du SMP avec la vitesse d'écoulement. Revaloriser les SMP trop bas."
+  ],
+  pls_c1:[
+    "Chambre froide & réserve : Dégager les allées, évacuer les emballages vides, s'assurer que les produits sont bien identifiés.",
+    "Réserve PLS : Sortir les cartons vides, libérer les accès, vérifier l'organisation et la lisibilité des produits stockés.",
+    "Rangement réserve : Désencombrer la chambre froide, évacuer les emballages, garantir les allées libres."
+  ],
+  pls_c2:[
+    "Meubles froids : Contrôler les températures (+4°C max / -18°C surgel.). Nettoyer vitrines, joints et étagères. Signaler toute anomalie.",
+    "Températures & nettoyage : Vérifier les relevés de chaque meuble réfrigéré, nettoyer les surfaces en contact, noter tout écart dans le cahier.",
+    "Contrôle froid : Tour des températures (frais +4°C, surgel. -18°C), nettoyage des vitrines et joints, signalement immédiat si anomalie."
+  ],
+  pls_c3:[
+    "Linéaire frais : Redresser les articles mal positionnés, contrôler les étagères, vérifier les étiquettes de prix.",
+    "Tenue étagères : Repositionner les produits déplacés, s'assurer du bon état des rayonnages, contrôler les prix.",
+    "Tour rayonnages : Vérifier l'alignement des produits, l'état des tablettes et la conformité des affichages de prix."
+  ],
+
+  pft_tb:[
+    "Traçabilité & origine : Vérifier lot, date de réception et origine sur chaque produit en vitrine. Contrôler l'affichage réglementaire de l'origine.",
+    "Contrôle traçabilité : Fiche complète (lot, réception, origine) pour chaque article exposé. Affichage de l'origine conforme en vitrine.",
+    "Traçabilité obligatoire : S'assurer que lot, date et origine géographique sont documentés sur chaque produit. Vérifier l'étiquetage vitrine."
+  ],
+  pft_fl:[
+    "Origine & traçabilité : Vérifier l'affichage de l'origine (pays, exploitation si bio) sur chaque produit. Retirer tout article sans fiche conforme.",
+    "Fiches origine : Contrôler que chaque référence affiche son origine complète. Écarter les produits sans traçabilité. Vérifier la fraîcheur de l'étalage.",
+    "Contrôle origine : Étiquettes d'origine à jour et lisibles, fiches traçabilité présentes, fraîcheur visuelle de l'ensemble de l'étalage."
+  ],
+  pft_bo:[
+    "Allergènes & DLC : Vérifier que les 14 allergènes sont affichés lisiblement pour chaque produit maison. Retirer les articles arrivés à date.",
+    "Contrôle allergènes : Affichage des allergènes complet et à jour. DLC vérifiées, produits périmés retirés sans exception.",
+    "Étiquetage allergènes : Chaque préparation maison doit avoir l'affichage des 14 allergènes réglementaires. Contrôle DLC simultané."
+  ],
+  pft_dl:[
+    "DLC & qualité : Vérifier les dates de tous les produits en vitrine et réserve. Retirer tout article périmé ou présentant un défaut d'aspect.",
+    "Tour DLC frais : Inspecter vitrine et réserve, écarter les produits arrivés à date ou abîmés, contrôler l'intégrité des conditionnements.",
+    "Contrôle qualité & DLC : Parcourir l'intégralité des produits frais, retirer les hors-date et les articles en mauvais état."
+  ],
+  pft_o2:[
+    "Ruptures : Pour chaque emplacement vide — corriger le stock, passer 1 carton commande client pour relancer l'automatique.",
+    "Chasse aux ruptures : Repérer les trous, vérifier et corriger les stocks, commander 1 carton pour réamorcer les commandes automatiques.",
+    "Tour des ruptures : Identifier les références absentes, corriger les stocks négatifs ou erronés, relancer via 1 carton commande client."
+  ],
+  pft_o3:[
+    "SMP & marge : Vérifier les SMP des ruptures traitées, corriger les valeurs insuffisantes. Contrôler les coûts d'achat des dernières réceptions.",
+    "Mise à jour SMP : S'assurer que les minima de stock correspondent à la rotation. Vérifier le prix d'achat pour veiller à la marge.",
+    "SMP & coût d'achat : Revaloriser les SMP trop bas, contrôler les tarifs des dernières livraisons pour maintenir le taux de marge."
+  ],
+  pft_c1:[
+    "Meubles froids : Relever les températures, nettoyer vitrines, joints et bacs. Consigner toute anomalie dans le cahier d'hygiène.",
+    "Contrôle froid & nettoyage : Vérifier les températures de chaque vitrine, nettoyer les surfaces, signaler immédiatement tout écart.",
+    "Températures & hygiène : Tour des relevés de froid, nettoyage complet des meubles, traçabilité dans le cahier d'hygiène."
+  ],
+  pft_c2:[
+    "Réserve & chambre froide : Évacuer déchets et emballages de découpe, dégager les allées et sorties de secours.",
+    "Rangement réserve : Sortir les emballages usagés, libérer les accès, s'assurer que les issues de secours sont dégagées.",
+    "Chambre froide : Évacuer les déchets, désencombrer les allées, vérifier les accès libres et sécurisés."
+  ],
+  pft_c3:[
+    "Plans de travail : Désinfecter plans, planches et ustensiles. Nettoyer le sol de la zone PFT. Consigner dans le cahier d'hygiène.",
+    "Nettoyage zone PFT : Désinfecter les surfaces de travail et les outils, nettoyer le sol, traçabilité dans le cahier.",
+    "Hygiène zone de production : Désinfecter après chaque usage, nettoyer le sol, renseigner le cahier d'hygiène."
+  ],
+
+  na_o1:[
+    "Facing & rangement : Remettre chaque article à sa place, facing face-client sur toutes les étagères, vérifier les étiquettes de prix.",
+    "Tenue du rayon : Replacer les articles selon le plan, facing complet, s'assurer que chaque référence est correctement balisée.",
+    "Rangement & facing : Remettre en ordre l'ensemble du rayon, facing soigné, contrôle des prix et du balisage."
+  ],
+  na_o2:[
+    "Ruptures : Pour chaque référence manquante — corriger le stock si erroné, commander 1 carton commande client pour relancer l'automatique, ajuster le SMP.",
+    "Chasse aux ruptures : Repérer les trous, vérifier les stocks, corriger les erreurs, passer 1 carton commande client, revoir les SMP.",
+    "Tour des ruptures : Identifier les absences, corriger le stock si besoin, relancer via 1 carton commande client, puis vérifier le SMP."
+  ],
+  na_o3:[
+    "SMP : Vérifier que le Stock Mini Permanent reflète la vitesse de vente. Corriger les valeurs à 0 ou insuffisantes.",
+    "Mise à jour SMP : Sur les ruptures traitées, s'assurer que les minima garantissent le réapprovisionnement automatique.",
+    "SMP à revoir : Après chaque rupture traitée, contrôler et ajuster le SMP pour éviter qu'elle ne se reproduise."
+  ],
+  na_c1:[
+    "Réserve : Évacuer cartons vides et emballages, dégager les allées et sorties de secours, vérifier l'état du mobilier.",
+    "Rangement réserve : Sortir les emballages inutiles, libérer les accès, contrôler le mobilier de stockage.",
+    "Réserve : Désencombrer, évacuer les déchets, s'assurer que les issues restent libres."
+  ],
+  na_c2:[
+    "Linéaire : Contrôler l'état de chaque étagère, redresser les articles déplacés, vérifier la stabilité des tablettes.",
+    "Tour des rayonnages : Repositionner les articles tombés ou mal alignés, vérifier la solidité des étagères.",
+    "Vérification étagères : Redresser ce qui est renversé, contrôler les tablettes et signaler toute dégradation."
+  ],
+  na_c3:[
+    "Tenue visuelle : Dépoussiérer les étagères et articles exposés, soigner les têtes de gondole, allées propres et dégagées.",
+    "Propreté rayon : Dépoussiérer, soigner la mise en scène des têtes de gondole, vérifier la propreté des allées.",
+    "Présentation : Dépoussiérer l'ensemble, mettre en valeur les têtes de gondole, maintenir les allées libres et propres."
+  ]
 };
 
-function lC(k){ return (SHOT&&SHOT[k])||CO[k]||''; }
+// Textes par défaut pour le modal edit (toujours le premier variant)
+var CO = {};
+Object.keys(CV).forEach(function(k){ CO[k] = CV[k][0]; });
+
+function lC(k){ return (SHOT&&SHOT[k])||rnd(CV[k]||[CO[k]]); }
 function fmtC(s){
   var i=s.indexOf(':');
   if(i>0&&i<80) return '<strong>'+s.substring(0,i)+' :</strong>'+s.substring(i+1);
@@ -594,6 +712,58 @@ function getCons(k){
     op=[lC('na_o1'),lC('na_o2'),lC('na_o3')]; cl=[lC('na_c1'),lC('na_c2'),lC('na_c3')];
   }
   return {op:op,cl:cl};
+}
+
+// ═══════════════════════════════════════════════════
+// MESSAGE DE CLÔTURE
+// ═══════════════════════════════════════════════════
+var MSG_POS = [
+  {t:"Bonne journée à toute l'équipe !", s:"Un rayon bien tenu, c'est la première impression que le client retient. Merci pour votre implication."},
+  {t:"Merci pour votre engagement !", s:"Chaque geste quotidien construit la satisfaction client. L'équipe fait la différence."},
+  {t:"En route pour une belle journée !", s:"La rigueur d'aujourd'hui prépare les résultats de demain. Comptez sur vous."},
+  {t:"L'équipe fait la force du rayon !", s:"Un bon brief, c'est une journée qui se déroule sans accroc. Bonne continuation à tous."},
+  {t:"Chaque détail compte !", s:"Un produit bien placé, un client satisfait. Votre travail a un impact direct sur le résultat du magasin."},
+  {t:"Cap sur une journée productive !", s:"Les indicateurs guident, votre terrain fait la différence. Bonne journée à toutes et tous."}
+];
+var MSG_NEG = [
+  {k:'stk',  t:"Point d'amélioration :", s:"Les stocks négatifs sont à corriger en priorité pour fiabiliser les commandes automatiques."},
+  {k:'rupt', t:"Point d'amélioration :", s:"Les ruptures assortiment pénalisent le CA — chasse aux trous et commande 1 carton pour chaque référence manquante."},
+  {k:'ev',   t:"Point d'amélioration :", s:"Le chiffre d'affaires est en recul — renforcer le facing et la disponibilité produit pour limiter la perte."},
+  {k:'dm',   t:"Point d'amélioration :", s:"La marge est sous pression — contrôler les prix d'achat et limiter les démarques non justifiées."},
+  {k:'bud',  t:"Point d'amélioration :", s:"L'écart au budget persiste — chaque vente compte pour rattraper le retard."}
+];
+
+function buildClosing(d){
+  var pos = rnd(MSG_POS);
+  // Identifier le point négatif le plus significatif
+  var neg = null;
+  if(d.stk > 20)   neg = MSG_NEG[0];
+  else if(d.rupt > 50)  neg = MSG_NEG[1];
+  else if(d.ev < -10)   neg = MSG_NEG[2];
+  else if(d.dm < -2)    neg = MSG_NEG[3];
+  else if(d.bud < -3)   neg = MSG_NEG[4];
+
+  if(!neg){
+    // Tout vert : un seul message positif
+    return '<div class="closing">'+
+      '<div class="cl-ico">🌟</div>'+
+      '<div><div class="cl-t">'+pos.t+'</div><div class="cl-s">'+pos.s+'</div></div>'+
+    '</div>';
+  }
+
+  var pos2 = rnd(MSG_POS.filter(function(p){ return p.t !== pos.t; }));
+  return '<div class="closing">'+
+    '<div class="cl-ico">💪</div>'+
+    '<div><div class="cl-t">'+pos.t+'</div><div class="cl-s">'+pos.s+'</div></div>'+
+  '</div>'+
+  '<div class="card full" style="margin-bottom:12px;border-left:4px solid var(--orange)">'+
+    '<div class="ch al" style="background:#fff7ed;color:#9a3412">⚡ '+neg.t+'</div>'+
+    '<div style="padding:10px 14px;font-size:13px;color:var(--text)">'+neg.s+'</div>'+
+  '</div>'+
+  '<div class="closing">'+
+    '<div class="cl-ico">🎯</div>'+
+    '<div><div class="cl-t">'+pos2.t+'</div><div class="cl-s">'+pos2.s+'</div></div>'+
+  '</div>';
 }
 
 // ═══════════════════════════════════════════════════
@@ -666,13 +836,7 @@ function genBrief(){
       '<div class="card"><div class="ch cl">🧹 Propreté & Tenue du Rayon</div><div class="clist">'+clH+'</div></div>'+
     '</div>'+
     '<div id="reg-s" style="display:none"></div>'+
-    '<div class="closing">'+
-      '<div class="cl-ico">💪</div>'+
-      '<div>'+
-        '<div class="cl-t">Bonne journée à toute l\'équipe !</div>'+
-        '<div class="cl-s">Chaque action compte — un rayon bien tenu, c\'est un client qui revient. Merci pour votre engagement au quotidien.</div>'+
-      '</div>'+
-    '</div>'+
+    buildClosing(d)+
     '<div class="bfoot">Brief généré — HF7152 Narbonne — '+(DATE_STR||new Date().toLocaleDateString('fr-FR'))+' — Confidentiel Carrefour</div>';
 
   document.getElementById('brief-c').innerHTML=h;
