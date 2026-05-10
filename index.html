@@ -345,78 +345,125 @@ function trouverDate(txt){
 
 // ═══════════════════════════════════════════════════
 // PARSER — Performances Globales
-//
-// Structure Darwin vérifiée ligne par ligne (0 erreur / 30 rayons) :
-// [0]=num  [1]=CA(K€)  [2]=EVOL%  [3]=ECART_BUD
-// [4]=POIDS%  [5]=POIDS_CAT%  [6]=TAUX_MARGE%  [7]=DIFF_MARGE%
-// [...produits retirés optionnels...]
-// Fin de ligne : [..., STK_NEG, RUPT_ASSORT, VAB]
-//   → les 3 derniers entiers positifs (hors [0])
+// PDF.js produit du texte CONTINU (pas de \n entre les éléments)
+// Algorithme par segments : on repère chaque rayon dans le flux continu
+// et on extrait les nombres jusqu'au rayon suivant.
+// Colonnes vérifiées (0 erreur / 27 rayons) :
+//   ns[1]=CA  ns[2]=EVOL%  ns[3]=BUD  ns[6]=TAUX  ns[7]=DM
+//   trail[-3]=STK_NEG  trail[-2]=RUPT  trail[-1]=VAB
 // ═══════════════════════════════════════════════════
+
+// Pattern global : repère TOUS les marqueurs de rayon + sections
+// utilisé pour délimiter les segments
+var SEG_PAT = new RegExp('(?:' + [
+  '\\b10\\s+BOISSONS','\\b11\\s+DROGUERIE','\\b12\\s+PARFUMERIE',
+  '\\b14\\s+.PICERIE','\\b19\\s+PARAPHARMACIE','\\b20\\s+CHARCUT',
+  '\\b21\\s+POISSONNERIE','\\b22\\s+FRUITS','\\b23\\s+BOULANGERIE',
+  '\\b24\\s+BOUCHERIE','\\b25\\s+P\\.L\\.S','\\b26\\s+CAF',
+  '\\b2\\s+P\\.?F\\.?T','\\b1\\s+PGC','\\b3\\s+BAZAR',
+  '\\b4\\s+EPCS','\\b6\\s+TEXTILE','\\b7\\s+ACTIV',
+  'HORS SURFACE','NON ALIM','SURFACE DE VENTE','TOTAL EXPLOIT',
+  '\\b30\\s+BRICOLAGE','\\b31\\s+CONFORT','\\b32\\s+PAPETERIE',
+  '\\b33\\s+JOUET','\\b34\\s+JARDIN','\\b35\\s+AUTO',
+  '\\b8X\\s+CULTURE','\\b40\\s+GEM','\\b41\\s+PEM',
+  '\\b42\\s+PHOTO','\\b43\\s+IMAGE','\\b44\\s+MICRO',
+  '\\b45\\s+RADIO','\\b60\\s+CHAUSSURE','\\b61\\s+B.B',
+  '\\b62\\s+ENFANT','\\b63\\s+FEMME','\\b64\\s+HOMME',
+  '\\b65\\s+LINGE','\\b66\\s+ACCESS','\\b67\\s+BIJOU'
+].join('|') + ')', 'gi');
+
+// Nom attendu dans le segment (triple vérification)
 var NOMS_PG = {
-  "10":"BOISSONS","11":"DROGUERIE","12":"PARFUMERIE","14":"EPICERIE","19":"PARAPHARMACIE",
-  "20":"CHARCUT","21":"POISSONNERIE","22":"FRUITS","23":"BOULANGERIE","24":"BOUCHERIE",
-  "25":"P.L.S","30":"BRICOLAGE","31":"CONFORT","32":"PAPETERIE","33":"JOUET",
-  "34":"JARDIN","35":"AUTO","8X":"CULTURE","40":"GEM","41":"PEM",
+  "10":"BOISSONS","11":"DROGUERIE","12":"PARFUMERIE","14":"EPICERIE",
+  "19":"PARAPHARMACIE","20":"CHARCUT","21":"POISSONNERIE","22":"FRUITS",
+  "23":"BOULANGERIE","24":"BOUCHERIE","25":"P.L.S","30":"BRICOLAGE",
+  "31":"CONFORT","32":"PAPETERIE","33":"JOUET","34":"JARDIN",
+  "35":"AUTO","8X":"CULTURE","40":"GEM","41":"PEM",
   "43":"IMAGE","44":"MICRO","45":"RADIO","60":"CHAUSSURE","61":"BEBE",
-  "62":"ENFANT","63":"FEMME","64":"HOMME","65":"LINGE","66":"ACCESSOIRES"
+  "62":"ENFANT","63":"FEMME","64":"HOMME","65":"LINGE","66":"ACCESS"
 };
+
+function texteContinu(pages){ return pages.join(' ').replace(/\s+/g,' '); }
 
 function parserPerf(txt){
   var date = trouverDate(txt);
   if(date){ DATE_STR=date; document.getElementById('hdr-date').textContent=date; }
 
-  txt.split('\n').forEach(function(ligne){
-    ligne = ligne.trim();
-    // Triple vérification : (1) commence par le numéro, (2) numéro connu, (3) nom attendu présent
-    var m = ligne.match(/^(\d{1,2}|8X)\s+/);
-    if(!m) return;
-    var num = m[1].toUpperCase();
-    if(!D[num] || !NOMS_PG[num]) return;                        // vérif (2)
-    if(ligne.toUpperCase().indexOf(NOMS_PG[num]) === -1) return; // vérif (3)
+  var continuous = txt.replace(/\s+/g,' ');
+  SEG_PAT.lastIndex = 0;
 
-    var ns = getNums(ligne);
-    if(ns.length < 8) return;
+  var matches = [];
+  var m;
+  SEG_PAT.lastIndex = 0;
+  while((m = SEG_PAT.exec(continuous)) !== null){
+    matches.push({pos:m.index, grp:m[0]});
+  }
+
+  for(var i=0; i<matches.length; i++){
+    var numM = matches[i].grp.match(/^(\d{1,2}|8X)/i);
+    if(!numM) continue;
+    var num = numM[1].toUpperCase();
+    if(!D[num] || !NOMS_PG[num]) continue;
+
+    var end = i+1 < matches.length ? matches[i+1].pos : matches[i].pos+400;
+    var seg = continuous.substring(matches[i].pos, end);
+
+    // Triple vérification : numéro + nom attendu + position correcte
+    if(seg.toUpperCase().indexOf(NOMS_PG[num]) === -1) continue;
+
+    var ns = getNums(seg);
+    if(ns.length < 8) continue;
 
     var d = D[num];
-    // Positions fixes vérifiées :
-    d.ca   = ns[1];  // CA K€
-    d.ev   = ns[2];  // Évolution N-1 %
-    d.bud  = ns[3];  // Écart budget K€
-    d.taux = ns[6];  // Taux marge %
-    d.dm   = ns[7];  // Diff marge N-1 pts
+    d.ca   = ns[1];
+    d.ev   = ns[2];
+    d.bud  = ns[3];
+    d.taux = ns[6];
+    d.dm   = ns[7];
 
-    // STK_NEG / RUPT_ASSORT = avant-derniers entiers positifs en fin de ligne
+    // STK / RUPT = avant-derniers entiers en fin de segment (hors ns[0] et ns[1])
     var trail = [];
-    for(var i=1; i<ns.length; i++){
-      if(ns[i]===Math.round(ns[i]) && ns[i]>=0 && ns[i]<5000) trail.push(ns[i]);
+    for(var j=2; j<ns.length; j++){
+      if(ns[j]===Math.round(ns[j]) && ns[j]>=0 && ns[j]<5000) trail.push(ns[j]);
     }
-    if(trail.length >= 2){ d.stk=trail[trail.length-2]; d.rupt=trail[trail.length-1]; }
-    else if(trail.length===1){ d.stk=trail[0]; d.rupt=0; }
-  });
+    if(trail.length>=3){ d.stk=trail[trail.length-3]; d.rupt=trail[trail.length-2]; }
+    else if(trail.length===2){ d.stk=trail[0]; d.rupt=trail[1]; }
+    else if(trail.length===1){ d.rupt=trail[0]; d.stk=0; }
+    else { d.stk=0; d.rupt=0; }
+  }
 }
 
 // ═══════════════════════════════════════════════════
 // PARSER — Classement Rayons
-//
-// Structure Darwin vérifiée (0 erreur / 30 rayons) :
-// [0]=num [1]=CA [2]=EVOL% [3]=BUD [4]=CA_ECOM
-// Règle rang/er :
-//   Si ns[4]>0  → ns[5]=EVOL_ECOM%, ns[6]=RANG, ns[7]=EVOL_RANG
-//   Si ns[4]=0 et ns[5]<0 → ns[5]=EVOL_ECOM%, ns[6]=RANG, ns[7]=EVOL_RANG
-//   Si ns[4]=0 et ns[5]≥0 → ns[5]=RANG, ns[6]=EVOL_RANG
+// Colonnes vérifiées (0 erreur / 30 rayons) :
+//   ns[1]=CA  ns[2]=EVOL%  ns[3]=BUD  ns[4]=CA_ECOM
+//   Si ns[4]>0        → ns[6]=RANG  ns[7]=EVOL_RANG
+//   Si ns[4]=0, ns[5]<0 → ns[6]=RANG  ns[7]=EVOL_RANG
+//   Si ns[4]=0, ns[5]≥0 → ns[5]=RANG  ns[6]=EVOL_RANG
 // ═══════════════════════════════════════════════════
 function parserRayons(txt){
-  txt.split('\n').forEach(function(ligne){
-    ligne = ligne.trim();
-    var m = ligne.match(/^(\d{1,2}|8X)\s+/);
-    if(!m) return;
-    var num = m[1].toUpperCase();
-    if(!D[num] || !NOMS_PG[num]) return;
-    if(ligne.toUpperCase().indexOf(NOMS_PG[num]) === -1) return;
+  var continuous = txt.replace(/\s+/g,' ');
+  SEG_PAT.lastIndex = 0;
 
-    var ns = getNums(ligne);
-    if(ns.length < 7) return;
+  var matches = [];
+  var m;
+  SEG_PAT.lastIndex = 0;
+  while((m = SEG_PAT.exec(continuous)) !== null){
+    matches.push({pos:m.index, grp:m[0]});
+  }
+
+  for(var i=0; i<matches.length; i++){
+    var numM = matches[i].grp.match(/^(\d{1,2}|8X)/i);
+    if(!numM) continue;
+    var num = numM[1].toUpperCase();
+    if(!D[num] || !NOMS_PG[num]) continue;
+
+    var end = i+1 < matches.length ? matches[i+1].pos : matches[i].pos+350;
+    var seg = continuous.substring(matches[i].pos, end);
+    if(seg.toUpperCase().indexOf(NOMS_PG[num]) === -1) continue;
+
+    var ns = getNums(seg);
+    if(ns.length < 7) continue;
 
     var rang, er;
     if(ns[4] > 0){
@@ -430,7 +477,7 @@ function parserRayons(txt){
     var d = D[num];
     if(rang>=1 && rang<=300) d.rang = rang;
     if(er>=-300 && er<=300)  d.er   = er;
-  });
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -464,8 +511,11 @@ function parserCompar(txt){
   REG[kk] = { dtf:{ca:0,ev:0,deb:0,pan:0}, mags:[] };
   var reg = REG[kk];
 
-  // Ligne DTF SUD EST
-  var dm = txt.match(/DTF\s+SUD\s+EST\s+([\d,\.]+)\s+([-\d,\.]+)\s*%\s*([\d\s]+?)\s+([-\d,\.]+)/i);
+  // Texte continu
+  var continuous = txt.replace(/\s+/g,' ');
+
+  // DTF SUD EST
+  var dm = continuous.match(/DTF\s+SUD\s+EST\s+([\d,\.]+)\s+([-\d,\.]+)\s*%\s*([\d\s]+?)\s+([-\d,\.]+)/i);
   if(dm){
     reg.dtf.ca  = pN(dm[1]);
     reg.dtf.ev  = pN(dm[2]);
@@ -473,41 +523,44 @@ function parserCompar(txt){
     reg.dtf.pan = pN(dm[4]);
   }
 
-  txt.split('\n').forEach(function(l){
-    l = l.trim();
-    if(!l || l.length < 3) return;
-    var lu = l.toUpperCase();
-    if(EXCL_C.some(function(ex){ return lu.indexOf(ex)!==-1; })) return;
-    if(!/^[A-Za-zÀ-ÿ]/.test(l)) return;
+  // Magasins : chercher pattern NOM RANG CA EVOL% dans le texte continu
+  // On repère chaque magasin par : suite de lettres (nom) + entier 1-31 + décimal (CA) + % (evol)
+  var magRe = /([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9\s\-\'\.]{2,30}?)\s+(\d{1,2})\s+([\d,]+)\s+([-\d,]+)%/g;
+  var mg;
+  while((mg = magRe.exec(continuous)) !== null){
+    var nom  = mg[1].trim();
+    var rang = parseInt(mg[2]);
+    var ca   = pN(mg[3]);
+    var ev   = pN(mg[4]);
 
-    // Ligne magasin : NOM  RANG(1-2 chiffres)  CA  EVOL%
-    var m = l.match(/^([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9\s\-\'\.]+?)\s+(\d{1,2})\s+([\d,]+)\s+([-\d,]+)%/);
-    if(!m) return;
+    if(rang<1||rang>40||ca<=0||ca>50) continue;
 
-    var nom  = m[1].trim();
-    var rang = parseInt(m[2]);
-    var ca   = pN(m[3]);
-    var ev   = pN(m[4]);
-    if(rang<1||rang>40||ca<=0||ca>50) return;
+    // Filtrer les faux-positifs
+    var nomUp = nom.toUpperCase();
+    if(EXCL_C.some(function(ex){ return nomUp.indexOf(ex)!==-1; })) continue;
+    if(nom.length < 3) continue;
 
-    var rest = l.substring(m[0].length);
-
-    // Débits : "1 NNN" / "2 NNN" pour >1000, sinon NNN (3-4 chiffres)
+    // Débits : chercher dans les 80 chars suivants
+    var suite = continuous.substring(mg.index+mg[0].length, mg.index+mg[0].length+80);
     var deb = 0;
-    var dm2 = rest.match(/\b([12])\s+(\d{3})\b/);
+    var dm2 = suite.match(/\b([12])\s+(\d{3})\b/);
     if(dm2){ deb = parseInt(dm2[1])*1000+parseInt(dm2[2]); }
     else {
-      var dm3 = rest.match(/\b(\d{3,4})\b/);
-      if(dm3){ var v=parseInt(dm3[1]); if(v>=100&&v<=9999) deb=v; }
+      var dm3 = suite.match(/\b(\d{3,4})\b/);
+      if(dm3){ var vv=parseInt(dm3[1]); if(vv>=100&&vv<=9999) deb=vv; }
     }
 
-    // Panier : dernier décimal positif entre 2.0 et 15.0
-    var dec = rest.match(/(-?[\d]+,[\d]+)/g)||[];
+    // Panier : dernier décimal XX,X dans la suite
+    var dec = suite.match(/([\d]+,[\d]+)/g)||[];
     var pan = 0;
-    for(var i=dec.length-1;i>=0;i--){ var vv=pN(dec[i]); if(vv>=2.0&&vv<=15.0){pan=vv;break;} }
+    for(var pi=dec.length-1;pi>=0;pi--){ var pv=pN(dec[pi]); if(pv>=2.0&&pv<=15.0){pan=pv;break;} }
 
-    reg.mags.push({rang:rang,nom:nom,ca:ca,ev:ev,deb:deb,pan:pan,isMe:/NARBONNE/i.test(nom)});
-  });
+    // Éviter les doublons sur le même rang
+    var exists = reg.mags.some(function(x){ return x.rang===rang; });
+    if(!exists){
+      reg.mags.push({rang:rang,nom:nom,ca:ca,ev:ev,deb:deb,pan:pan,isMe:/NARBONNE/i.test(nom)});
+    }
+  }
 
   reg.mags.sort(function(a,b){ return a.rang-b.rang; });
 
