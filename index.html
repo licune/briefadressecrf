@@ -312,11 +312,38 @@ function lirePDF(file){
           for(var i=1;i<=pdf.numPages;i++){
             pp.push(pdf.getPage(i).then(function(pg){
               return pg.getTextContent().then(function(tc){
-                return tc.items.map(function(it){return it.str;}).join(' ');
+                // Reconstruction par lignes en utilisant les positions Y réelles
+                var items = tc.items;
+                if(!items || !items.length) return '';
+                // Trier par Y décroissant (haut→bas) puis X croissant (gauche→droite)
+                var sorted = items.slice().sort(function(a,b){
+                  var dy = Math.round(b.transform[5]) - Math.round(a.transform[5]);
+                  return dy !== 0 ? dy : a.transform[4] - b.transform[4];
+                });
+                // Regrouper par ligne (tolérance 3px sur Y)
+                var lines = [], curY = null, curLine = [];
+                sorted.forEach(function(it){
+                  if(!it.str.trim()) return;
+                  var y = Math.round(it.transform[5]);
+                  if(curY === null || Math.abs(y - curY) > 3){
+                    if(curLine.length) lines.push(curLine.join(' '));
+                    curLine = [it.str.trim()];
+                    curY = y;
+                  } else {
+                    curLine.push(it.str.trim());
+                  }
+                });
+                if(curLine.length) lines.push(curLine.join(' '));
+                return lines.join('\n');
               });
             }));
           }
-          Promise.all(pp).then(function(ts){res(ts.join('\n'));}).catch(rej);
+          Promise.all(pp).then(function(ts){
+            var full = ts.join('\n');
+            // Debug : afficher les 800 premiers chars dans la console
+            console.log('[PDF] Texte extrait (' + full.length + ' chars):\n' + full.substring(0, 800));
+            res(full);
+          }).catch(rej);
         }).catch(rej);
     };
     rd.readAsArrayBuffer(file);
@@ -389,47 +416,91 @@ function parserPerf(txt){
   var date = trouverDate(txt);
   if(date){ DATE_STR=date; document.getElementById('hdr-date').textContent=date; }
 
-  var continuous = txt.replace(/\s+/g,' ');
-  SEG_PAT.lastIndex = 0;
+  // Travailler ligne par ligne (texte reconstruit par positions Y)
+  // ET en fallback sur texte continu
+  var lignes = txt.split('\n');
+  console.log('[parserPerf] Nombre de lignes:', lignes.length);
 
-  var matches = [];
-  var m;
-  SEG_PAT.lastIndex = 0;
-  while((m = SEG_PAT.exec(continuous)) !== null){
-    matches.push({pos:m.index, grp:m[0]});
-  }
+  // Essai 1 : ligne par ligne
+  var found = 0;
+  lignes.forEach(function(ligne){
+    ligne = ligne.trim();
+    if(!ligne) return;
 
-  for(var i=0; i<matches.length; i++){
-    var numM = matches[i].grp.match(/^(\d{1,2}|8X)/i);
-    if(!numM) continue;
+    // Chercher un numéro de rayon en début ou dans la ligne
+    var numM = ligne.match(/\b(10|11|12|14|19|20|21|22|23|24|25|30|31|32|33|34|35|40|41|43|44|45|60|61|62|63|64|65|66|8X)\b/i);
+    if(!numM) return;
     var num = numM[1].toUpperCase();
-    if(!D[num] || !NOMS_PG[num]) continue;
+    if(!D[num] || !NOMS_PG[num]) return;
 
-    var end = i+1 < matches.length ? matches[i+1].pos : matches[i].pos+400;
-    var seg = continuous.substring(matches[i].pos, end);
+    // Triple vérif : nom attendu présent
+    if(ligne.toUpperCase().indexOf(NOMS_PG[num]) === -1) return;
+    // Le numéro doit apparaître avant le nom dans la ligne
+    if(ligne.toUpperCase().indexOf(num) > ligne.toUpperCase().indexOf(NOMS_PG[num])) return;
 
-    // Triple vérification : numéro + nom attendu + position correcte
-    if(seg.toUpperCase().indexOf(NOMS_PG[num]) === -1) continue;
-
-    var ns = getNums(seg);
-    if(ns.length < 8) continue;
+    var ns = getNums(ligne);
+    if(ns.length < 8){ console.log('[parserPerf] R'+num+' trop peu de nums ('+ns.length+'):', ligne.substring(0,80)); return; }
 
     var d = D[num];
-    d.ca   = ns[1];
-    d.ev   = ns[2];
-    d.bud  = ns[3];
-    d.taux = ns[6];
-    d.dm   = ns[7];
+    // Trouver l'index de ns[0] = le numéro de rayon lui-même
+    // ns[0] doit correspondre au numéro de rayon
+    var startIdx = 0;
+    for(var si=0; si<ns.length; si++){
+      if(Math.round(ns[si]) === parseInt(num) || (num==='8X' && si===0)){ startIdx=si; break; }
+    }
+    d.ca   = ns[startIdx+1] || 0;
+    d.ev   = ns[startIdx+2] || 0;
+    d.bud  = ns[startIdx+3] || 0;
+    d.taux = ns[startIdx+6] || 0;
+    d.dm   = ns[startIdx+7] || 0;
 
-    // STK / RUPT = avant-derniers entiers en fin de segment (hors ns[0] et ns[1])
     var trail = [];
-    for(var j=2; j<ns.length; j++){
+    for(var j=startIdx+2; j<ns.length; j++){
       if(ns[j]===Math.round(ns[j]) && ns[j]>=0 && ns[j]<5000) trail.push(ns[j]);
     }
     if(trail.length>=3){ d.stk=trail[trail.length-3]; d.rupt=trail[trail.length-2]; }
     else if(trail.length===2){ d.stk=trail[0]; d.rupt=trail[1]; }
     else if(trail.length===1){ d.rupt=trail[0]; d.stk=0; }
-    else { d.stk=0; d.rupt=0; }
+
+    found++;
+    console.log('[parserPerf] R'+num+' OK: ca='+d.ca+' taux='+d.taux+' stk='+d.stk+' rupt='+d.rupt);
+  });
+
+  // Fallback : si moins de 5 rayons trouvés, essayer texte continu par segments
+  if(found < 5){
+    console.log('[parserPerf] Fallback segments continus (found='+found+')');
+    var continuous = txt.replace(/\s+/g,' ');
+    SEG_PAT.lastIndex = 0;
+    var matches = [];
+    var m;
+    SEG_PAT.lastIndex = 0;
+    while((m = SEG_PAT.exec(continuous)) !== null){
+      matches.push({pos:m.index, grp:m[0]});
+    }
+    console.log('[parserPerf] Segments trouvés:', matches.length);
+
+    for(var i=0; i<matches.length; i++){
+      var nM = matches[i].grp.match(/^(\d{1,2}|8X)/i);
+      if(!nM) continue;
+      var num = nM[1].toUpperCase();
+      if(!D[num] || !NOMS_PG[num]) continue;
+      var end = i+1 < matches.length ? matches[i+1].pos : matches[i].pos+400;
+      var seg = continuous.substring(matches[i].pos, end);
+      if(seg.toUpperCase().indexOf(NOMS_PG[num]) === -1) continue;
+      var ns = getNums(seg);
+      if(ns.length < 8) continue;
+      var d = D[num];
+      d.ca   = ns[1]; d.ev   = ns[2]; d.bud  = ns[3];
+      d.taux = ns[6]; d.dm   = ns[7];
+      var trail = [];
+      for(var j=2; j<ns.length; j++){
+        if(ns[j]===Math.round(ns[j]) && ns[j]>=0 && ns[j]<5000) trail.push(ns[j]);
+      }
+      if(trail.length>=3){ d.stk=trail[trail.length-3]; d.rupt=trail[trail.length-2]; }
+      else if(trail.length===2){ d.stk=trail[0]; d.rupt=trail[1]; }
+      else if(trail.length===1){ d.rupt=trail[0]; d.stk=0; }
+      console.log('[parserPerf-seg] R'+num+': ca='+d.ca+' taux='+d.taux);
+    }
   }
 }
 
@@ -540,25 +611,37 @@ function parserCompar(txt){
     if(EXCL_C.some(function(ex){ return nomUp.indexOf(ex)!==-1; })) continue;
     if(nom.length < 3) continue;
 
-    // Débits : chercher dans les 80 chars suivants
-    var suite = continuous.substring(mg.index+mg[0].length, mg.index+mg[0].length+80);
+    // Après le match : DEBITS  EVOL_DEB%  PANIER  EVOL_PAN%
+    // Le panier est toujours le 3ème nombre (position fixe Darwin)
+    var suite = continuous.substring(mg.index+mg[0].length, mg.index+mg[0].length+100);
+
+    // Extraire tous les nombres de la suite
+    var suiteNums = getNums(suite);
+    // suiteNums[0] = DEBITS (entier, ou partie d'un "1 NNN")
+    // suiteNums[1] = EVOL_DEB%
+    // suiteNums[2] = PANIER  ← position fixe
+    // suiteNums[3] = EVOL_PAN%
+
+    // Débits : reconstituer "1 NNN" ou "2 NNN" si présents
     var deb = 0;
     var dm2 = suite.match(/\b([12])\s+(\d{3})\b/);
-    if(dm2){ deb = parseInt(dm2[1])*1000+parseInt(dm2[2]); }
-    else {
+    if(dm2){
+      deb = parseInt(dm2[1])*1000 + parseInt(dm2[2]);
+      // Dans ce cas suiteNums[0]=1 ou 2, suiteNums[1]=NNN, suiteNums[2]=EVOL_DEB, suiteNums[3]=PANIER
+      var pan = (suiteNums.length > 3) ? suiteNums[3] : 0;
+      // Vérification : panier doit être entre 1 et 15
+      if(pan < 1 || pan > 15) pan = 0;
+      var exists = reg.mags.some(function(x){ return x.rang===rang; });
+      if(!exists) reg.mags.push({rang:rang,nom:nom,ca:ca,ev:ev,deb:deb,pan:pan,isMe:/NARBONNE/i.test(nom)});
+    } else {
+      // Débits sur 3-4 chiffres sans espace
       var dm3 = suite.match(/\b(\d{3,4})\b/);
       if(dm3){ var vv=parseInt(dm3[1]); if(vv>=100&&vv<=9999) deb=vv; }
-    }
-
-    // Panier : dernier décimal XX,X dans la suite
-    var dec = suite.match(/([\d]+,[\d]+)/g)||[];
-    var pan = 0;
-    for(var pi=dec.length-1;pi>=0;pi--){ var pv=pN(dec[pi]); if(pv>=2.0&&pv<=15.0){pan=pv;break;} }
-
-    // Éviter les doublons sur le même rang
-    var exists = reg.mags.some(function(x){ return x.rang===rang; });
-    if(!exists){
-      reg.mags.push({rang:rang,nom:nom,ca:ca,ev:ev,deb:deb,pan:pan,isMe:/NARBONNE/i.test(nom)});
+      // Panier = suiteNums[2] (position fixe)
+      var pan = (suiteNums.length > 2) ? suiteNums[2] : 0;
+      if(pan < 1 || pan > 15) pan = 0;
+      var exists = reg.mags.some(function(x){ return x.rang===rang; });
+      if(!exists) reg.mags.push({rang:rang,nom:nom,ca:ca,ev:ev,deb:deb,pan:pan,isMe:/NARBONNE/i.test(nom)});
     }
   }
 
