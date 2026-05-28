@@ -289,8 +289,10 @@ var NOM_PG={
   "65":"LINGE","66":"ACCESS","67":"BIJOUTERIE"
 };
 
-// Regex code rayon — ordre décroissant longueur pour éviter "1" avant "10"
-var RE_NUM=/^(10|11|12|14|19|20|21|22|23|24|25|30|31|32|33|34|35|40|41|42|43|44|45|60|61|62|63|64|65|66|67|8X|1|2|3|4|6)\s/i;
+// Regex code rayon — cherche dans toute la ligne (pas seulement en début)
+// car les menus navigation Darwin partagent parfois le même Y que le rayon
+// et se retrouvent avant le code rayon dans la ligne reconstituée
+var RE_NUM_GLOBAL=/\b(10|11|12|14|19|20|21|22|23|24|25|30|31|32|33|34|35|40|41|42|43|44|45|60|61|62|63|64|65|66|67|8X|1|2|3|4|6)\s/i;
 
 // ══════════════════════════════════════════════════
 // ÉTAT GLOBAL
@@ -419,7 +421,7 @@ function parserPerf(txt){
 
   for(var i=0;i<n;i++){
     var ligne=lines[i].trim(); if(!ligne) continue;
-    var numM=ligne.match(RE_NUM); if(!numM) continue;
+    var numM=ligne.match(RE_NUM_GLOBAL); if(!numM) continue;
     var num=numM[1].toUpperCase();
     if(!D[num]||!NOM_PG[num]) continue;
     if(normaliser(ligne).toUpperCase().indexOf(NOM_PG[num])===-1) continue;
@@ -429,7 +431,7 @@ function parserPerf(txt){
     var merged=ligne;
     for(var x=1;x<=6&&i+x<n;x++){
       var nxt=lines[i+x].trim(); if(!nxt) continue;
-      var nm=nxt.match(RE_NUM);
+      var nm=nxt.match(RE_NUM_GLOBAL);
       if(nm){
         var nn=nm[1].toUpperCase();
         if(NOM_PG[nn]&&normaliser(nxt).toUpperCase().indexOf(NOM_PG[nn])!==-1) break;
@@ -537,7 +539,7 @@ function parserRayons(txt){
 
   for(var i=0;i<n;i++){
     var ligne=lines[i].trim(); if(!ligne) continue;
-    var numM=ligne.match(RE_NUM); if(!numM) continue;
+    var numM=ligne.match(RE_NUM_GLOBAL); if(!numM) continue;
     var num=numM[1].toUpperCase();
     if(!D[num]||!NOM_PG[num]) continue;
     if(normaliser(ligne).toUpperCase().indexOf(NOM_PG[num])===-1) continue;
@@ -547,7 +549,7 @@ function parserRayons(txt){
     var merged=ligne;
     for(var x=1;x<=12&&i+x<n;x++){
       var nxt=lines[i+x].trim(); if(!nxt) continue;
-      var nm=nxt.match(RE_NUM);
+      var nm=nxt.match(RE_NUM_GLOBAL);
       if(nm){
         var nn=nm[1].toUpperCase();
         if(NOM_PG[nn]&&normaliser(nxt).toUpperCase().indexOf(NOM_PG[nn])!==-1) break;
@@ -971,6 +973,89 @@ function genBrief(){
   var c=getCons(k);
   SHOT=null; majBtnEdit();
 
+  // ── Bloc consignes : vue département pour ALI et NALI ──
+  var opH='', clH='';
+  if(k==='ALI'||k==='NALI'){
+    // Définition des départements avec leurs rayons
+    var DEPTS_ALI=[
+      {nom:'PGC — Produits Grande Consommation',rayons:[
+        {n:'10',nom:'Boissons'},{n:'11',nom:'Droguerie'},{n:'12',nom:'Parfumerie Hygiène'},
+        {n:'14',nom:'Épicerie'},{n:'19',nom:'Parapharmacie'}
+      ]},
+      {nom:'PFT — Produits Frais Traditionnels',rayons:[
+        {n:'20',nom:'Charcuterie / Traiteur'},{n:'21',nom:'Poissonnerie'},
+        {n:'22',nom:'Fruits et Légumes'},{n:'23',nom:'Boulangerie / Pâtisserie'},
+        {n:'24',nom:'Boucherie Volaille'},{n:'25',nom:'PLS (Libre Service)'}
+      ]}
+    ];
+    var DEPTS_NALI=[
+      {nom:'Bazar',rayons:[
+        {n:'30',nom:'Bricolage'},{n:'31',nom:'Confort de la Maison'},{n:'32',nom:'Papeterie'},
+        {n:'33',nom:'Jouet Sport'},{n:'34',nom:'Jardin et Animalerie'},{n:'35',nom:'Auto'},{n:'8X',nom:'Culture'}
+      ]},
+      {nom:'EPCS — Électroménager / Photo / Son',rayons:[
+        {n:'40',nom:'GEM'},{n:'41',nom:'PEM'},{n:'42',nom:'Photo Communication'},
+        {n:'43',nom:'Image et Son'},{n:'44',nom:'Micro Informatique'},{n:'45',nom:'Radiotéléphonie'}
+      ]},
+      {nom:'Textile',rayons:[
+        {n:'60',nom:'Chaussure'},{n:'61',nom:'Bébé'},{n:'62',nom:'Enfant'},
+        {n:'63',nom:'Femme'},{n:'64',nom:'Homme'},{n:'65',nom:'Linge de Maison'},
+        {n:'66',nom:'Accessoires'},{n:'67',nom:'Bijouterie'}
+      ]}
+    ];
+    var depts=k==='ALI'?DEPTS_ALI:DEPTS_NALI;
+
+    function sgClr(v){return v>0?'var(--green)':v<0?'var(--red)':'var(--muted)';}
+
+    var blocs='';
+    depts.forEach(function(dept){
+      blocs+='<div style="margin-bottom:16px">'+
+        '<div style="font-size:14px;font-weight:800;color:var(--blue);padding:8px 12px;'+
+        'background:#eff6ff;border-left:4px solid var(--blue);border-radius:6px 6px 0 0;letter-spacing:.3px">'+
+        dept.nom+'</div>'+
+        '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+      blocs+='<thead><tr style="background:#f8fafc">'+
+        '<th style="padding:6px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Rayon</th>'+
+        '<th style="padding:6px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">CA</th>'+
+        '<th style="padding:6px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Évol N-1</th>'+
+        '<th style="padding:6px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Taux</th>'+
+        '<th style="padding:6px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">E/B</th>'+
+        '<th style="padding:6px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Rang</th>'+
+        '</tr></thead><tbody>';
+      dept.rayons.forEach(function(r,idx){
+        var rd=D[r.n]||{ca:0,ev:0,taux:0,bud:0,rang:0};
+        var bg=idx%2===0?'#fff':'#f9fafb';
+        blocs+='<tr style="background:'+bg+'">'+
+          '<td style="padding:7px 12px;border-bottom:1px solid #f0f3f8;font-weight:600">'+
+          '<span style="color:var(--muted);font-size:11px;margin-right:5px">'+r.n+'</span>'+r.nom+'</td>'+
+          '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #f0f3f8">'+
+          (rd.ca>0?'<strong>'+rd.ca.toFixed(1)+'</strong> K€':'—')+'</td>'+
+          '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #f0f3f8;color:'+sgClr(rd.ev)+'">'+
+          (rd.ca>0?(rd.ev>=0?'+':'')+rd.ev.toFixed(1)+'%':'—')+'</td>'+
+          '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #f0f3f8">'+
+          (rd.taux>0?rd.taux.toFixed(1)+'%':'—')+'</td>'+
+          '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #f0f3f8;color:'+sgClr(rd.bud)+'">'+
+          (rd.ca>0?(rd.bud>=0?'+':'')+rd.bud.toFixed(1)+' K€':'—')+'</td>'+
+          '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #f0f3f8">'+
+          (rd.rang>0?'<span class="rbg">'+rd.rang+'</span>':'—')+'</td>'+
+          '</tr>';
+      });
+      blocs+='</tbody></table></div>';
+    });
+    opH=blocs;
+    clH=''; // Pas de section propreté pour les vues agrégées
+  } else {
+    // Rayons normaux : consignes automatiques
+    function opR(t,n){return '<div class="ci"><div class="cn">'+n+'</div><div class="ct">'+fmtC(t)+'</div></div>';}
+    function clR(t,n){return '<div class="ci cl"><div class="cn">'+n+'</div><div class="ct">'+fmtC(t)+'</div></div>';}
+    function mR(t,isCl){return '<div class="ci man'+(isCl?' cl':'')+'"><div class="cn">+</div><div class="ct">'+esc(t)+'<span class="mbadge">MANUEL</span></div></div>';}
+    opH=c.op.map(function(t,i){return opR(t,i+1);}).join('');
+    if(mOp1) opH+=mR(mOp1,false);
+    if(mOp2) opH+=mR(mOp2,false);
+    clH=c.cl.map(function(t,i){return clR(t,i+1);}).join('');
+    if(mCl) clH+=mR(mCl,true);
+  }
+
   var al=[];
   if(d.stk>20)      al.push({t:'bad',l:'⚠ '+d.stk+' stocks négatifs'});
   else if(d.stk>0)  al.push({t:'warn',l:d.stk+' stocks négatifs'});
@@ -982,16 +1067,6 @@ function genBrief(){
   if(d.er>10)   al.push({t:'good',l:'✓ Progression nationale (+'+d.er+' places)'});
   if(d.bud<-2)  al.push({t:'warn',l:'Écart budget '+d.bud.toFixed(1)+' K€'});
   if(!al.length) al.push({t:'good',l:'✓ Situation globale correcte'});
-
-  function opR(t,n){return '<div class="ci"><div class="cn">'+n+'</div><div class="ct">'+fmtC(t)+'</div></div>';}
-  function clR(t,n){return '<div class="ci cl"><div class="cn">'+n+'</div><div class="ct">'+fmtC(t)+'</div></div>';}
-  function mR(t,isCl){return '<div class="ci man'+(isCl?' cl':'')+'"><div class="cn">+</div><div class="ct">'+esc(t)+'<span class="mbadge">MANUEL</span></div></div>';}
-
-  var opH=c.op.map(function(t,i){return opR(t,i+1);}).join('');
-  if(mOp1) opH+=mR(mOp1,false);
-  if(mOp2) opH+=mR(mOp2,false);
-  var clH=c.cl.map(function(t,i){return clR(t,i+1);}).join('');
-  if(mCl) clH+=mR(mCl,true);
 
   var erl=(d.er>0?'+':'')+d.er+' place'+(Math.abs(d.er)>1?'s':'');
   var rangTxt=d.rang?'Rang '+d.rang:'—';
@@ -1018,8 +1093,15 @@ function genBrief(){
       '<div class="alerts">'+al.map(function(a){return '<span class="chip '+a.t+'">'+a.l+'</span>';}).join('')+'</div>'+
     '</div>'+
     '<div class="g2">'+
-      '<div class="card"><div class="ch op">⚙️ Consignes Opérationnelles</div><div class="clist">'+opH+'</div></div>'+
-      '<div class="card"><div class="ch cl">🧹 Propreté & Tenue du Rayon</div><div class="clist">'+clH+'</div></div>'+
+      (k==='ALI'||k==='NALI'?
+        // Vue agrégée : tableau par département sur toute la largeur
+        '<div class="card full"><div class="ch op">📋 Détail par département</div>'+
+        '<div style="padding:14px">'+opH+'</div></div>'
+        :
+        // Vue rayon normal : deux colonnes consignes
+        '<div class="card"><div class="ch op">⚙️ Consignes Opérationnelles</div><div class="clist">'+opH+'</div></div>'+
+        '<div class="card"><div class="ch cl">🧹 Propreté & Tenue du Rayon</div><div class="clist">'+clH+'</div></div>'
+      )+
       buildNational(d,m)+
     '</div>'+
     '<div id="reg-s" style="display:none"></div>'+
