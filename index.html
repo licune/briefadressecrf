@@ -452,26 +452,30 @@ function parserPerf(txt){
     d.ev=ns[2];
     d.bud=ns[3];
 
-    // ── Extraction robuste du Taux de marge ──────────
-    // Taux attendu : décimal dans [5, 90] (marges réalistes en grande distribution)
-    // Diff N-1 attendu : décimal de faible amplitude (abs < 20), suit immédiatement le Taux
-    // On scanne ns[4..8] et on prend la DERNIÈRE valeur dans [5,90] dont le suivant est abs<20
-    // Cela exclut Poids% (peut dépasser 90 pour certains groupes) et garantit le bon couple
-    var taux=0, dm=0, tauxTrouve=false;
-    for(var ti=4; ti<=Math.min(8, ns.length-2); ti++){
-      var tv=ns[ti], dv=ns[ti+1];
-      if(tv>=5 && tv<=90 && Math.abs(dv)<=20){
-        taux=tv; dm=dv; tauxTrouve=true;
-        // Ne pas break : on veut le DERNIER couple valide
-        // (évite de prendre Poids% si celui-ci est dans [5,90] par hasard)
+    // ── Extraction Taux de marge et Diff N-1 ─────────
+    // Structure Darwin CONFIRMÉE par mesure X sur 3 PDFs (12/13/14 mai) :
+    //   ns[0]=code  ns[1]=CA  ns[2]=Evol%  ns[3]=E/B
+    //   ns[4]=Poids%  ns[5]=PoidsCata%
+    //   ns[6]=TAUX (x≈265)    ← toujours ici
+    //   ns[7]=Diff%N-1 (x≈289) ← toujours ici
+    // Ces positions sont fixes — ne pas scanner, lire directement
+    var taux=ns[6], dm=ns[7];
+    // Validation de cohérence : Taux marge grande distribution = [5,90]%, Diff = abs<20
+    if(taux>=5 && taux<=90 && Math.abs(dm)<=20){
+      d.taux=taux; d.dm=dm;
+    } else {
+      // La tolérance Y=4px devrait empêcher ce cas, mais on log si ça arrive
+      console.warn('[PERF] '+num+' taux ou diff suspect — ns[6]='+taux+' ns[7]='+dm+' | ns='+JSON.stringify(ns.slice(0,10)));
+      // Tentative de récupération : chercher le seul couple cohérent dans ns[4..8]
+      var recupere=false;
+      for(var ti=4;ti<=Math.min(7,ns.length-2)&&!recupere;ti++){
+        if(ns[ti]>=5&&ns[ti]<=90&&Math.abs(ns[ti+1])<=20){
+          d.taux=ns[ti]; d.dm=ns[ti+1]; recupere=true;
+          console.warn('[PERF] '+num+' recuperation taux='+d.taux+' dm='+d.dm+' depuis ns['+ti+']');
+        }
       }
+      if(!recupere){ d.taux=0; d.dm=0; }
     }
-    // Fallback : si aucun couple trouvé, prendre ns[6] directement
-    if(!tauxTrouve){
-      if(ns[6]>=5&&ns[6]<=90){ taux=ns[6]; dm=ns[7]||0; }
-      else { console.warn('[PERF] '+num+' taux non trouvé — ns='+JSON.stringify(ns.slice(0,10))); }
-    }
-    d.taux=taux; d.dm=dm;
 
     // Stk et Rupt : chercher les entiers en queue de ligne
     // Structure fin : ... StkNegCdable RuptAssort RuptCata VABTop3000
